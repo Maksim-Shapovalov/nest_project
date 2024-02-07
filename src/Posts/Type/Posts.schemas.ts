@@ -28,10 +28,11 @@ export type PostLikeDocument = HydratedDocument<PostLike>;
 export class PostLike {
   @Prop({ required: true })
   postId: string;
-  // @Prop({
-  //   required: true,
-  //   type: { type: String, enum: Object.values(AvailableStatusEnum), },
-  // })
+  @Prop({
+    required: true,
+    type: String,
+    enum: Object.values(AvailableStatusEnum),
+  })
   likesStatus: { type: string };
   @Prop({ required: true })
   userId: string;
