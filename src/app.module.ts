@@ -30,6 +30,9 @@ import {
   PostLikeSchema,
   PostsSchema,
 } from './Posts/Type/Posts.schemas';
+import { AllDataClearController } from './DataClear/all-data-clear.controller';
+import { AllDataClearRepo } from './DataClear/AllDataClearRepo';
+import { ConfigModule } from '@nestjs/config';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -44,6 +47,7 @@ export const HTTP_STATUS = {
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     MongooseModule.forRoot(
       process.env.MONGO_URL || 'mongodb://localhost:27017',
     ),
@@ -62,6 +66,7 @@ export const HTTP_STATUS = {
     BlogsController,
     CommentsController,
     PostsController,
+    AllDataClearController,
   ],
   providers: [
     AppService,
@@ -73,6 +78,7 @@ export const HTTP_STATUS = {
     CommentsService,
     PostsRepository,
     PostsService,
+    AllDataClearRepo,
   ],
 })
 export class AppModule {}

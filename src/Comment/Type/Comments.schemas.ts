@@ -35,14 +35,11 @@ export class CommentsLike {
   userId: string;
   @Prop({
     required: true,
-    type: {
-      type: String,
-      enum: Object.values(AvailableStatusEnum),
-    },
+    type: String,
+    enum: Object.values(AvailableStatusEnum),
   })
   likesStatus: {
     type: string;
-    enum: string;
   };
   @Prop({ required: true })
   content: string;
