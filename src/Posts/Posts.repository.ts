@@ -140,8 +140,9 @@ export class PostsRepository {
     return true;
   }
 
-  async savePost(post: PostClass) {
-    return this.postModel.create(post);
+  async savePost(post: PostClass, user: string | null) {
+    await this.postModel.create(post);
+    return this.postsLikeMapper(post, user);
   }
 
   async updatePostsById(

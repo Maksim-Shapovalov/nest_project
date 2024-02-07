@@ -1,9 +1,5 @@
-import {
-  BodyPostToRequest,
-  PostClass,
-  PostOutputModel,
-} from './Type/Posts.type';
-import { postsLikeMapper, PostsRepository } from './Posts.repository';
+import { BodyPostToRequest, PostClass } from './Type/Posts.type';
+import { PostsRepository } from './Posts.repository';
 import { BlogsRepository } from '../Blogs/Blogs.repository';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
@@ -19,7 +15,7 @@ export class PostsService {
     bodyPost: BodyPostToRequest,
     blogId: string,
     user: string | null,
-  ): Promise<PostOutputModel | null> {
+  ) {
     const findBlogName = await this.blogsRepository.getBlogsById(blogId);
     if (!findBlogName) {
       return null;
@@ -34,8 +30,7 @@ export class PostsService {
       new Date().toISOString(),
     );
 
-    const result = await this.postsRepository.savePost(newPosts);
-    return postsLikeMapper(result, user);
+    return this.postsRepository.savePost(newPosts, user);
   }
   async updateStatusLikeInUser(
     postId: string,
