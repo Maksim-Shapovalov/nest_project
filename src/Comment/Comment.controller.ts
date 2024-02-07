@@ -1,19 +1,19 @@
 import 'reflect-metadata';
 import { injectable } from 'inversify';
 import { CommentsService } from './Comments.service';
-import { PostsRepository } from '../Posts/Posts.repository';
+
 import { CommentsRepository } from './Comments.repository';
-import { HTTP_STATUS } from '../Index';
+
 import { Body, Controller, Delete, Get, Param, Put } from '@nestjs/common';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { WithId } from 'mongodb';
+import { HTTP_STATUS } from '../app.module';
 
 @injectable()
-@Controller()
+@Controller('users')
 export class CommentsController {
   constructor(
     protected serviceComments: CommentsService,
-    protected postsRepository: PostsRepository,
     protected commentsRepository: CommentsRepository,
   ) {}
   @Get(':id')
@@ -57,22 +57,22 @@ export class CommentsController {
     if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
     return HTTP_STATUS.NO_CONTENT_204;
   }
-  @Put('id')
-  async appropriationLike(
-    @Param('id') id: string,
-    @Body() userFind: WithId<UserMongoDbType>,
-    @Body() inputLikeStatus: string,
-  ) {
-    const updateComment = await this.serviceComments.updateStatusLikeInUser(
-      id,
-      userFind._id.toString(),
-      inputLikeStatus,
-    );
-
-    if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
-
-    return HTTP_STATUS.NO_CONTENT_204;
-  }
+  // @Put('id')
+  // async appropriationLike(
+  //   @Param('id') id: string,
+  //   @Body() userFind: WithId<UserMongoDbType>,
+  //   @Body() inputLikeStatus: string,
+  // ) {
+  //   const updateComment = await this.serviceComments.updateStatusLikeInUser(
+  //     id,
+  //     userFind._id.toString(),
+  //     inputLikeStatus,
+  //   );
+  //
+  //   if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
+  //
+  //   return HTTP_STATUS.NO_CONTENT_204;
+  // }
   @Delete('id')
   async deleteCommentByCommentId(
     @Param('id') id: string,

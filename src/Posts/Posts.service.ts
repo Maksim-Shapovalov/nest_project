@@ -2,13 +2,11 @@ import {
   BodyPostToRequest,
   PostClass,
   PostOutputModel,
-  PostsOutputType,
 } from './Type/Posts.type';
 import { postsLikeMapper, PostsRepository } from './Posts.repository';
 import { BlogsRepository } from '../Blogs/Blogs.repository';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
-import { WithId } from 'mongodb';
 import { UserMongoDbType } from '../Users/Type/User.type';
 @injectable()
 export class PostsService {

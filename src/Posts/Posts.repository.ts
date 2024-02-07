@@ -1,46 +1,42 @@
-import {
-  PostClass,
-  PostLikesDB,
-  PostOutputModel,
-  PostsOutputType,
-  PostsType,
-} from './Type/Posts.type';
-import { ObjectId, WithId } from 'mongodb';
-import {
-  PaginationQueryType,
-  PaginationType,
-} from '../qurey-repo/query-filter';
-import { PostLikesModelClass, PostModelClass } from './Type/Posts.schemas';
+import { PostClass } from './Type/Posts.type';
+import { ObjectId } from 'mongodb';
+import { PaginationQueryType } from '../qurey-repo/query-filter';
 import { BlogsRepository } from '../Blogs/Blogs.repository';
-import { LikesModelClass } from '../Comment/Type/Comments.schemas';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
-import {
-  AvailableStatusEnum,
-  CommentsOutputType,
-  CommentsTypeDb,
-} from '../Comment/Type/Comment.type';
-import { UserModelClass } from '../Users/Type/User.schemas';
+import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 import { UserMongoDbType } from '../Users/Type/User.type';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import {
+  Post,
+  PostLike,
+  PostLikeDocument,
+  PostsDocument,
+} from './Type/Posts.schemas';
+
 @injectable()
 export class PostsRepository {
-  constructor(protected blogsRepository: BlogsRepository) {}
-  async getAllPosts(
-    filter: PaginationQueryType,
-    userId: string | null,
-  ): Promise<PaginationType<PostsOutputType>> {
+  constructor(
+    protected blogsRepository: BlogsRepository,
+    @InjectModel(Post.name) protected postModel: Model<PostsDocument>,
+    @InjectModel(PostLike.name)
+    protected postLikeModel: Model<PostLikeDocument>,
+  ) {}
+  async getAllPosts(filter: PaginationQueryType, userId: string | null) {
     const pageSizeInQuery: number = filter.pageSize;
-    const totalCountBlogs = await PostModelClass.countDocuments({});
+    const totalCountBlogs = await this.postModel.countDocuments({});
 
     const pageCountBlogs: number = Math.ceil(totalCountBlogs / pageSizeInQuery);
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
-    const result = await PostModelClass.find({})
+    const result = await this.postModel
+      .find({})
       .sort({ [filter.sortBy]: filter.sortDirection })
       .skip(pageBlog)
       .limit(pageSizeInQuery)
       .lean();
     // const items = result.map((p) => postsLikeMapper(p,userId))
-    const itemsPromises = result.map((p) => postsLikeMapper(p, userId));
+    const itemsPromises = result.map((p) => this.postsLikeMapper(p, userId));
     const items = await Promise.all(itemsPromises);
     return {
       pagesCount: pageCountBlogs,
@@ -51,23 +47,20 @@ export class PostsRepository {
     };
   }
 
-  async getPostsById(
-    id: string,
-    userId: string | null,
-  ): Promise<PostsOutputType | null> {
-    const findPosts = await PostModelClass.findOne({ _id: new ObjectId(id) });
+  async getPostsById(id: string, userId: string | null) {
+    const findPosts = await this.postModel.findOne({ _id: new ObjectId(id) });
 
     if (!findPosts) {
       return null;
     }
-    return postsLikeMapper(findPosts, userId);
+    return this.postsLikeMapper(findPosts, userId);
   }
 
   async getPostInBlogs(
     blogId: string,
     filter: PaginationQueryType,
     userId: string | null,
-  ): Promise<PaginationType<PostsOutputType> | null> {
+  ) {
     const findBlog = await this.blogsRepository.getBlogsById(blogId);
     if (!findBlog) {
       return null;
@@ -76,18 +69,21 @@ export class PostsRepository {
     const filterQuery = { blogId: findBlog.id };
 
     const pageSizeInQuery: number = filter.pageSize;
-    const totalCountBlogs = await PostModelClass.countDocuments(filterQuery);
+    const totalCountBlogs = await this.postModel.countDocuments(filterQuery);
 
     const pageCountBlogs: number = Math.ceil(totalCountBlogs / pageSizeInQuery);
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
-    const res = await PostModelClass.find(filterQuery)
+    const res = await this.postModel
+      .find(filterQuery)
       .sort({ [filter.sortBy]: filter.sortDirection })
       .skip(pageBlog)
       .limit(pageSizeInQuery)
       .lean();
     // const items = res.map((p) => postsLikeMapper(p,null))
-    const itemsPromises = res.map((p) => postsLikeMapper(p, userId));
+    const itemsPromises = res.map((p) => {
+      return this.postsLikeMapper(p, userId);
+    });
     const items = await Promise.all(itemsPromises);
 
     return {
@@ -103,21 +99,25 @@ export class PostsRepository {
     user: UserMongoDbType,
     status: string,
   ) {
-    const likeWithUserId = await PostLikesModelClass.findOne({
-      userId: user._id.toString(),
-      postId: postId,
-    }).exec();
+    const likeWithUserId = await this.postLikeModel
+      .findOne({
+        userId: user._id.toString(),
+        postId: postId,
+      })
+      .exec();
 
-    const comment = await PostModelClass.findOne({
-      _id: new ObjectId(postId),
-    }).exec();
+    const comment = await this.postModel
+      .findOne({
+        _id: new ObjectId(postId),
+      })
+      .exec();
 
     if (!comment) {
       return false;
     }
 
     if (likeWithUserId) {
-      const updateStatus = await PostLikesModelClass.updateOne(
+      const updateStatus = await this.postLikeModel.updateOne(
         { postId: postId, userId: user._id.toString() },
         {
           $set: {
@@ -129,7 +129,7 @@ export class PostsRepository {
       return updateStatus.matchedCount === 1;
     }
 
-    await PostLikesModelClass.create({
+    await this.postLikeModel.create({
       postId,
       userId: user._id.toString(),
       likesStatus: status,
@@ -140,8 +140,8 @@ export class PostsRepository {
     return true;
   }
 
-  async savePost(post: PostClass): Promise<PostsType> {
-    return PostModelClass.create(post);
+  async savePost(post: PostClass) {
+    return this.postModel.create(post);
   }
 
   async updatePostsById(
@@ -151,7 +151,7 @@ export class PostsRepository {
     content: string,
     blogId: string,
   ): Promise<boolean> {
-    const res = await PostModelClass.updateOne(
+    const res = await this.postModel.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
@@ -166,52 +166,52 @@ export class PostsRepository {
   }
 
   async deletePostsById(id: string): Promise<boolean> {
-    const findPost = await PostModelClass.deleteOne({ _id: new ObjectId(id) });
+    const findPost = await this.postModel.deleteOne({ _id: new ObjectId(id) });
     return findPost.deletedCount === 1;
   }
+  async postsLikeMapper(post: any, userId: string | null) {
+    const likeCount = await this.postLikeModel.countDocuments({
+      likesStatus: AvailableStatusEnum.like,
+      postId: post._id.toString(),
+    });
+    const dislikeCount = await this.postLikeModel.countDocuments({
+      likesStatus: AvailableStatusEnum.dislike,
+      postId: post._id.toString(),
+    });
+
+    const myStatus = await this.postLikeModel
+      .findOne({
+        userId: userId,
+        postId: post._id.toString(),
+      })
+      .exec();
+    const findThreeLastUser = await this.postLikeModel
+      .find({
+        likesStatus: { $all: ['Like'] },
+        postId: post._id.toString(),
+      })
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .exec();
+
+    return {
+      id: post._id.toHexString(),
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blogName,
+      createdAt: post.createdAt,
+      extendedLikesInfo: {
+        likesCount: +likeCount,
+        dislikesCount: +dislikeCount,
+        myStatus: myStatus ? myStatus.likesStatus : 'None',
+        newestLikes: findThreeLastUser.map((r) => ({
+          addedAt: r.createdAt,
+          userId: r.userId,
+          login: r.login,
+        })),
+      },
+    };
+  }
 }
-export const postsLikeMapper = async (
-  post: WithId<PostsType>,
-  userId: string | null,
-): Promise<PostsOutputType> => {
-  const likeCount = await PostLikesModelClass.countDocuments({
-    likesStatus: AvailableStatusEnum.like,
-    postId: post._id.toString(),
-  });
-  const dislikeCount = await PostLikesModelClass.countDocuments({
-    likesStatus: AvailableStatusEnum.dislike,
-    postId: post._id.toString(),
-  });
-
-  const myStatus = await PostLikesModelClass.findOne({
-    userId: userId,
-    postId: post._id.toString(),
-  }).exec();
-  const findThreeLastUser = await PostLikesModelClass.find({
-    likesStatus: { $all: ['Like'] },
-    postId: post._id.toString(),
-  })
-    .sort({ createdAt: -1 })
-    .limit(3)
-    .exec();
-
-  return {
-    id: post._id.toHexString(),
-    title: post.title,
-    shortDescription: post.shortDescription,
-    content: post.content,
-    blogId: post.blogId,
-    blogName: post.blogName,
-    createdAt: post.createdAt,
-    extendedLikesInfo: {
-      likesCount: +likeCount,
-      dislikesCount: +dislikeCount,
-      myStatus: myStatus ? myStatus.likesStatus : 'None',
-      newestLikes: findThreeLastUser.map((r) => ({
-        addedAt: r.createdAt,
-        userId: r.userId,
-        login: r.login,
-      })),
-    },
-  };
-};

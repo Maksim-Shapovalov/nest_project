@@ -4,12 +4,17 @@ import {
   BlogsPaginationQueryType,
   PaginationType,
 } from '../qurey-repo/query-filter';
-import { BlogModelClass } from './Type/Blogs.schemas';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Blog, UserDocument } from './Type/Blogs.schemas';
 
 @injectable()
 export class BlogsRepository {
+  constructor(
+    @InjectModel(Blog.name) protected blogModel: Model<UserDocument>,
+  ) {}
   async getAllBlogs(
     filter: BlogsPaginationQueryType,
   ): Promise<PaginationType<BlogsOutputModel>> {
@@ -18,11 +23,12 @@ export class BlogsRepository {
     };
 
     const pageSizeInQuery: number = filter.pageSize;
-    const totalCountBlogs = await BlogModelClass.countDocuments(filterQuery);
+    const totalCountBlogs = await this.blogModel.countDocuments(filterQuery);
 
     const pageCountBlogs: number = Math.ceil(totalCountBlogs / pageSizeInQuery);
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
-    const res = await BlogModelClass.find(filterQuery)
+    const res = await this.blogModel
+      .find(filterQuery)
       .sort({ [filter.sortBy]: filter.sortDirection })
       .skip(pageBlog)
       .limit(pageSizeInQuery)
@@ -39,12 +45,12 @@ export class BlogsRepository {
   }
   async getBlogsById(id: string): Promise<BlogsOutputModel | null> {
     if (!ObjectId.isValid(id)) return null;
-    const findCursor = await BlogModelClass.findOne({ _id: new ObjectId(id) });
+    const findCursor = await this.blogModel.findOne({ _id: new ObjectId(id) });
     if (!findCursor) return null;
     return blogMapper(findCursor);
   }
   async saveBlog(blog: BlogClass): Promise<BlogsType> {
-    return BlogModelClass.create(blog);
+    return this.blogModel.create(blog);
   }
   async updateBlogById(
     id: string,
@@ -52,7 +58,7 @@ export class BlogsRepository {
     description: string,
     websiteUrl: string,
   ): Promise<boolean> {
-    const res = await BlogModelClass.updateOne(
+    const res = await this.blogModel.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
@@ -65,7 +71,7 @@ export class BlogsRepository {
     return res.matchedCount === 1;
   }
   async deleteBlogsById(id: string): Promise<boolean> {
-    const findBlog = await BlogModelClass.deleteOne({ _id: new ObjectId(id) });
+    const findBlog = await this.blogModel.deleteOne({ _id: new ObjectId(id) });
     return findBlog.deletedCount === 1;
   }
 }

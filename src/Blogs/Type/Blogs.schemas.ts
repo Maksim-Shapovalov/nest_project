@@ -1,11 +1,19 @@
-import { BlogsType } from './Blogs.type';
-import mongoose from 'mongoose';
+import { HydratedDocument } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-const blogsSchemas = new mongoose.Schema<BlogsType>({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  websiteUrl: { type: String, required: true },
-  createdAt: { type: String, required: true },
-  isMembership: { type: Boolean, required: true },
-});
-export const BlogModelClass = mongoose.model('blogs', blogsSchemas);
+export type UserDocument = HydratedDocument<Blog>;
+
+@Schema()
+export class Blog {
+  @Prop({ required: true })
+  name: string;
+  @Prop({ required: true })
+  description: string;
+  @Prop({ required: true })
+  websiteUrl: string;
+  @Prop({ required: true })
+  createdAt: string;
+  @Prop({ required: true })
+  isMembership: boolean;
+}
+export const BlogSchema = SchemaFactory.createForClass(Blog);

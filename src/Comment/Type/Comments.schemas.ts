@@ -1,33 +1,60 @@
-import mongoose, { Types } from 'mongoose';
-import {
-  AvailableStatusEnum,
-  CommentsTypeDb,
-  LikesTypeDb,
-} from './Comment.type';
+import { HydratedDocument } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { AvailableStatusEnum } from './Comment.type';
 
-const likesSchema = new mongoose.Schema<LikesTypeDb>({
-  userId: { type: String, required: true },
-  likeStatus: {
-    type: String,
-    enum: Object.values(AvailableStatusEnum),
+export type CommentsDocument = HydratedDocument<Comment>;
+
+@Schema()
+export class Comment {
+  @Prop({ required: true })
+  content: string;
+  @Prop({
     required: true,
-  },
-  commentId: { type: String, required: true },
-});
-
-const commentSchema = new mongoose.Schema<CommentsTypeDb>({
-  content: { type: String, required: true },
-  commentatorInfo: {
     type: {
-      userId: { type: String, required: true },
-      userLogin: { type: String, required: true },
+      userId: String,
+      userLogin: String,
     },
-    required: true,
-  },
-  postId: { type: String, required: true },
-  createdAt: { type: String, required: true },
-  //statuses: {type: [likesSchema]},
-});
+  })
+  commentatorInfo: {
+    userId: string;
+    userLogin: string;
+  };
+  @Prop({ required: true })
+  postId: string;
+  @Prop({ required: true })
+  createdAt: string;
+}
 
-export const LikesModelClass = mongoose.model('likes', likesSchema);
-export const CommentsModelClass = mongoose.model('comments', commentSchema);
+export const CommentsSchema = SchemaFactory.createForClass(Comment);
+
+export type CommentsLikeDocument = HydratedDocument<CommentsLike>;
+
+@Schema()
+export class CommentsLike {
+  @Prop({ required: true })
+  userId: string;
+  @Prop({
+    required: true,
+    type: {
+      type: String,
+      enum: Object.values(AvailableStatusEnum),
+    },
+  })
+  likesStatus: {
+    type: string;
+    enum: string;
+  };
+  @Prop({ required: true })
+  content: string;
+}
+export const CommentsLikeSchema = SchemaFactory.createForClass(CommentsLike);
+
+// const likesSchema = new mongoose.Schema<LikesTypeDb>({
+//     userId: {type: String, required: true},
+//     likeStatus:  {
+//         type: String,
+//         enum: Object.values(AvailableStatusEnum),
+//         required:true
+//     },
+//     commentId: {type: String, required: true},
+// })

@@ -4,14 +4,23 @@ import { PostsService } from './Posts.service';
 import { PostsRepository } from './Posts.repository';
 import { CommentsService } from '../Comment/Comments.service';
 import { CommentsRepository } from '../Comment/Comments.repository';
-import { Request, Response } from 'express';
 import { queryFilter } from '../qurey-repo/query-filter';
-import { HTTP_STATUS } from '../Index';
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { WithId } from 'mongodb';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
 import { BodyPostToRequest } from './Type/Posts.type';
+import { HTTP_STATUS } from '../app.module';
 
 @injectable()
 @Controller('posts')
@@ -125,31 +134,29 @@ export class PostsController {
       return HTTP_STATUS.NOT_FOUND_404;
     }
   }
-  async appropriationLike(req: Request, res: Response) {
-    const value = req.body.user;
+  // @Put()
+  // async appropriationLike(req: Request, res: Response) {
+  //   const value = req.body.user;
+  //
+  //   const updateComment = await this.postsService.updateStatusLikeInUser(
+  //     req.params.postId,
+  //     value,
+  //     req.body.likeStatus,
+  //   );
+  //
+  //   if (!updateComment) {
+  //     res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+  //     return;
+  //   }
+  //
+  //   res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
+  // }
+  @Delete(':id')
+  async deletePostByPostId(@Param('id') id: string) {
+    const deleted = await this.postsService.deletePostsById(id);
 
-    const updateComment = await this.postsService.updateStatusLikeInUser(
-      req.params.postId,
-      value,
-      req.body.likeStatus,
-    );
+    if (!deleted) return HTTP_STATUS.NOT_FOUND_404;
 
-    if (!updateComment) {
-      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
-      return;
-    }
-
-    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  }
-
-  async deletePostByPostId(req: Request, res: Response) {
-    const deleted = await this.postsService.deletePostsById(req.params.id);
-
-    if (!deleted) {
-      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
-      return;
-    }
-
-    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
+    return HTTP_STATUS.NO_CONTENT_204;
   }
 }

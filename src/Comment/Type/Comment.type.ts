@@ -24,6 +24,17 @@ export type CommentsTypeDb = WithId<{
   createdAt: string;
   // statuses: LikesTypeDb[]
 }>;
+export type CommentsTypeOutputDb = {
+  id: string;
+  content: string;
+  commentatorInfo: {
+    userId: string;
+    userLogin: string;
+  };
+  postId: string;
+  createdAt: string;
+  // statuses: LikesTypeDb[]
+};
 
 export type LikesTypeDb = WithId<{
   userId: string;

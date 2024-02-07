@@ -1,5 +1,5 @@
-import { commentsMapper, CommentsRepository } from './Comments.repository';
-import { CommentsClass, CommentsOutputType } from './Type/Comment.type';
+import { CommentsRepository } from './Comments.repository';
+import { CommentsClass } from './Type/Comment.type';
 import { WithId } from 'mongodb';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { PostsRepository } from '../Posts/Posts.repository';
@@ -16,7 +16,7 @@ export class CommentsService {
     postId: string,
     content: string,
     user: WithId<UserMongoDbType>,
-  ): Promise<CommentsOutputType | null> {
+  ) {
     const post = await this.postsRepository.getPostsById(
       postId,
       user._id.toString(),
@@ -36,8 +36,10 @@ export class CommentsService {
       new Date().toISOString(),
     );
 
-    const res = await this.commentsRepository.saveComments(newComment);
-    return commentsMapper(res, user._id.toString());
+    return this.commentsRepository.saveComments(
+      newComment,
+      user._id.toString(),
+    );
   }
 
   async updateComment(commentId: string, content: string) {

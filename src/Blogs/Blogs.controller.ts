@@ -5,7 +5,6 @@ import { BlogsRepository } from './Blogs.repository';
 import { PostsRepository } from '../Posts/Posts.repository';
 import { queryFilter, searchNameInBlog } from '../qurey-repo/query-filter';
 import 'reflect-metadata';
-import { HTTP_STATUS } from '../Index';
 import {
   Body,
   Controller,
@@ -16,10 +15,11 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { QueryType } from '../Other/Query.Type';
 import { BodyPostToRequest } from '../Posts/Type/Posts.type';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { BlogRequest } from './Type/Blogs.type';
+import { QueryType } from '../Other/Query.Type';
+import { HTTP_STATUS } from '../app.module';
 @injectable()
 @Controller()
 export class BlogsController {
@@ -43,7 +43,7 @@ export class BlogsController {
       return;
     }
   }
-  @Get(':id')
+  @Get(':id/posts')
   async getPostsByBlogId(
     @Param('id') id: string,
     @Query() query: QueryType,
@@ -59,7 +59,7 @@ export class BlogsController {
     if (!result) return HTTP_STATUS.NOT_FOUND_404;
     return result;
   }
-  @Post()
+  @Post(':id/posts')
   async createPostInBlogByBlogId(
     @Param('id') id: string,
     @Body() blogsInputModel: BodyPostToRequest,
