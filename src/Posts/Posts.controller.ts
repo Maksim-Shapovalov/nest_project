@@ -19,7 +19,7 @@ import {
 import { WithId } from 'mongodb';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
-import { BodyPostToRequest } from './Type/Posts.type';
+import { BodyPostToRequest, BodyPostToRequest1 } from './Type/Posts.type';
 import { HTTP_STATUS } from '../app.module';
 
 @injectable()
@@ -32,47 +32,23 @@ export class PostsController {
     protected commentsRepository: CommentsRepository,
   ) {}
   @Get()
-  async getAllPostsInDB(
-    @Body() userFind: WithId<UserMongoDbType>,
-    @Query() query: QueryType,
-  ) {
-    const user = userFind;
-    if (!user) {
-      const filter = queryFilter(query);
-      return this.postsRepository.getAllPosts(filter, null);
-    }
+  async getAllPostsInDB(@Query() query: QueryType) {
     const filter = queryFilter(query);
-    return this.postsRepository.getAllPosts(filter, user._id.toString());
+    return this.postsRepository.getAllPosts(filter);
   }
   @Get(':id')
-  async getPostByPostId(
-    @Param('id') id: string,
-    @Body() userFind: WithId<UserMongoDbType>,
-  ) {
-    const user = userFind;
-    if (!user) {
-      // const filter = queryFilter(req.query);
-      return this.postsRepository.getPostsById(id, null);
-    }
-    const post = await this.postsRepository.getPostsById(
-      id,
-      user._id.toString(),
-    );
+  async getPostByPostId(@Param('id') id: string) {
+    const post = await this.postsRepository.getPostsById(id);
     if (!post) return HTTP_STATUS.NOT_FOUND_404;
     return post;
   }
   @Get('/:id/comments')
   async getCommentByCommendIdInPosts(
-    @Body() userFind: WithId<UserMongoDbType>,
     @Query() query: QueryType,
     @Param('id') id: string,
   ) {
     const filter = queryFilter(query);
-    const result = await this.commentsRepository.getCommentsInPost(
-      id,
-      filter,
-      userFind._id.toString(),
-    );
+    const result = await this.commentsRepository.getCommentsInPost(id, filter);
     if (!result) {
       return HTTP_STATUS.NOT_FOUND_404;
     }
@@ -95,25 +71,14 @@ export class PostsController {
     return result;
   }
   @Post()
-  async createNewPost(
-    @Body() postInputModel: BodyPostToRequest,
-    @Body() userFind: WithId<UserMongoDbType>,
-    @Body() blogId: string,
-  ) {
-    const user = userFind;
+  async createNewPost(@Body() postInputModel: BodyPostToRequest1) {
     const postBody = {
       title: postInputModel.title,
       shortDescription: postInputModel.shortDescription,
       content: postInputModel.content,
+      blogId: postInputModel.blogId,
     };
-    if (!user) {
-      return this.postsService.createNewPosts(postBody, blogId, null);
-    }
-    return this.postsService.createNewPosts(
-      postBody,
-      blogId,
-      user._id.toString(),
-    );
+    return this.postsService.createNewPosts(postBody);
   }
   @Put(':id')
   async updatePostByPostId(

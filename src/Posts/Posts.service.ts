@@ -1,4 +1,4 @@
-import { BodyPostToRequest, PostClass } from './Type/Posts.type';
+import { BodyPostToRequest1, PostClass } from './Type/Posts.type';
 import { PostsRepository } from './Posts.repository';
 import { BlogsRepository } from '../Blogs/Blogs.repository';
 import { injectable } from 'inversify';
@@ -11,12 +11,10 @@ export class PostsService {
     protected blogsRepository: BlogsRepository,
   ) {}
 
-  async createNewPosts(
-    bodyPost: BodyPostToRequest,
-    blogId: string,
-    user: string | null,
-  ) {
-    const findBlogName = await this.blogsRepository.getBlogsById(blogId);
+  async createNewPosts(bodyPost: BodyPostToRequest1, blogId?: string) {
+    const findBlogName = await this.blogsRepository.getBlogsById(
+      blogId ?? bodyPost.blogId,
+    );
     if (!findBlogName) {
       return null;
     }
@@ -25,12 +23,12 @@ export class PostsService {
       bodyPost.title,
       bodyPost.shortDescription,
       bodyPost.content,
-      blogId,
+      bodyPost.blogId,
       findBlogName.name,
       new Date().toISOString(),
     );
 
-    return this.postsRepository.savePost(newPosts, user);
+    return this.postsRepository.savePost(newPosts);
   }
   async updateStatusLikeInUser(
     postId: string,

@@ -74,6 +74,12 @@ export type BodyPostToRequest = {
   shortDescription: string;
   content: string;
 };
+export type BodyPostToRequest1 = {
+  title: string;
+  shortDescription: string;
+  content: string;
+  blogId: string;
+};
 
 export type PostsType = WithId<{
   // id: string

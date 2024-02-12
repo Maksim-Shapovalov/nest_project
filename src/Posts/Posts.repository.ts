@@ -4,7 +4,6 @@ import { PaginationQueryType } from '../qurey-repo/query-filter';
 import { BlogsRepository } from '../Blogs/Blogs.repository';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
-import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -23,7 +22,7 @@ export class PostsRepository {
     @InjectModel(PostLike.name)
     protected postLikeModel: Model<PostLikeDocument>,
   ) {}
-  async getAllPosts(filter: PaginationQueryType, userId: string | null) {
+  async getAllPosts(filter: PaginationQueryType) {
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountBlogs = await this.postModel.countDocuments({});
 
@@ -36,7 +35,7 @@ export class PostsRepository {
       .limit(pageSizeInQuery)
       .lean();
     // const items = result.map((p) => postsLikeMapper(p,userId))
-    const itemsPromises = result.map((p) => this.postsLikeMapper(p, userId));
+    const itemsPromises = result.map((p) => this.postsLikeMapper(p));
     const items = await Promise.all(itemsPromises);
     return {
       pagesCount: pageCountBlogs,
@@ -47,20 +46,16 @@ export class PostsRepository {
     };
   }
 
-  async getPostsById(id: string, userId: string | null) {
+  async getPostsById(id: string) {
     const findPosts = await this.postModel.findOne({ _id: new ObjectId(id) });
 
     if (!findPosts) {
       return null;
     }
-    return this.postsLikeMapper(findPosts, userId);
+    return this.postsLikeMapper(findPosts);
   }
 
-  async getPostInBlogs(
-    blogId: string,
-    filter: PaginationQueryType,
-    userId: string | null,
-  ) {
+  async getPostInBlogs(blogId: string, filter: PaginationQueryType) {
     const findBlog = await this.blogsRepository.getBlogsById(blogId);
     if (!findBlog) {
       return null;
@@ -82,7 +77,7 @@ export class PostsRepository {
       .lean();
     // const items = res.map((p) => postsLikeMapper(p,null))
     const itemsPromises = res.map((p) => {
-      return this.postsLikeMapper(p, userId);
+      return this.postsLikeMapper(p);
     });
     const items = await Promise.all(itemsPromises);
 
@@ -140,9 +135,10 @@ export class PostsRepository {
     return true;
   }
 
-  async savePost(post: PostClass, user: string | null) {
-    await this.postModel.create(post);
-    return this.postsLikeMapper(post, user);
+  async savePost(post: PostClass) {
+    // await this.postsLikeMapper(post, null);
+    const newPost = await this.postModel.create(post);
+    return this.postsLikeMapper(newPost);
   }
 
   async updatePostsById(
@@ -170,7 +166,8 @@ export class PostsRepository {
     const findPost = await this.postModel.deleteOne({ _id: new ObjectId(id) });
     return findPost.deletedCount === 1;
   }
-  async postsLikeMapper(post: any, userId: string | null) {
+  async postsLikeMapper(post: any) {
+    /*
     const likeCount = await this.postLikeModel.countDocuments({
       likesStatus: AvailableStatusEnum.like,
       postId: post._id.toString(),
@@ -195,6 +192,8 @@ export class PostsRepository {
       .limit(3)
       .exec();
 
+
+     */
     return {
       id: post._id.toHexString(),
       title: post.title,
@@ -204,14 +203,14 @@ export class PostsRepository {
       blogName: post.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: +likeCount,
-        dislikesCount: +dislikeCount,
-        myStatus: myStatus ? myStatus.likesStatus : 'None',
-        newestLikes: findThreeLastUser.map((r) => ({
-          addedAt: r.createdAt,
-          userId: r.userId,
-          login: r.login,
-        })),
+        likesCount: '0', //+likeCount
+        dislikesCount: '0', //+dislikeCount
+        myStatus: 'None', //myStatus ? myStatus.likesStatus : 'None'
+        // newestLikes: findThreeLastUser.map((r) => ({
+        //   addedAt: r.createdAt,
+        //   userId: r.userId,
+        //   login: r.login,
+        // })),
       },
     };
   }

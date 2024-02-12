@@ -2,8 +2,6 @@ import { HydratedDocument } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
 
-export type PostsDocument = HydratedDocument<Post>;
-
 @Schema()
 export class Post {
   @Prop({ required: true })
@@ -19,11 +17,11 @@ export class Post {
   @Prop({ required: true })
   createdAt: string;
 }
-
+export type PostsDocument = HydratedDocument<Post>;
 export const PostsSchema = SchemaFactory.createForClass(Post);
 
 export type PostLikeDocument = HydratedDocument<PostLike>;
-// dhsakjd
+
 @Schema()
 export class PostLike {
   @Prop({ required: true })
@@ -43,15 +41,3 @@ export class PostLike {
 }
 
 export const PostLikeSchema = SchemaFactory.createForClass(PostLike);
-
-// const postLike = new mongoose.Schema<PostLikesDB>({
-//   postId: { type: String, required: true },
-//   likesStatus: {
-//     type: String,
-//     enum: Object.values(AvailableStatusEnum),
-//     required: true,
-//   },
-//   userId: { type: String, required: true },
-//   createdAt: { type: String, required: true },
-//   login: { type: String, required: true },
-// });

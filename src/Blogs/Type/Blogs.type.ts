@@ -19,11 +19,11 @@ export type BlogsOutputModel = {
   isMembership: boolean;
 };
 
-export type BlogRequest = {
+export class BlogRequest {
   name: string;
   description: string;
   websiteUrl: string;
-};
+}
 
 export type BlogsType = WithId<{
   // _id:

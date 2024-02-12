@@ -26,12 +26,8 @@ export class CommentsRepository {
     @InjectModel(CommentsLike.name)
     protected commentsLikeModel: Model<CommentsLikeDocument>,
   ) {}
-  async getCommentsInPost(
-    postId: string,
-    filter: PaginationQueryType,
-    userId: string | null,
-  ) {
-    const findPost = await this.postsRepository.getPostsById(postId, userId);
+  async getCommentsInPost(postId: string, filter: PaginationQueryType) {
+    const findPost = await this.postsRepository.getPostsById(postId);
 
     if (!findPost) {
       return null;
@@ -52,7 +48,7 @@ export class CommentsRepository {
       .limit(pageSizeInQuery)
       .lean();
 
-    const itemsPromises = res.map((c) => this.commentsMapper(c, userId));
+    const itemsPromises = res.map((c) => this.commentsMapper(c, null));
     const items = await Promise.all(itemsPromises);
 
     return {

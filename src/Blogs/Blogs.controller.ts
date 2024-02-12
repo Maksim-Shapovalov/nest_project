@@ -16,12 +16,11 @@ import {
   Query,
 } from '@nestjs/common';
 import { BodyPostToRequest } from '../Posts/Type/Posts.type';
-import { UserMongoDbType } from '../Users/Type/User.type';
 import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
 import { HTTP_STATUS } from '../app.module';
 @injectable()
-@Controller()
+@Controller('blogs')
 export class BlogsController {
   constructor(
     protected postsService: PostsService,
@@ -44,18 +43,9 @@ export class BlogsController {
     }
   }
   @Get(':id/posts')
-  async getPostsByBlogId(
-    @Param('id') id: string,
-    @Query() query: QueryType,
-    @Body() userFind: UserMongoDbType,
-  ) {
-    const user = userFind;
+  async getPostsByBlogId(@Param('id') id: string, @Query() query: QueryType) {
     const filter = queryFilter(query);
-    const result = await this.postsRepository.getPostInBlogs(
-      id,
-      filter,
-      user._id.toString(),
-    );
+    const result = await this.postsRepository.getPostInBlogs(id, filter);
     if (!result) return HTTP_STATUS.NOT_FOUND_404;
     return result;
   }
@@ -63,22 +53,14 @@ export class BlogsController {
   async createPostInBlogByBlogId(
     @Param('id') id: string,
     @Body() blogsInputModel: BodyPostToRequest,
-    @Body() userFind: UserMongoDbType,
   ) {
-    const user = userFind;
     const postBody = {
       title: blogsInputModel.title,
       shortDescription: blogsInputModel.shortDescription,
       content: blogsInputModel.content,
+      blogId: '',
     };
-    if (!user) {
-      return this.postsService.createNewPosts(postBody, id, null);
-    }
-    const newPost = await this.postsService.createNewPosts(
-      postBody,
-      id,
-      user._id.toString(),
-    );
+    const newPost = await this.postsService.createNewPosts(postBody, id);
     if (!newPost) {
       return;
     }

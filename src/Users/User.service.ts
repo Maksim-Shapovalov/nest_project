@@ -5,17 +5,20 @@ import {
   UserToShow,
 } from './Type/User.type';
 import { UserRepository, userToPostMapper } from './User.repository';
-import bcrypt from 'bcrypt';
-import add from 'date-fns/add';
+import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
+import { addHours } from 'date-fns';
 @injectable()
 export class UserService {
   constructor(protected userRepository: UserRepository) {}
   async getNewUser(user: UserBasicRequestBody): Promise<UserToShow> {
+    console.log(1);
     const passwordSalt = await bcrypt.genSalt(10);
+    console.log(2);
     const passwordHash = await this._generateHash(user.password, passwordSalt);
+    console.log(passwordSalt, passwordHash);
 
     const now = new Date();
 
@@ -27,14 +30,16 @@ export class UserService {
       now.toISOString(),
       {
         confirmationCode: randomUUID(),
-        expirationDate: add(now, {
-          hours: 1,
-          minutes: 3,
-        }).toISOString(),
+        expirationDate: addHours(new Date(), 1).toISOString(),
         isConfirmed: false,
       },
       Math.floor(10000 + Math.random() * 90000).toString(),
     );
+    console.log(35);
+    // add(now, {
+    //   hours: 1,
+    //   minutes: 3,
+    // }).toString(),
 
     const result: UserMongoDbType = await this.userRepository.saveUser(newUser);
     return userToPostMapper(result);

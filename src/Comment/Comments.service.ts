@@ -17,10 +17,7 @@ export class CommentsService {
     content: string,
     user: WithId<UserMongoDbType>,
   ) {
-    const post = await this.postsRepository.getPostsById(
-      postId,
-      user._id.toString(),
-    );
+    const post = await this.postsRepository.getPostsById(postId);
 
     if (!post) {
       return null;

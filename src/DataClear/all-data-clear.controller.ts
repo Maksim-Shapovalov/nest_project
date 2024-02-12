@@ -4,7 +4,7 @@ import { Controller, Delete } from '@nestjs/common';
 import { AllDataClearRepo } from './AllDataClearRepo';
 
 @injectable()
-@Controller('')
+@Controller('testing/all-data')
 export class AllDataClearController {
   constructor(protected allDataClearRepo: AllDataClearRepo) {}
   @Delete()

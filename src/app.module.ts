@@ -33,6 +33,8 @@ import {
 import { AllDataClearController } from './DataClear/all-data-clear.controller';
 import { AllDataClearRepo } from './DataClear/AllDataClearRepo';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -51,6 +53,10 @@ export const HTTP_STATUS = {
     MongooseModule.forRoot(
       process.env.MONGO_URL || 'mongodb://localhost:27017',
     ),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'swagger-static'),
+      serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/swagger',
+    }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Blog.name, schema: BlogSchema },

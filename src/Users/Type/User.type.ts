@@ -1,4 +1,5 @@
 import { WithId } from 'mongodb';
+import { IsEmail, Length, Matches, Validate } from 'class-validator';
 
 export class UserDbType {
   constructor(
@@ -34,12 +35,16 @@ export type UserToShow = {
   email: string;
   createdAt: string;
 };
-export type UserBasicRequestBody = {
-  login: string;
-  password: string;
-  email: string;
-};
 
+export class UserBasicRequestBody {
+  @Length(3, 10)
+  @Matches(/^[a-zA-Z0-9_-]*$/)
+  login: string;
+  @Length(6, 20)
+  password: string;
+  @IsEmail()
+  email: string;
+}
 export type UserMongoDbType = WithId<{
   login: string;
   email: string;
