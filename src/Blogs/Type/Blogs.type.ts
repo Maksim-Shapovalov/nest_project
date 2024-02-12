@@ -1,4 +1,5 @@
 import { WithId } from 'mongodb';
+import { Length } from 'class-validator';
 
 export class BlogClass {
   constructor(
@@ -20,8 +21,11 @@ export type BlogsOutputModel = {
 };
 
 export class BlogRequest {
+  @Length(0, 30)
   name: string;
+  @Length(0, 100)
   description: string;
+  @Length(0, 1000)
   websiteUrl: string;
 }
 

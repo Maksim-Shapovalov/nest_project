@@ -1,4 +1,5 @@
 import { WithId } from 'mongodb';
+import { Length, Matches } from 'class-validator';
 
 export class PostClass {
   constructor(
@@ -69,17 +70,26 @@ export type LastThreeLikeUserInPost = [
   },
 ];
 
-export type BodyPostToRequest = {
+export class BodyPostToRequest {
+  @Length(0, 15)
   title: string;
+  @Length(0, 500)
   shortDescription: string;
+  @Length(0, 100)
+  @Matches(
+    /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
+  )
   content: string;
-};
-export type BodyPostToRequest1 = {
+}
+export class BodyPostToRequest1 {
+  @Length(0, 30)
   title: string;
+  @Length(0, 100)
   shortDescription: string;
+  @Length(0, 1000)
   content: string;
   blogId: string;
-};
+}
 
 export type PostsType = WithId<{
   // id: string
