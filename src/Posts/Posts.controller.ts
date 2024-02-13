@@ -43,7 +43,7 @@ export class PostsController {
     if (!post) return HttpCode(404);
     return post;
   }
-  @Get('/:id/comments')
+  @Get(':id/comments')
   @HttpCode(204)
   async getCommentByCommendIdInPosts(
     @Query() query: QueryType,
@@ -56,7 +56,7 @@ export class PostsController {
     }
     return result;
   }
-  @Post('/:id')
+  @Post(':id')
   @HttpCode(204)
   async createCommentsInPostById(
     @Body() contentInput: string,
