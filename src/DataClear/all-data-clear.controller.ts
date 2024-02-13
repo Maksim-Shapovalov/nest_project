@@ -8,6 +8,7 @@ import { AllDataClearRepo } from './AllDataClearRepo';
 export class AllDataClearController {
   constructor(protected allDataClearRepo: AllDataClearRepo) {}
   @Delete()
+  @HttpCode(204)
   async allDataClear() {
     await this.allDataClearRepo.dataClear();
     return HttpCode(204);

@@ -1,5 +1,6 @@
 import { injectable } from 'inversify';
 import { InjectModel } from '@nestjs/mongoose';
+import 'reflect-metadata';
 import {
   Post,
   PostLike,
