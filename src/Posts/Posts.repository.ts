@@ -206,7 +206,7 @@ export class PostsRepository {
         likesCount: 0, //+likeCount
         dislikesCount: 0, //+dislikeCount
         myStatus: 'None', //myStatus ? myStatus.likesStatus : 'None'
-        newestLikes: {},
+        newestLikes: [],
       },
     };
   }
