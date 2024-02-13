@@ -103,12 +103,13 @@ export class BlogsController {
     }
   }
   @Delete(':id')
+  @HttpCode(204)
   async deleteBlogById(@Param('id') id: string) {
     const deleted = await this.blogsService.deleteBlogsById(id);
 
     if (!deleted) {
       throw new NotFoundException();
     }
-    return HTTP_STATUS.NO_CONTENT_204;
+    return HttpCode(204);
   }
 }

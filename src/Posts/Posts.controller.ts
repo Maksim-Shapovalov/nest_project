@@ -11,6 +11,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
@@ -19,8 +20,7 @@ import {
 import { WithId } from 'mongodb';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
-import { BodyPostToRequest, BodyPostToRequest1 } from './Type/Posts.type';
-import { HTTP_STATUS } from '../app.module';
+import { BodyPostToPut, BodyPostToRequest1 } from './Type/Posts.type';
 
 @injectable()
 @Controller('posts')
@@ -37,12 +37,14 @@ export class PostsController {
     return this.postsRepository.getAllPosts(filter);
   }
   @Get(':id')
+  @HttpCode(200)
   async getPostByPostId(@Param('id') id: string) {
     const post = await this.postsRepository.getPostsById(id);
-    if (!post) return HTTP_STATUS.NOT_FOUND_404;
+    if (!post) return HttpCode(404);
     return post;
   }
   @Get('/:id/comments')
+  @HttpCode(204)
   async getCommentByCommendIdInPosts(
     @Query() query: QueryType,
     @Param('id') id: string,
@@ -50,11 +52,12 @@ export class PostsController {
     const filter = queryFilter(query);
     const result = await this.commentsRepository.getCommentsInPost(id, filter);
     if (!result) {
-      return HTTP_STATUS.NOT_FOUND_404;
+      return HttpCode(404);
     }
     return result;
   }
   @Post('/:id')
+  @HttpCode(204)
   async createCommentsInPostById(
     @Body() contentInput: string,
     @Param('id') id: string,
@@ -66,7 +69,7 @@ export class PostsController {
       userFind,
     );
 
-    if (!result) return HTTP_STATUS.NOT_FOUND_404;
+    if (!result) return HttpCode(404);
 
     return result;
   }
@@ -81,22 +84,22 @@ export class PostsController {
     return this.postsService.createNewPosts(postBody);
   }
   @Put(':id')
+  @HttpCode(204)
   async updatePostByPostId(
     @Param('id') userId: string,
-    @Body() postInputModel: BodyPostToRequest,
-    @Body() id: string,
+    @Body() postInputModel: BodyPostToPut,
   ) {
     const result = await this.postsService.updatePostsById(
       userId,
       postInputModel.title,
       postInputModel.shortDescription,
       postInputModel.content,
-      id,
+      postInputModel.blogId,
     );
     if (result) {
-      return HTTP_STATUS.NO_CONTENT_204;
+      return HttpCode(204);
     } else {
-      return HTTP_STATUS.NOT_FOUND_404;
+      return HttpCode(404);
     }
   }
   // @Put()
@@ -117,11 +120,12 @@ export class PostsController {
   //   res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   // }
   @Delete(':id')
+  @HttpCode(204)
   async deletePostByPostId(@Param('id') id: string) {
     const deleted = await this.postsService.deletePostsById(id);
 
-    if (!deleted) return HTTP_STATUS.NOT_FOUND_404;
+    if (!deleted) return HttpCode(404);
 
-    return HTTP_STATUS.NO_CONTENT_204;
+    return HttpCode(204);
   }
 }
