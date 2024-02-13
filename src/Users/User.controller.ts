@@ -39,7 +39,7 @@ export class UserController {
     return user;
   }
   @Post()
-  @HttpCode(204)
+  @HttpCode(201)
   async createNewUser(@Body() inputModel: UserBasicRequestBody) {
     const user = {
       login: inputModel.login,

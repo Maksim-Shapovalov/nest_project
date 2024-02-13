@@ -14,11 +14,8 @@ import { addHours } from 'date-fns';
 export class UserService {
   constructor(protected userRepository: UserRepository) {}
   async getNewUser(user: UserBasicRequestBody): Promise<UserToShow> {
-    console.log(1);
     const passwordSalt = await bcrypt.genSalt(10);
-    console.log(2);
     const passwordHash = await this._generateHash(user.password, passwordSalt);
-    console.log(passwordSalt, passwordHash);
 
     const now = new Date();
 
