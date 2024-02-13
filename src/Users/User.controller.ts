@@ -7,6 +7,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -22,15 +24,22 @@ export class UserController {
     protected serviceUser: UserService,
   ) {}
   @Get()
+  @HttpCode(200)
   async getAllUserInDB(@Query() query: QueryType) {
     const filter = searchLogAndEmailInUsers(query);
     return this.userRepository.getAllUsers(filter);
   }
   @Get(':id')
+  @HttpCode(200)
   async getUserByCodeIdInDB(@Param('id') userId) {
-    return this.userRepository.getUserByIdWithMapper(userId.toString());
+    const user = await this.userRepository.getUserByIdWithMapper(
+      userId.toString(),
+    );
+    if (!user) throw new NotFoundException();
+    return user;
   }
   @Post()
+  @HttpCode(204)
   async createNewUser(@Body() inputModel: UserBasicRequestBody) {
     const user = {
       login: inputModel.login,
@@ -40,11 +49,12 @@ export class UserController {
     return this.serviceUser.getNewUser(user);
   }
   @Delete(':id')
+  @HttpCode(204)
   async deleteUserInDB(@Param('id') userId) {
     const deletedUs = await this.serviceUser.deleteUserById(userId);
     if (!deletedUs) {
-      return;
+      throw new NotFoundException();
     }
-    return;
+    return HttpCode(204);
   }
 }
