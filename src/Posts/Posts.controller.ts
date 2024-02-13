@@ -70,7 +70,7 @@ export class PostsController {
       userFind,
     );
 
-    if (!result) return HttpCode(404);
+    if (!result) throw new NotFoundException();
 
     return result;
   }
@@ -100,7 +100,7 @@ export class PostsController {
     if (result) {
       return HttpCode(204);
     } else {
-      return HttpCode(404);
+      throw new NotFoundException();
     }
   }
   // @Put()
