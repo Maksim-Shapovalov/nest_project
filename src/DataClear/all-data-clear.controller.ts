@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import { Controller, Delete } from '@nestjs/common';
 
 import { AllDataClearRepo } from './AllDataClearRepo';
+import { HTTP_STATUS } from '../app.module';
 
 @injectable()
 @Controller('testing/all-data')
@@ -9,7 +10,8 @@ export class AllDataClearController {
   constructor(protected allDataClearRepo: AllDataClearRepo) {}
   @Delete()
   async allDataClear() {
-    return this.allDataClearRepo.dataClear();
+    await this.allDataClearRepo.dataClear();
+    return HTTP_STATUS.NO_CONTENT_204;
   }
 }
 

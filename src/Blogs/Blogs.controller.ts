@@ -10,6 +10,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -39,14 +40,16 @@ export class BlogsController {
     if (blog) {
       return blog;
     } else {
-      return;
+      throw new NotFoundException();
     }
   }
   @Get(':id/posts')
   async getPostsByBlogId(@Param('id') id: string, @Query() query: QueryType) {
     const filter = queryFilter(query);
     const result = await this.postsRepository.getPostInBlogs(id, filter);
-    if (!result) return HTTP_STATUS.NOT_FOUND_404;
+    if (!result) {
+      throw new NotFoundException();
+    }
     return result;
   }
   @Post(':id/posts')
@@ -58,11 +61,11 @@ export class BlogsController {
       title: blogsInputModel.title,
       shortDescription: blogsInputModel.shortDescription,
       content: blogsInputModel.content,
-      blogId: '',
+      blogId: id,
     };
     const newPost = await this.postsService.createNewPosts(postBody, id);
     if (!newPost) {
-      return;
+      throw new NotFoundException();
     }
     return newPost;
   }
@@ -93,7 +96,7 @@ export class BlogsController {
       blogUpdateModel.websiteUrl,
     );
     if (!result) {
-      return HTTP_STATUS.NOT_FOUND_404;
+      throw new NotFoundException();
     } else {
       return HTTP_STATUS.NO_CONTENT_204;
     }
@@ -103,7 +106,7 @@ export class BlogsController {
     const deleted = await this.blogsService.deleteBlogsById(id);
 
     if (!deleted) {
-      return HTTP_STATUS.NOT_FOUND_404;
+      throw new NotFoundException();
     }
     return HTTP_STATUS.NO_CONTENT_204;
   }
