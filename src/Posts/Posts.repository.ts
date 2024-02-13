@@ -203,14 +203,14 @@ export class PostsRepository {
       blogName: post.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: '0', //+likeCount
-        dislikesCount: '0', //+dislikeCount
+        likesCount: 0, //+likeCount
+        dislikesCount: 0, //+dislikeCount
         myStatus: 'None', //myStatus ? myStatus.likesStatus : 'None'
-        // newestLikes: findThreeLastUser.map((r) => ({
-        //   addedAt: r.createdAt,
-        //   userId: r.userId,
-        //   login: r.login,
-        // })),
+        newestLikes: {
+          addedAt: 'r.createdAt',
+          userId: 'r.userId',
+          login: 'r.login',
+        },
       },
     };
   }
