@@ -10,6 +10,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   Post,
@@ -79,18 +80,18 @@ export class BlogsController {
     return this.blogsService.createNewBlogs(blog);
   }
   @Put(':id')
+  @HttpCode(204)
   async updateBlogByBlogId(
-    @Param('id') id: string,
+    @Param('id') idBlogs: string,
     @Body()
     blogUpdateModel: {
-      id: string;
       name: string;
       description: string;
       websiteUrl: string;
     },
   ) {
     const result = await this.blogsService.updateBlogById(
-      blogUpdateModel.id,
+      idBlogs,
       blogUpdateModel.name,
       blogUpdateModel.description,
       blogUpdateModel.websiteUrl,
@@ -98,7 +99,7 @@ export class BlogsController {
     if (!result) {
       throw new NotFoundException();
     } else {
-      return HTTP_STATUS.NO_CONTENT_204;
+      return HttpCode(204);
     }
   }
   @Delete(':id')
