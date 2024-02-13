@@ -41,7 +41,7 @@ export class PostsController {
   @HttpCode(200)
   async getPostByPostId(@Param('id') id: string) {
     const post = await this.postsRepository.getPostsById(id);
-    if (!post) return HttpCode(404);
+    if (!post) throw new NotFoundException();
     return post;
   }
   @Get(':id/comments')
@@ -53,7 +53,7 @@ export class PostsController {
     const filter = queryFilter(query);
     const result = await this.commentsRepository.getCommentsInPost(id, filter);
     if (!result) {
-      return HttpCode(404);
+      throw new NotFoundException();
     }
     return result;
   }
