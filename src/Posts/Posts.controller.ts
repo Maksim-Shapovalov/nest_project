@@ -12,6 +12,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -124,7 +125,7 @@ export class PostsController {
   async deletePostByPostId(@Param('id') id: string) {
     const deleted = await this.postsService.deletePostsById(id);
 
-    if (!deleted) return HttpCode(404);
+    if (!deleted) throw new NotFoundException();
 
     return HttpCode(204);
   }
