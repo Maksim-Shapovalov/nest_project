@@ -7,18 +7,23 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   NotFoundException,
   Param,
   Post,
   Query,
+  Req,
   UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common';
 import { QueryType } from '../Other/Query.Type';
 import { UserBasicRequestBody, UserMongoDbType } from './Type/User.type';
 import { isMongoIdPipe } from './user-chto-to';
-import { AuthGuard, User } from '../authGuard';
+import { User } from '../authGuard';
+import { Request } from 'express';
+import { AuthService } from '../auth/auth.service';
+import { JwtService } from '../Token/jwt-service';
+import { ObjectId } from 'mongodb';
 
 @injectable()
 @Controller('users')
@@ -26,6 +31,8 @@ export class UserController {
   constructor(
     protected userRepository: UserRepository,
     protected serviceUser: UserService,
+    protected authService: AuthService,
+    protected jwtService: JwtService,
   ) {}
   @Get()
   @HttpCode(200)
@@ -47,8 +54,20 @@ export class UserController {
   @HttpCode(201)
   async createNewUser(
     @Body() inputModel: UserBasicRequestBody,
-    // @User() userModel: UserMongoDbType,
+    @User() userModel: UserMongoDbType,
+    @Headers() header,
+    @Req() req: Request,
   ) {
+    const refreshTokenToRequest = req.cookies.refreshTokenToRequest;
+
+    const tokenVerification = await this.jwtService.parseJWTRefreshToken(
+      refreshTokenToRequest,
+    );
+    if (!tokenVerification) throw new UnauthorizedException();
+    const findUser = await this.userRepository.getUserById(
+      new ObjectId(tokenVerification.userId),
+    );
+    if (!findUser) throw new UnauthorizedException();
     const user = {
       login: inputModel.login,
       password: inputModel.password,
