@@ -3,11 +3,36 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { createWriteStream } from 'fs';
 import { get } from 'http';
+import { HttpExceptionFilter } from './exception.filter';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 
 const serverUrl = 'http://localhost:3000';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
+  app.use(cookieParser());
+  app.useGlobalGuards();
+  app.useGlobalPipes(
+    new ValidationPipe({
+      stopAtFirstError: true,
+      exceptionFactory: (errors) => {
+        const errorsForResponse = [];
+
+        errors.forEach((e) => {
+          const constrainsKeys = Object.keys(e.constraints);
+          constrainsKeys.forEach((ckey) => {
+            errorsForResponse.push({
+              message: e.constraints[ckey],
+              filed: e.property,
+            });
+          });
+        });
+        throw new BadRequestException(errorsForResponse);
+      },
+    }),
+  );
+  app.useGlobalFilters(new HttpExceptionFilter());
   const config = new DocumentBuilder()
     .setTitle('api example')
     .setDescription('The cats API description')
@@ -17,6 +42,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
   await app.listen(3000);
+  console.log('300000000');
   // get the swagger json file (if app is running in development mode)
   if (process.env.NODE_ENV === 'development') {
     // write swagger ui files

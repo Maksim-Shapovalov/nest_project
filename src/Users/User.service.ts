@@ -2,6 +2,7 @@ import {
   UserBasicRequestBody,
   UserDbType,
   UserMongoDbType,
+  UserOutputModel,
   UserToShow,
 } from './Type/User.type';
 import { UserRepository, userToPostMapper } from './User.repository';
@@ -10,6 +11,7 @@ import { randomUUID } from 'crypto';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
 import { addHours } from 'date-fns';
+import { UnauthorizedException } from '@nestjs/common';
 @injectable()
 export class UserService {
   constructor(protected userRepository: UserRepository) {}
@@ -32,7 +34,6 @@ export class UserService {
       },
       Math.floor(10000 + Math.random() * 90000).toString(),
     );
-    console.log(35);
     // add(now, {
     //   hours: 1,
     //   minutes: 3,
@@ -47,13 +48,19 @@ export class UserService {
   async _generateHash(password: string, salt: string) {
     return bcrypt.hash(password, salt);
   }
-  async checkCredentials(loginOrEmail: string, password: string) {
+  async findOneUserByUserName(userName: string) {
+    return this.userRepository.findByLoginOrEmail(userName);
+  }
+  async checkCredentials(
+    loginOrEmail: string,
+    password: string,
+  ): Promise<UserOutputModel | null> {
     const user = await this.userRepository.findByLoginOrEmail(loginOrEmail);
-    if (!user) return false;
+    if (!user) return null;
 
     const passwordHash = await this._generateHash(password, user.passwordSalt);
     if (user.passwordHash !== passwordHash) {
-      return false;
+      throw new UnauthorizedException();
     }
     return user;
   }

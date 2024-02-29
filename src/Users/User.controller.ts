@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common';
 import { QueryType } from '../Other/Query.Type';
 import { UserBasicRequestBody } from './Type/User.type';
+import { isMongoIdPipe } from './user-chto-to';
 
 @injectable()
 @Controller('users')
@@ -50,7 +51,7 @@ export class UserController {
   }
   @Delete(':id')
   @HttpCode(204)
-  async deleteUserInDB(@Param('id') userId) {
+  async deleteUserInDB(@Param('id', isMongoIdPipe) userId) {
     const deletedUs = await this.serviceUser.deleteUserById(userId);
     if (!deletedUs) {
       throw new NotFoundException();

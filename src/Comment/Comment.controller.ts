@@ -4,7 +4,16 @@ import { CommentsService } from './Comments.service';
 
 import { CommentsRepository } from './Comments.repository';
 
-import { Body, Controller, Delete, Get, Param, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Put,
+} from '@nestjs/common';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { WithId } from 'mongodb';
 import { HTTP_STATUS } from '../app.module';
@@ -57,23 +66,25 @@ export class CommentsController {
     if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
     return HTTP_STATUS.NO_CONTENT_204;
   }
-  // @Put('id')
-  // async appropriationLike(
-  //   @Param('id') id: string,
-  //   @Body() userFind: WithId<UserMongoDbType>,
-  //   @Body() inputLikeStatus: string,
-  // ) {
-  //   const updateComment = await this.serviceComments.updateStatusLikeInUser(
-  //     id,
-  //     userFind._id.toString(),
-  //     inputLikeStatus,
-  //   );
-  //
-  //   if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
-  //
-  //   return HTTP_STATUS.NO_CONTENT_204;
-  // }
+  @Put(':id')
+  @HttpCode(204)
+  async appropriationLike(
+    @Param('id') id: string,
+    @Body() userFind: WithId<UserMongoDbType>,
+    @Body() inputLikeStatus: string,
+  ) {
+    const updateComment = await this.serviceComments.updateStatusLikeInUser(
+      id,
+      userFind._id.toString(),
+      inputLikeStatus,
+    );
+
+    if (!updateComment) throw new NotFoundException();
+
+    return HttpCode(204);
+  }
   @Delete('id')
+  @HttpCode(204)
   async deleteCommentByCommentId(
     @Param('id') id: string,
     @Body() userFind: WithId<UserMongoDbType>,
@@ -88,8 +99,8 @@ export class CommentsController {
       return HTTP_STATUS.Forbidden_403;
     const deletedComment = await this.serviceComments.deletedComment(id);
 
-    if (!deletedComment) return HTTP_STATUS.NOT_FOUND_404;
+    if (!deletedComment) throw new NotFoundException();
 
-    return HTTP_STATUS.NO_CONTENT_204;
+    return HttpCode(204);
   }
 }

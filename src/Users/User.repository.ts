@@ -88,10 +88,12 @@ export class UserRepository {
     return res.matchedCount === 1;
   }
 
-  async findByLoginOrEmail(loginOrEmail: string) {
-    return this.userModel.findOne({
+  async findByLoginOrEmail(loginOrEmail: string): Promise<UserOutputModel> {
+    const user = await this.userModel.findOne({
       $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
     });
+    if (!user) return null;
+    return userMapper(user);
   }
 
   async findByEmailAndAddRecoveryode(possibleUser: possibleUser) {
@@ -102,10 +104,12 @@ export class UserRepository {
     if (!findUser) return false;
     return findUser;
   }
-  async findUserByCodeInValidation(code: string) {
+  async findUserByCodeInValidation(
+    code: string | null,
+  ): Promise<UserOutputModel | null> {
     const user = await this.userModel.findOne({ recoveryCode: code });
-    if (!user) return false;
-    return user;
+    if (!user) return null;
+    return userMapper(user);
   }
   async findUserByRecoveryCode(newDataUser: newDataUser2) {
     const user = await this.userModel.findOneAndUpdate(

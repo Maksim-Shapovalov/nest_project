@@ -22,6 +22,7 @@ import { WithId } from 'mongodb';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
 import { BodyPostToPut, BodyPostToRequest1 } from './Type/Posts.type';
+import { User } from '../authGuard';
 
 @injectable()
 @Controller('posts')
@@ -103,23 +104,23 @@ export class PostsController {
       throw new NotFoundException();
     }
   }
-  // @Put()
-  // async appropriationLike(req: Request, res: Response) {
-  //   const value = req.body.user;
-  //
-  //   const updateComment = await this.postsService.updateStatusLikeInUser(
-  //     req.params.postId,
-  //     value,
-  //     req.body.likeStatus,
-  //   );
-  //
-  //   if (!updateComment) {
-  //     res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
-  //     return;
-  //   }
-  //
-  //   res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  // }
+  @Put(':id/like-status')
+  @HttpCode(204)
+  async appropriationLike(
+    @Param('id') id: string,
+    @User() userModel: UserMongoDbType,
+    @Body() inputLikeStatus: string,
+  ) {
+    const updateComment = await this.postsService.updateStatusLikeInUser(
+      id,
+      userModel,
+      inputLikeStatus,
+    );
+
+    if (!updateComment) throw new NotFoundException();
+
+    return HttpCode(204);
+  }
   @Delete(':id')
   @HttpCode(204)
   async deletePostByPostId(@Param('id') id: string) {

@@ -35,6 +35,12 @@ import { AllDataClearRepo } from './DataClear/AllDataClearRepo';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { DeviceController } from './Device/SecurityDevice.controller';
+import { Device, DeviceSchema } from './Device/Type/DataId.schemas';
+import { AuthModule } from './auth/auth.module';
+import { Token, TokenSchema } from './Token/Token.schema';
+import { SecurityDeviceService } from './Device/SecurityDevice.service';
+import { SecurityDevicesRepository } from './Device/SecurityDevicesRepository';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -64,7 +70,10 @@ export const HTTP_STATUS = {
       { name: Post.name, schema: PostsSchema },
       { name: PostLike.name, schema: PostLikeSchema },
       { name: CommentsLike.name, schema: CommentsLikeSchema },
+      { name: Device.name, schema: DeviceSchema },
+      { name: Token.name, schema: TokenSchema },
     ]),
+    AuthModule,
   ],
   controllers: [
     AppController,
@@ -73,6 +82,7 @@ export const HTTP_STATUS = {
     CommentsController,
     PostsController,
     AllDataClearController,
+    DeviceController,
   ],
   providers: [
     AppService,
@@ -84,7 +94,10 @@ export const HTTP_STATUS = {
     CommentsService,
     PostsRepository,
     PostsService,
+    SecurityDevicesRepository,
+    SecurityDeviceService,
     AllDataClearRepo,
   ],
+  exports: [SecurityDeviceService, SecurityDevicesRepository],
 })
 export class AppModule {}
