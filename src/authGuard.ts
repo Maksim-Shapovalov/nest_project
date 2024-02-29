@@ -3,6 +3,7 @@ import {
   CanActivate,
   ExecutionContext,
   createParamDecorator,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
@@ -13,7 +14,7 @@ export class AuthGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     // const request = context.switchToHttp().getRequest();
-    return false;
+    throw new UnauthorizedException();
   }
 }
 

@@ -9,13 +9,14 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { userMapper, UserRepository } from '../Users/User.repository';
 import { DeletedTokenRepoRepository } from '../Token/deletedTokenRepo-repository';
 import { UserService } from '../Users/User.service';
-import { User } from '../authGuard';
+import { AuthGuard, User } from '../authGuard';
 import { UserBasicRequestBody, UserMongoDbType } from '../Users/Type/User.type';
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 import { injectable } from 'inversify';
@@ -67,6 +68,7 @@ export class AuthController {
     });
     return accessToken;
   }
+  @UseGuards(AuthGuard)
   @Post('refresh-token')
   async refreshToken(
     @Req() request: Request,
@@ -123,6 +125,7 @@ export class AuthController {
     if (!result) throw new NotFoundException();
     return HttpCode(204);
   }
+  @UseGuards(AuthGuard)
   @Post('registration')
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
@@ -141,6 +144,7 @@ export class AuthController {
     await this.authService.findUserByEmail(findUser);
     return HttpCode(204);
   }
+  @UseGuards(AuthGuard)
   @Post('logout')
   @HttpCode(204)
   async logoutInApp(
@@ -164,7 +168,7 @@ export class AuthController {
     if (!deletedDevice) throw new BadRequestException();
     return HttpCode(204);
   }
-
+  @UseGuards(AuthGuard)
   @Post('me')
   @HttpCode(204)
   async me(@Body() code: string, @User() userModel: UserMongoDbType) {
