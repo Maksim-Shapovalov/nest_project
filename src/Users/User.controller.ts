@@ -12,10 +12,12 @@ import {
   Param,
   Post,
   Query,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { QueryType } from '../Other/Query.Type';
-import { UserBasicRequestBody } from './Type/User.type';
+import { UserBasicRequestBody, UserMongoDbType } from './Type/User.type';
 import { isMongoIdPipe } from './user-chto-to';
+import { User } from '../authGuard';
 
 @injectable()
 @Controller('users')
@@ -41,7 +43,11 @@ export class UserController {
   }
   @Post()
   @HttpCode(201)
-  async createNewUser(@Body() inputModel: UserBasicRequestBody) {
+  async createNewUser(
+    @Body() inputModel: UserBasicRequestBody,
+    @User() userModel: UserMongoDbType,
+  ) {
+    if (!userModel) throw new UnauthorizedException();
     const user = {
       login: inputModel.login,
       password: inputModel.password,

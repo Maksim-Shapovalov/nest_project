@@ -16,15 +16,10 @@ import { userMapper, UserRepository } from '../Users/User.repository';
 import { DeletedTokenRepoRepository } from '../Token/deletedTokenRepo-repository';
 import { UserService } from '../Users/User.service';
 import { User } from '../authGuard';
-import { UserMongoDbType } from '../Users/Type/User.type';
+import { UserBasicRequestBody, UserMongoDbType } from '../Users/Type/User.type';
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 import { injectable } from 'inversify';
 
-type bodyUserForRegistration = {
-  login: string;
-  password: string;
-  email: string;
-};
 @injectable()
 @Controller('auth')
 export class AuthController {
@@ -130,7 +125,7 @@ export class AuthController {
   }
   @Post('registration')
   @HttpCode(204)
-  async registration(@Body() bodyUser: bodyUserForRegistration) {
+  async registration(@Body() bodyUser: UserBasicRequestBody) {
     const newUser = await this.serviceUser.getNewUser(bodyUser);
     const findUser = await this.userRepository.findByLoginOrEmail(
       newUser.login,
