@@ -42,7 +42,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
   await app.listen(3000);
-  console.log(300000);
+  console.log(3000000);
   // get the swagger json file (if app is running in development mode)
   if (process.env.NODE_ENV === 'development') {
     // write swagger ui files
