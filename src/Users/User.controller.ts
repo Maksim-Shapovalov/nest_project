@@ -63,11 +63,13 @@ export class UserController {
     const tokenVerification = await this.jwtService.parseJWTRefreshToken(
       refreshTokenToRequest,
     );
-    if (!tokenVerification) throw new UnauthorizedException();
-    const findUser = await this.userRepository.getUserById(
-      new ObjectId(tokenVerification.userId),
-    );
-    if (!findUser) throw new UnauthorizedException();
+    if (tokenVerification) {
+      const findUser = await this.userRepository.getUserById(
+        new ObjectId(tokenVerification.userId),
+      );
+      if (!findUser) throw new UnauthorizedException();
+    } else throw new UnauthorizedException();
+
     const user = {
       login: inputModel.login,
       password: inputModel.password,

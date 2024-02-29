@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { setting } from '../../src/setting';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { RefreshTokenRepo } from './refreshToken-repo';
@@ -7,6 +6,7 @@ import { DeviceClass } from '../Device/Type/Device.user';
 import { SecurityDevicesRepository } from '../Device/SecurityDevicesRepository';
 import { UserToPostsOutputModel } from '../Users/Type/User.type';
 import { injectable } from 'inversify';
+import { setting } from '../setting';
 
 type PayloadType = {
   userId: string;
