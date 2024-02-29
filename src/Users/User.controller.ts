@@ -43,7 +43,7 @@ export class UserController {
     return user;
   }
   @Post()
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @HttpCode(201)
   async createNewUser(
     @Body() inputModel: UserBasicRequestBody,
