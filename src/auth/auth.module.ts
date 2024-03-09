@@ -25,16 +25,13 @@ import { SecurityDeviceService } from '../Device/SecurityDevice.service';
   ],
   controllers: [AuthController],
   providers: [
-    AuthService,
     UserService,
-    RefreshTokenRepo,
-    JwtService,
     SecurityDevicesRepository,
     SecurityDeviceService,
     DeletedTokenRepoRepository,
     UserRepository,
-    EmailManager,
-    EmailAdapter,
+    AuthService,
+    RefreshTokenRepo,
   ],
 })
 export class AuthModule {}

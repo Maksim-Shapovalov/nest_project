@@ -41,6 +41,11 @@ import { AuthModule } from './auth/auth.module';
 import { Token, TokenSchema } from './Token/Token.schema';
 import { SecurityDeviceService } from './Device/SecurityDevice.service';
 import { SecurityDevicesRepository } from './Device/SecurityDevicesRepository';
+import { AuthService } from './auth/auth.service';
+import { RefreshTokenRepo } from './Token/refreshToken-repo';
+import { JwtService } from '@nestjs/jwt';
+import { EmailManager } from './Email/email-manager';
+import { EmailAdapter } from './Email/email-adapter';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -85,7 +90,6 @@ export const HTTP_STATUS = {
     DeviceController,
   ],
   providers: [
-    AppService,
     UserRepository,
     UserService,
     BlogsRepository,
@@ -97,7 +101,10 @@ export const HTTP_STATUS = {
     SecurityDevicesRepository,
     SecurityDeviceService,
     AllDataClearRepo,
+    JwtService,
+    EmailManager,
+    EmailAdapter,
   ],
-  exports: [SecurityDeviceService, SecurityDevicesRepository],
+  exports: [SecurityDeviceService, SecurityDevicesRepository, EmailManager],
 })
 export class AppModule {}
