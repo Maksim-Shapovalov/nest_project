@@ -8,7 +8,7 @@ import { UserToPostsOutputModel } from '../Users/Type/User.type';
 import { injectable } from 'inversify';
 import { setting } from '../setting';
 
-type PayloadType = {
+export type PayloadType = {
   userId: string;
   deviceId: string;
 };

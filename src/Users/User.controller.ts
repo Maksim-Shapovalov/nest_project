@@ -21,8 +21,9 @@ import { UserBasicRequestBody, UserMongoDbType } from './Type/User.type';
 import { isMongoIdPipe } from './user-chto-to';
 import { User } from '../authGuard';
 import { Request } from 'express';
-import { JwtServiceToken } from '../Token/jwt-service';
+import { PayloadType } from '../Token/jwt-service';
 import { ObjectId } from 'mongodb';
+import jwt from 'jsonwebtoken';
 
 @injectable()
 @Controller('users')
@@ -30,7 +31,7 @@ export class UserController {
   constructor(
     protected userRepository: UserRepository,
     protected serviceUser: UserService,
-    protected jwtService: JwtServiceToken,
+    // protected jwtService: JwtServiceToken,
   ) {}
   @Get()
   @HttpCode(200)
@@ -58,9 +59,10 @@ export class UserController {
   ) {
     const refreshTokenToRequest = req.cookies.refreshTokenToRequest;
 
-    const tokenVerification = await this.jwtService.parseJWTRefreshToken(
-      refreshTokenToRequest,
-    );
+    // const tokenVerification = await this.jwtService.parseJWTRefreshToken(
+    //   refreshTokenToRequest,
+    // );
+    const tokenVerification = jwt.decode(refreshTokenToRequest) as PayloadType;
     if (tokenVerification) {
       const findUser = await this.userRepository.getUserById(
         new ObjectId(tokenVerification.userId),

@@ -91,7 +91,6 @@ export const HTTP_STATUS = {
     CommentsService,
     PostsRepository,
     PostsService,
-    JwtServiceToken,
     AllDataClearRepo,
     EmailManager,
     EmailAdapter,
