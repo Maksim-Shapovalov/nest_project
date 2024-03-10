@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserController } from './Users/User.controller';
-import { UserRepository } from './Users/User.repository';
-import { UserService } from './Users/User.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import * as process from 'process';
 import { BlogsController } from './Blogs/Blogs.controller';
@@ -39,13 +37,10 @@ import { DeviceController } from './Device/SecurityDevice.controller';
 import { Device, DeviceSchema } from './Device/Type/DataId.schemas';
 import { AuthModule } from './auth/auth.module';
 import { Token, TokenSchema } from './Token/Token.schema';
-import { SecurityDeviceService } from './Device/SecurityDevice.service';
-import { SecurityDevicesRepository } from './Device/SecurityDevicesRepository';
-import { AuthService } from './auth/auth.service';
 import { RefreshTokenRepo } from './Token/refreshToken-repo';
-import { JwtService } from '@nestjs/jwt';
 import { EmailManager } from './Email/email-manager';
 import { EmailAdapter } from './Email/email-adapter';
+import { JwtServiceToken } from './Token/jwt-service';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -90,21 +85,18 @@ export const HTTP_STATUS = {
     DeviceController,
   ],
   providers: [
-    UserRepository,
-    UserService,
     BlogsRepository,
     BlogsService,
     CommentsRepository,
     CommentsService,
     PostsRepository,
     PostsService,
-    SecurityDevicesRepository,
-    SecurityDeviceService,
+    JwtServiceToken,
     AllDataClearRepo,
-    JwtService,
     EmailManager,
     EmailAdapter,
+    AppService,
+    RefreshTokenRepo,
   ],
-  exports: [SecurityDeviceService, SecurityDevicesRepository, EmailManager],
 })
 export class AppModule {}

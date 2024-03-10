@@ -16,6 +16,14 @@ import { DeletedTokenRepoRepository } from '../Token/deletedTokenRepo-repository
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 
 @Module({
+  controllers: [AuthController],
+  exports: [
+    UserService,
+    SecurityDevicesRepository,
+    SecurityDeviceService,
+    UserRepository,
+    JwtService,
+  ],
   imports: [
     MongooseModule.forFeature([
       { name: Token.name, schema: TokenSchema },
@@ -23,7 +31,6 @@ import { SecurityDeviceService } from '../Device/SecurityDevice.service';
       { name: User.name, schema: UserSchema },
     ]),
   ],
-  controllers: [AuthController],
   providers: [
     UserService,
     SecurityDevicesRepository,
@@ -32,6 +39,9 @@ import { SecurityDeviceService } from '../Device/SecurityDevice.service';
     UserRepository,
     AuthService,
     RefreshTokenRepo,
+    JwtService,
+    EmailManager,
+    EmailAdapter,
   ],
 })
 export class AuthModule {}

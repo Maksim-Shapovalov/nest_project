@@ -21,8 +21,7 @@ import { UserBasicRequestBody, UserMongoDbType } from './Type/User.type';
 import { isMongoIdPipe } from './user-chto-to';
 import { User } from '../authGuard';
 import { Request } from 'express';
-import { AuthService } from '../auth/auth.service';
-import { JwtService } from '../Token/jwt-service';
+import { JwtServiceToken } from '../Token/jwt-service';
 import { ObjectId } from 'mongodb';
 
 @injectable()
@@ -31,8 +30,7 @@ export class UserController {
   constructor(
     protected userRepository: UserRepository,
     protected serviceUser: UserService,
-    protected authService: AuthService,
-    protected jwtService: JwtService,
+    protected jwtService: JwtServiceToken,
   ) {}
   @Get()
   @HttpCode(200)

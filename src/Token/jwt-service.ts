@@ -19,7 +19,7 @@ type PayloadTypeRefresh = {
   exp: number;
 } | null;
 @injectable()
-export class JwtService {
+export class JwtServiceToken {
   constructor(
     protected refreshTokenRepo: RefreshTokenRepo,
     protected securityDevicesRepo: SecurityDevicesRepository,
