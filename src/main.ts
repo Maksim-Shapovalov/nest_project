@@ -24,7 +24,7 @@ async function bootstrap() {
           constrainsKeys.forEach((ckey) => {
             errorsForResponse.push({
               message: e.constraints[ckey],
-              filed: e.property,
+              field: e.property,
             });
           });
         });
