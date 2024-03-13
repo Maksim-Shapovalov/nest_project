@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../Users/User.service';
 import { DeviceClass } from '../Device/Type/Device.user';
 import { v4 as uuidv4 } from 'uuid';
@@ -42,48 +42,50 @@ export class AuthService {
       body.loginOrEmail,
       body.password,
     );
-    const userId = user.id;
-    if (!userId) return null;
-    if (!user) return null;
-    const passwordHash = await this.usersService._generateHash(
-      body.password,
-      user.passwordSalt,
-    );
-    if (user.passwordHash !== passwordHash) {
-      return null;
+    if (user) {
+      const userId = user.id;
+      if (!userId) return null;
+      const passwordHash = await this.usersService._generateHash(
+        body.password,
+        user.passwordSalt,
+      );
+      if (user.passwordHash !== passwordHash) {
+        return null;
+      }
+
+      // const payload =
+      const createRefreshTokenMeta = new DeviceClass(
+        userAgent.IP || '123',
+        userAgent.deviceName || 'internet',
+        new Date().toISOString(),
+        uuidv4(),
+        user.id,
+      );
+
+      //
+      await this.refreshTokenRepo.AddRefreshTokenInData(createRefreshTokenMeta);
+      const bodyToAccessToken = {
+        userId: user.id,
+        expiresIn: '10sec',
+      };
+      const bodyToRefreshToken = {
+        userId: user.id,
+        deviceId: createRefreshTokenMeta.deviceId,
+        expiresIn: '20sec',
+      };
+
+      const accessToken: string = await this.jwtService.signAsync(
+        bodyToAccessToken,
+        { secret: setting.JWT_SECRET },
+      );
+      const refreshToken: string = await this.jwtService.signAsync(
+        bodyToRefreshToken,
+        { secret: setting.JWT_REFRESH_SECRET },
+      );
+
+      return { accessToken, refreshToken };
     }
-
-    // const payload =
-    const createRefreshTokenMeta = new DeviceClass(
-      userAgent.IP || '123',
-      userAgent.deviceName || 'internet',
-      new Date().toISOString(),
-      uuidv4(),
-      user.id,
-    );
-
-    //
-    await this.refreshTokenRepo.AddRefreshTokenInData(createRefreshTokenMeta);
-    const bodyToAccessToken = {
-      userId: user.id,
-      expiresIn: '10sec',
-    };
-    const bodyToRefreshToken = {
-      userId: user.id,
-      deviceId: createRefreshTokenMeta.deviceId,
-      expiresIn: '20sec',
-    };
-
-    const accessToken: string = await this.jwtService.signAsync(
-      bodyToAccessToken,
-      { secret: setting.JWT_SECRET },
-    );
-    const refreshToken: string = await this.jwtService.signAsync(
-      bodyToRefreshToken,
-      { secret: setting.JWT_REFRESH_SECRET },
-    );
-
-    return { accessToken, refreshToken };
+    throw new UnauthorizedException();
   }
   async updateJWT(user: UserToPostsOutputModel, oldRefreshToken: string) {
     const parser = jwt.decode(oldRefreshToken) as PayloadTypeRefresh;
