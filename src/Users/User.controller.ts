@@ -61,6 +61,7 @@ export class UserController {
     };
     return this.serviceUser.getNewUser(user);
   }
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteUserInDB(@Param('id', isMongoIdPipe) userId) {
