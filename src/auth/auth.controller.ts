@@ -115,7 +115,7 @@ export class AuthController {
     if (!result) throw new NotFoundException();
     return HttpCode(204);
   }
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post('registration')
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
