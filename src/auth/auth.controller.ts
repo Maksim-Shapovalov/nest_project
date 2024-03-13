@@ -56,7 +56,7 @@ export class AuthController {
       httpOnly: true,
       secure: true,
     });
-    return accessToken;
+    return { accessToken };
   }
   @UseGuards(AuthGuard)
   @Post('refresh-token')
