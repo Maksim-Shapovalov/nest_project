@@ -20,11 +20,12 @@ import {
 import { QueryType } from '../Other/Query.Type';
 import { UserBasicRequestBody, UserMongoDbType } from './Type/User.type';
 import { isMongoIdPipe } from './user-chto-to';
-import { AuthGuard, User } from '../authGuard';
+import { User } from '../auth/guard/authGuard';
 import { Request } from 'express';
 import { PayloadType } from '../Token/jwt-service';
 import { ObjectId } from 'mongodb';
 import jwt from 'jsonwebtoken';
+import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 
 @injectable()
 @Controller('users')
@@ -49,28 +50,10 @@ export class UserController {
     if (!user) throw new NotFoundException();
     return user;
   }
+  @UseGuards(BasicAuthGuard)
   @Post()
-  // @UseGuards(AuthGuard)
   @HttpCode(201)
-  async createNewUser(
-    @Body() inputModel: UserBasicRequestBody,
-    @User() userModel: UserMongoDbType,
-    @Headers() header,
-    @Req() req: Request,
-  ) {
-    const refreshTokenToRequest = req.cookies.refreshTokenToRequest;
-
-    // const tokenVerification = await this.jwtService.parseJWTRefreshToken(
-    //   refreshTokenToRequest,
-    // );
-    const tokenVerification = jwt.decode(refreshTokenToRequest) as PayloadType;
-    if (tokenVerification) {
-      const findUser = await this.userRepository.getUserById(
-        new ObjectId(tokenVerification.userId),
-      );
-      if (!findUser) throw new UnauthorizedException();
-    } else throw new UnauthorizedException();
-
+  async createNewUser(@Body() inputModel: UserBasicRequestBody) {
     const user = {
       login: inputModel.login,
       password: inputModel.password,

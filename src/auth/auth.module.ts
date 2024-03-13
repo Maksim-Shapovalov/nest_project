@@ -14,6 +14,8 @@ import { Token, TokenSchema } from '../Token/Token.schema';
 import { EmailAdapter } from '../Email/email-adapter';
 import { DeletedTokenRepoRepository } from '../Token/deletedTokenRepo-repository';
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
+import { PassportModule } from '@nestjs/passport';
+import { BasicStrategy } from './strategies/basic.strategies';
 
 @Module({
   controllers: [AuthController],
@@ -23,8 +25,10 @@ import { SecurityDeviceService } from '../Device/SecurityDevice.service';
     SecurityDeviceService,
     UserRepository,
     JwtService,
+    BasicStrategy,
   ],
   imports: [
+    PassportModule,
     MongooseModule.forFeature([
       { name: Token.name, schema: TokenSchema },
       { name: Device.name, schema: DeviceSchema },
@@ -42,6 +46,7 @@ import { SecurityDeviceService } from '../Device/SecurityDevice.service';
     JwtService,
     EmailManager,
     EmailAdapter,
+    BasicStrategy,
   ],
 })
 export class AuthModule {}

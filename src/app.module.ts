@@ -40,8 +40,7 @@ import { Token, TokenSchema } from './Token/Token.schema';
 import { RefreshTokenRepo } from './Token/refreshToken-repo';
 import { EmailManager } from './Email/email-manager';
 import { EmailAdapter } from './Email/email-adapter';
-import { JwtServiceToken } from './Token/jwt-service';
-
+import { BasicStrategy } from './auth/strategies/basic.strategies';
 export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,
@@ -55,6 +54,7 @@ export const HTTP_STATUS = {
 
 @Module({
   imports: [
+    AuthModule,
     ConfigModule.forRoot(),
     MongooseModule.forRoot(
       process.env.MONGO_URL || 'mongodb://localhost:27017',
@@ -73,7 +73,6 @@ export const HTTP_STATUS = {
       { name: Device.name, schema: DeviceSchema },
       { name: Token.name, schema: TokenSchema },
     ]),
-    AuthModule,
   ],
   controllers: [
     AppController,

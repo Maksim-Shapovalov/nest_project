@@ -22,7 +22,7 @@ import { WithId } from 'mongodb';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
 import { BodyPostToPut, BodyPostToRequest1 } from './Type/Posts.type';
-import { User } from '../authGuard';
+import { User } from '../auth/guard/authGuard';
 
 @injectable()
 @Controller('posts')

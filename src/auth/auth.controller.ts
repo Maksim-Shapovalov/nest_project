@@ -16,7 +16,7 @@ import { Request, Response } from 'express';
 import { userMapper, UserRepository } from '../Users/User.repository';
 import { DeletedTokenRepoRepository } from '../Token/deletedTokenRepo-repository';
 import { UserService } from '../Users/User.service';
-import { AuthGuard, User } from '../authGuard';
+import { AuthGuard, User } from './guard/authGuard';
 import { UserBasicRequestBody, UserMongoDbType } from '../Users/Type/User.type';
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 import { injectable } from 'inversify';
@@ -44,23 +44,13 @@ export class AuthController {
       IP: req.ip,
       deviceName: header['user-agent'],
     };
-    //header['x-forwarded-for']
-    console.log(userAgent);
 
     const { accessToken, refreshToken } = await this.authService.signIn(
       body,
       userAgent,
     );
-    console.log(accessToken, refreshToken);
 
     if (!accessToken || !refreshToken) throw new UnauthorizedException();
-
-    // const { accessToken, refreshToken } =
-    //   await this.jwtService.createdJWTAndInsertDevice(
-    //     userMapper(user),
-    //     userAgent,
-    //   );
-    console.log('---------', accessToken, '----------', refreshToken);
 
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,

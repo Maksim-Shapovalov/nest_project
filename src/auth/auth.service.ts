@@ -42,7 +42,6 @@ export class AuthService {
       body.loginOrEmail,
       body.password,
     );
-    console.log(user);
     const userId = user.id;
     if (!userId) return null;
     if (!user) return null;
@@ -50,7 +49,6 @@ export class AuthService {
       body.password,
       user.passwordSalt,
     );
-    console.log(passwordHash);
     if (user.passwordHash !== passwordHash) {
       return null;
     }
@@ -63,7 +61,6 @@ export class AuthService {
       uuidv4(),
       user.id,
     );
-    console.log(createRefreshTokenMeta);
 
     //
     await this.refreshTokenRepo.AddRefreshTokenInData(createRefreshTokenMeta);
