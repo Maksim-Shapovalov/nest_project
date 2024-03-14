@@ -34,10 +34,6 @@ export class UserService {
       },
       Math.floor(10000 + Math.random() * 90000).toString(),
     );
-    // add(now, {
-    //   hours: 1,
-    //   minutes: 3,
-    // }).toString(),
 
     const result: UserMongoDbType = await this.userRepository.saveUser(newUser);
     return userToPostMapper(result);

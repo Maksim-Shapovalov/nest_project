@@ -3,6 +3,8 @@ import {
   UserPaginationQueryType,
 } from '../qurey-repo/query-filter';
 import {
+  EmailConfirmations,
+  FindUserByRecoveryCode,
   UserDbType,
   UserMongoDbType,
   UserOutputModel,
@@ -88,12 +90,14 @@ export class UserRepository {
     return res.matchedCount === 1;
   }
 
-  async findByLoginOrEmail(loginOrEmail: string): Promise<UserOutputModel> {
+  async findByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<FindUserByRecoveryCode> {
     const user = await this.userModel.findOne({
       $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
     });
     if (!user) return null;
-    return userMapper(user);
+    return userToResendMessageMapper(user);
   }
 
   async findByEmailAndAddRecoveryode(possibleUser: possibleUser) {
@@ -171,5 +175,19 @@ export const userToPostMapper = (user: WithId<UserMongoDbType>): UserToShow => {
     login: user.login,
     email: user.email,
     createdAt: user.createdAt,
+  };
+};
+export const userToResendMessageMapper = (
+  user: WithId<UserMongoDbType>,
+): FindUserByRecoveryCode => {
+  return {
+    id: user._id.toHexString(),
+    login: user.login,
+    email: user.email,
+    createdAt: user.createdAt,
+    passwordHash: user.passwordHash,
+    passwordSalt: user.passwordSalt,
+    emailConfirmation: user.emailConfirmation,
+    recoveryCode: user.recoveryCode,
   };
 };

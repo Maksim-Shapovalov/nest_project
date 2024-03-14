@@ -54,6 +54,16 @@ export type UserMongoDbType = WithId<{
   emailConfirmation: EmailConfirmations;
   recoveryCode: string;
 }>;
+export type FindUserByRecoveryCode = {
+  id: string;
+  login: string;
+  email: string;
+  createdAt: string;
+  passwordHash: any;
+  passwordSalt: string;
+  emailConfirmation: EmailConfirmations;
+  recoveryCode: string;
+};
 
 export type EmailConfirmations = {
   confirmationCode: string;

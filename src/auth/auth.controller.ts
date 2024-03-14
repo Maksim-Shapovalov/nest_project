@@ -123,6 +123,7 @@ export class AuthController {
     const findUser = await this.userRepository.findByLoginOrEmail(
       newUser.login,
     );
+    if (!findUser) throw new BadRequestException();
     await this.authService.doOperation(findUser);
     return HttpCode(204);
   }
