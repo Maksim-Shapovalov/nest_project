@@ -16,6 +16,7 @@ import { DeletedTokenRepoRepository } from '../Token/deletedTokenRepo-repository
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 import { PassportModule } from '@nestjs/passport';
 import { BasicStrategy } from './strategies/basic.strategies';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   controllers: [AuthController],
@@ -29,6 +30,12 @@ import { BasicStrategy } from './strategies/basic.strategies';
   ],
   imports: [
     PassportModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10000,
+        limit: 5,
+      },
+    ]),
     MongooseModule.forFeature([
       { name: Token.name, schema: TokenSchema },
       { name: Device.name, schema: DeviceSchema },

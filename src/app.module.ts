@@ -40,7 +40,7 @@ import { Token, TokenSchema } from './Token/Token.schema';
 import { RefreshTokenRepo } from './Token/refreshToken-repo';
 import { EmailManager } from './Email/email-manager';
 import { EmailAdapter } from './Email/email-adapter';
-import { BasicStrategy } from './auth/strategies/basic.strategies';
+import { ThrottlerModule } from '@nestjs/throttler';
 export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,

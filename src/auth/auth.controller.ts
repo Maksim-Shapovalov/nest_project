@@ -20,6 +20,7 @@ import { AuthGuard, User } from './guard/authGuard';
 import { UserBasicRequestBody, UserMongoDbType } from '../Users/Type/User.type';
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 import { injectable } from 'inversify';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @injectable()
 @Controller('auth')
@@ -116,14 +117,18 @@ export class AuthController {
     return HttpCode(204);
   }
   // @UseGuards(AuthGuard)
+  @UseGuards(ThrottlerGuard)
   @Post('registration')
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
+    const findUserInDB = await this.userRepository.findByLoginOrEmail(
+      bodyUser.login,
+    );
+    if (findUserInDB) throw new BadRequestException('login');
     const newUser = await this.serviceUser.getNewUser(bodyUser);
     const findUser = await this.userRepository.findByLoginOrEmail(
       newUser.login,
     );
-    if (!findUser) throw new BadRequestException();
     await this.authService.doOperation(findUser);
     return HttpCode(204);
   }
