@@ -116,13 +116,12 @@ export class AuthController {
   @Post('registration-confirmation')
   @HttpCode(204)
   async registrationConfirmation(@Body('code') code: string) {
-    if (!code)
+    const result = await this.authService.confirmatoryUser(code);
+    if (!result)
       throw new BadRequestException({
         message: 'code is not exist',
         field: 'code',
       });
-    const result = await this.authService.confirmatoryUser(code);
-    if (!result) throw new NotFoundException();
     return HttpCode(204);
   }
   // @UseGuards(AuthGuard)
@@ -131,12 +130,12 @@ export class AuthController {
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
     const findUserInDB = await this.userRepository.findByLoginOrEmail(
-      bodyUser.email,
+      bodyUser.login,
     );
     if (findUserInDB)
       throw new BadRequestException({
-        message: 'email is not exist',
-        field: 'email',
+        message: 'login is not exist',
+        field: 'login',
       });
     const newUser = await this.serviceUser.getNewUser(bodyUser);
     const findUser = await this.userRepository.findByLoginOrEmail(
