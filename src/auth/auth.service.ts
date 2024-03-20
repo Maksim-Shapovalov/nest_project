@@ -139,7 +139,11 @@ export class AuthService {
   async confirmatoryUser(code: string) {
     const findUser = await this.userRepository.findUsersByCode(code);
     if (!findUser) return null;
-    if (findUser.emailConfirmation.isConfirmed) throw new BadRequestException();
+    if (findUser.emailConfirmation.isConfirmed)
+      throw new BadRequestException({
+        message: 'code is not exist',
+        field: 'code',
+      });
     return this.userRepository.getUserByCode(code);
   }
 
