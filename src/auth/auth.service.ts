@@ -152,7 +152,10 @@ export class AuthService {
       user.login,
     );
     if (findConfirmCode.emailConfirmation.isConfirmed)
-      throw new BadRequestException();
+      throw new BadRequestException({
+        message: 'email is not exist',
+        field: 'email',
+      });
     const newConfirmationCode = {
       confirmationCode: uuidv4(),
     };

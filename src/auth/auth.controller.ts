@@ -141,7 +141,11 @@ export class AuthController {
   async registrationEmailResending(@Body('email') email: string) {
     const findUser: FindUserByRecoveryCode =
       await this.userRepository.findByLoginOrEmail(email);
-    if (!findUser) throw new BadRequestException();
+    if (!findUser)
+      throw new BadRequestException({
+        message: 'email is not exist',
+        field: 'email',
+      });
     await this.authService.findUserByEmail(findUser);
     return HttpCode(204);
   }
