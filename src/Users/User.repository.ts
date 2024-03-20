@@ -73,7 +73,7 @@ export class UserRepository {
     if (user === null) return null;
     return userMapper(user);
   }
-  async findUsersByCode(codeUser: string) {
+  async findUsersByCode(codeUser: string): Promise<FindUserByRecoveryCode> {
     return this.userModel.findOne({
       'emailConfirmation.confirmationCode': codeUser,
     });

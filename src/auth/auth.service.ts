@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from '../Users/User.service';
 import { DeviceClass } from '../Device/Type/Device.user';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,6 +11,7 @@ import { setting } from '../setting';
 import { JwtService } from '@nestjs/jwt';
 import jwt from 'jsonwebtoken';
 import {
+  FindUserByRecoveryCode,
   UserOutputModel,
   UserToPostsOutputModel,
 } from '../Users/Type/User.type';
@@ -132,6 +137,9 @@ export class AuthService {
   }
 
   async confirmatoryUser(code: string) {
+    const findUser = await this.userRepository.findUsersByCode(code);
+    if (!findUser) return null;
+    if (findUser.emailConfirmation.isConfirmed) throw new BadRequestException();
     return this.userRepository.getUserByCode(code);
   }
 
@@ -139,7 +147,12 @@ export class AuthService {
     await this.emailManager.sendEmailRecoveryMessage(user);
   }
 
-  async findUserByEmail(user: any) {
+  async findUserByEmail(user: FindUserByRecoveryCode) {
+    const findConfirmCode = await this.userRepository.findByLoginOrEmail(
+      user.login,
+    );
+    if (findConfirmCode.emailConfirmation.isConfirmed)
+      throw new BadRequestException();
     const newConfirmationCode = {
       confirmationCode: uuidv4(),
     };

@@ -17,7 +17,11 @@ import { userMapper, UserRepository } from '../Users/User.repository';
 import { DeletedTokenRepoRepository } from '../Token/deletedTokenRepo-repository';
 import { UserService } from '../Users/User.service';
 import { AuthGuard, User } from './guard/authGuard';
-import { UserBasicRequestBody, UserMongoDbType } from '../Users/Type/User.type';
+import {
+  FindUserByRecoveryCode,
+  UserBasicRequestBody,
+  UserMongoDbType,
+} from '../Users/Type/User.type';
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 import { injectable } from 'inversify';
 import { ThrottlerGuard } from '@nestjs/throttler';
@@ -135,11 +139,9 @@ export class AuthController {
   @Post('registration-email-resending')
   @HttpCode(204)
   async registrationEmailResending(@Body('email') email: string) {
-    console.log(email);
-    const findUser = await this.userRepository.findByLoginOrEmail(email);
-    console.log(2);
+    const findUser: FindUserByRecoveryCode =
+      await this.userRepository.findByLoginOrEmail(email);
     if (!findUser) throw new BadRequestException();
-    console.log(3);
     await this.authService.findUserByEmail(findUser);
     return HttpCode(204);
   }
