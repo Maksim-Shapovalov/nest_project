@@ -19,13 +19,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         errorsMessages: [],
       };
       const responseBody: any = exception.getResponse();
-      if (typeof responseBody.message === 'string') {
-        errorResponse.errorsMessages.push(responseBody.message);
-      } else {
-        responseBody.message.forEach((m) =>
-          errorResponse.errorsMessages.push(m),
-        );
-      }
+      // if (typeof responseBody.message === 'string') {
+      //   errorResponse.errorsMessages.push(responseBody.message);
+      // } else {
+      responseBody.message.forEach((m) => errorResponse.errorsMessages.push(m));
+      // }
       response.status(status).json(errorResponse);
     } else if (status == 401) {
       response.sendStatus(status);
