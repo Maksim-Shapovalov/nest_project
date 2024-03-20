@@ -128,7 +128,11 @@ export class AuthController {
     const findUserInDB = await this.userRepository.findByLoginOrEmail(
       bodyUser.email,
     );
-    if (findUserInDB) throw new BadRequestException('login');
+    if (findUserInDB)
+      throw new BadRequestException({
+        message: 'login is not exist',
+        field: 'login',
+      });
     const newUser = await this.serviceUser.getNewUser(bodyUser);
     const findUser = await this.userRepository.findByLoginOrEmail(
       newUser.login,
