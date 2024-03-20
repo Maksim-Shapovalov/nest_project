@@ -36,26 +36,5 @@ export class HttpExceptionFilter implements ExceptionFilter {
         path: request.url,
       });
     }
-
-    // switch (status) {
-    //   case 400:
-    //     const errorResponse = {
-    //       errors: [],
-    //     };
-    //     const responseBody: any = exception.getResponse();
-    //
-    //     responseBody.message.forEach((m) => errorResponse.errors.push(m));
-    //     response.status(status).json(errorResponse);
-    //     break;
-    //   case 404:
-    //     response.status(404);
-    //     break;
-    //   default:
-    //     response.status(status).json({
-    //       statusCode: status,
-    //       timestamp: new Date().toISOString(),
-    //       path: request.url,
-    //     });
-    // }
   }
 }

@@ -7,24 +7,16 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   HttpCode,
   NotFoundException,
   Param,
   Post,
   Query,
-  Req,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { QueryType } from '../Other/Query.Type';
-import { UserBasicRequestBody, UserMongoDbType } from './Type/User.type';
+import { UserBasicRequestBody } from './Type/User.type';
 import { isMongoIdPipe } from './user-chto-to';
-import { User } from '../auth/guard/authGuard';
-import { Request } from 'express';
-import { PayloadType } from '../Token/jwt-service';
-import { ObjectId } from 'mongodb';
-import jwt from 'jsonwebtoken';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 
 @injectable()

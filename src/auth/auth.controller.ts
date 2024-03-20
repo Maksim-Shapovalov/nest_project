@@ -111,7 +111,7 @@ export class AuthController {
   }
   @Post('registration-confirmation')
   @HttpCode(204)
-  async registrationConfirmation(@Body() code: string) {
+  async registrationConfirmation(@Body('code') code: string) {
     const result = await this.authService.confirmatoryUser(code);
     if (!result) throw new NotFoundException();
     return HttpCode(204);
@@ -134,9 +134,12 @@ export class AuthController {
   }
   @Post('registration-email-resending')
   @HttpCode(204)
-  async registrationEmailResending(@Body() email: string) {
+  async registrationEmailResending(@Body('email') email: string) {
+    console.log(email);
     const findUser = await this.userRepository.findByLoginOrEmail(email);
+    console.log(2);
     if (!findUser) throw new BadRequestException();
+    console.log(3);
     await this.authService.findUserByEmail(findUser);
     return HttpCode(204);
   }
