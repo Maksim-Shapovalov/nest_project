@@ -129,8 +129,9 @@ export class AuthController {
   @Post('registration')
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
-    const findUserInDB = await this.userRepository.findByLoginOrEmail(
+    const findUserInDB = await this.userRepository.findByLoginAndEmail(
       bodyUser.login,
+      bodyUser.email,
     );
     if (findUserInDB) {
       if (findUserInDB.login === bodyUser.login) {

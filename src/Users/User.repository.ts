@@ -99,6 +99,16 @@ export class UserRepository {
     if (!user) return null;
     return userToResendMessageMapper(user);
   }
+  async findByLoginAndEmail(
+    login: string,
+    email: string,
+  ): Promise<FindUserByRecoveryCode> {
+    const user = await this.userModel.findOne({
+      $or: [{ login: login }, { email: email }],
+    });
+    if (!user) return null;
+    return userToResendMessageMapper(user);
+  }
 
   async findByEmailAndAddRecoveryode(possibleUser: possibleUser) {
     const findUser = await this.userModel.findOneAndUpdate(
