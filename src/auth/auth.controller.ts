@@ -122,7 +122,7 @@ export class AuthController {
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
     const findUserInDB = await this.userRepository.findByLoginOrEmail(
-      bodyUser.login,
+      bodyUser.email,
     );
     if (findUserInDB) throw new BadRequestException('login');
     const newUser = await this.serviceUser.getNewUser(bodyUser);
