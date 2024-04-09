@@ -98,10 +98,10 @@ export class PostsController {
       postInputModel.content,
       postInputModel.blogId,
     );
-    if (result) {
-      return HttpCode(204);
-    } else {
+    if (!result) {
       throw new NotFoundException();
+    } else {
+      return HttpCode(204);
     }
   }
   @Put(':id/like-status')

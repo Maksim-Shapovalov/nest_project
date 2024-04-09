@@ -76,9 +76,6 @@ export class BodyPostToRequest {
   @Length(0, 500)
   shortDescription: string;
   @Length(0, 100)
-  @Matches(
-    /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
-  )
   content: string;
 }
 export class BodyPostToPut {
@@ -87,9 +84,6 @@ export class BodyPostToPut {
   @Length(0, 500)
   shortDescription: string;
   @Length(0, 100)
-  @Matches(
-    /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
-  )
   content: string;
   blogId: string;
 }

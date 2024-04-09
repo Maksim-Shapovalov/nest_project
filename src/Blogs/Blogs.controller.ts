@@ -20,7 +20,7 @@ import {
 import { BodyPostToRequest } from '../Posts/Type/Posts.type';
 import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
-import { HTTP_STATUS } from '../app.module';
+
 @injectable()
 @Controller('blogs')
 export class BlogsController {
@@ -84,11 +84,7 @@ export class BlogsController {
   async updateBlogByBlogId(
     @Param('id') idBlogs: string,
     @Body()
-    blogUpdateModel: {
-      name: string;
-      description: string;
-      websiteUrl: string;
-    },
+    blogUpdateModel: BlogRequest,
   ) {
     const result = await this.blogsService.updateBlogById(
       idBlogs,

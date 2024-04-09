@@ -66,7 +66,7 @@ export class CommentsController {
     if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
     return HTTP_STATUS.NO_CONTENT_204;
   }
-  @Put(':id')
+  @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
     @Param('id') id: string,
