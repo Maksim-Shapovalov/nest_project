@@ -102,6 +102,7 @@ export class BlogsController {
       return HttpCode(204);
     }
   }
+  @UseGuards(AuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteBlogById(@Param('id') id: string) {
