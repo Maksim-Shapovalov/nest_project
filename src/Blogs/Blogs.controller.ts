@@ -16,10 +16,12 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BodyPostToRequest } from '../Posts/Type/Posts.type';
 import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
+import { AuthGuard } from '../auth/guard/authGuard';
 
 @injectable()
 @Controller('blogs')
@@ -70,6 +72,7 @@ export class BlogsController {
     }
     return newPost;
   }
+  @UseGuards(AuthGuard)
   @Post()
   async createNewBlog(@Body() blogInputModel: BlogRequest) {
     const blog = {
@@ -79,6 +82,7 @@ export class BlogsController {
     };
     return this.blogsService.createNewBlogs(blog);
   }
+  @UseGuards(AuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updateBlogByBlogId(

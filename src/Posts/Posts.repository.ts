@@ -13,6 +13,7 @@ import {
   PostLikeDocument,
   PostsDocument,
 } from './Type/Posts.schemas';
+import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 
 @injectable()
 export class PostsRepository {
@@ -100,6 +101,7 @@ export class PostsRepository {
         postId: postId,
       })
       .exec();
+    console.log(likeWithUserId);
 
     const comment = await this.postModel
       .findOne({
@@ -167,33 +169,30 @@ export class PostsRepository {
     return findPost.deletedCount === 1;
   }
   async postsLikeMapper(post: any) {
-    /*
-    const likeCount = await this.postLikeModel.countDocuments({
-      likesStatus: AvailableStatusEnum.like,
-      postId: post._id.toString(),
-    });
-    const dislikeCount = await this.postLikeModel.countDocuments({
-      likesStatus: AvailableStatusEnum.dislike,
-      postId: post._id.toString(),
-    });
+    // const likeCount = await this.postLikeModel.countDocuments({
+    //   likesStatus: AvailableStatusEnum.like,
+    //   postId: post._id.toString(),
+    // });
+    // const dislikeCount = await this.postLikeModel.countDocuments({
+    //   likesStatus: AvailableStatusEnum.dislike,
+    //   postId: post._id.toString(),
+    // });
+    //
+    // const myStatus = await this.postLikeModel
+    //   .findOne({
+    //     userId: userId,
+    //     postId: post._id.toString(),
+    //   })
+    //   .exec();
+    // const findThreeLastUser = await this.postLikeModel
+    //   .find({
+    //     likesStatus: { $all: ['Like'] },
+    //     postId: post._id.toString(),
+    //   })
+    //   .sort({ createdAt: -1 })
+    //   .limit(3)
+    //   .exec();
 
-    const myStatus = await this.postLikeModel
-      .findOne({
-        userId: userId,
-        postId: post._id.toString(),
-      })
-      .exec();
-    const findThreeLastUser = await this.postLikeModel
-      .find({
-        likesStatus: { $all: ['Like'] },
-        postId: post._id.toString(),
-      })
-      .sort({ createdAt: -1 })
-      .limit(3)
-      .exec();
-
-
-     */
     return {
       id: post._id.toHexString(),
       title: post.title,
