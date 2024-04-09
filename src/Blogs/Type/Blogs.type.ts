@@ -1,5 +1,6 @@
 import { WithId } from 'mongodb';
 import { Length, Matches } from 'class-validator';
+import { Trim } from '../../Other/trim-validator';
 
 export class BlogClass {
   constructor(
@@ -22,10 +23,13 @@ export type BlogsOutputModel = {
 
 export class BlogRequest {
   @Length(0, 15)
+  @Trim()
   name: string;
   @Length(0, 500)
+  @Trim()
   description: string;
   @Length(0, 100)
+  @Trim()
   @Matches(
     /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
   )
