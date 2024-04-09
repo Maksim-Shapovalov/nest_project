@@ -25,7 +25,7 @@ export class BlogRequest {
   name: string;
   @Length(0, 500)
   description: string;
-  @Length(0, 1000)
+  @Length(0, 100)
   @Matches(
     /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
   )
