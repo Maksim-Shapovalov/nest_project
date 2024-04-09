@@ -12,13 +12,7 @@ export class BasicStrategy extends PassportStrategy(Strategy) {
   }
 
   public validate = async (req, username, password): Promise<boolean> => {
-    console.log(username, password);
-    console.log(setting.Username);
-    console.log(setting.Password);
-    console.log(setting.Username === username);
-    console.log(setting.Password === password);
     if (setting.Username === username && setting.Password === password) {
-      console.log(username, password);
       return true;
     } else {
       throw new UnauthorizedException();

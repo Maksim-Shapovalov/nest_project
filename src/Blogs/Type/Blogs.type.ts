@@ -22,14 +22,14 @@ export type BlogsOutputModel = {
 };
 
 export class BlogRequest {
+  @Trim()
   @Length(0, 15)
-  @Trim()
   name: string;
+  @Trim()
   @Length(0, 500)
-  @Trim()
   description: string;
-  @Length(0, 100)
   @Trim()
+  @Length(0, 100)
   @Matches(
     /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
   )
