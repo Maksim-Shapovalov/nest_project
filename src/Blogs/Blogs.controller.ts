@@ -72,7 +72,6 @@ export class BlogsController {
     }
     return newPost;
   }
-  @UseGuards(AuthGuard)
   @Post()
   async createNewBlog(@Body() blogInputModel: BlogRequest) {
     const blog = {
@@ -82,7 +81,6 @@ export class BlogsController {
     };
     return this.blogsService.createNewBlogs(blog);
   }
-  @UseGuards(AuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updateBlogByBlogId(
@@ -103,7 +101,7 @@ export class BlogsController {
       return HttpCode(204);
     }
   }
-  @UseGuards(AuthGuard)
+
   @Delete(':id')
   @HttpCode(204)
   async deleteBlogById(@Param('id') id: string) {
