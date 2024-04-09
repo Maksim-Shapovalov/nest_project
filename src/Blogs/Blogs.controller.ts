@@ -81,6 +81,7 @@ export class BlogsController {
     };
     return this.blogsService.createNewBlogs(blog);
   }
+  @UseGuards(AuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updateBlogByBlogId(
