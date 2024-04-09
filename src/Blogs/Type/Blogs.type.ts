@@ -21,7 +21,7 @@ export type BlogsOutputModel = {
 };
 
 export class BlogRequest {
-  @Length(0, 30)
+  @Length(0, 15)
   name: string;
   @Length(0, 500)
   description: string;
