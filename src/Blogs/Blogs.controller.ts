@@ -90,6 +90,7 @@ export class BlogsController {
     @Body()
     blogUpdateModel: BlogRequest,
   ) {
+    console.log('s');
     const result = await this.blogsService.updateBlogById(
       idBlogs,
       blogUpdateModel.name,
