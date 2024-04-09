@@ -25,7 +25,6 @@ export class UserController {
   constructor(
     protected userRepository: UserRepository,
     protected serviceUser: UserService,
-    // protected jwtService: JwtServiceToken,
   ) {}
   @Get()
   @HttpCode(200)
