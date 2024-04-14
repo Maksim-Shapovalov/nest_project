@@ -14,6 +14,7 @@ import {
   PostsDocument,
 } from './Type/Posts.schemas';
 import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
+import { NotFoundException } from '@nestjs/common';
 
 @injectable()
 export class PostsRepository {
@@ -122,6 +123,7 @@ export class PostsRepository {
           },
         },
       );
+      if (!updateStatus) throw new NotFoundException();
 
       return updateStatus.matchedCount === 1;
     }
