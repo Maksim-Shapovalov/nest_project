@@ -17,6 +17,7 @@ import {
   Post,
   Put,
   Query,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { WithId } from 'mongodb';
@@ -105,7 +106,6 @@ export class PostsController {
       return HttpCode(204);
     }
   }
-  @UseGuards(AuthGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
@@ -113,6 +113,7 @@ export class PostsController {
     @User() userModel: UserMongoDbType,
     @Body() inputLikeStatus: string,
   ) {
+    if (!userModel) throw new UnauthorizedException();
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
       userModel,
