@@ -13,10 +13,12 @@ import {
   NotFoundException,
   Param,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { WithId } from 'mongodb';
 import { HTTP_STATUS } from '../app.module';
+import { AuthGuard, User } from '../auth/guard/authGuard';
 
 @injectable()
 @Controller('users')
@@ -66,16 +68,17 @@ export class CommentsController {
     if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
     return HTTP_STATUS.NO_CONTENT_204;
   }
+  @UseGuards(AuthGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
     @Param('id') id: string,
-    @Body() userFind: WithId<UserMongoDbType>,
+    @User() userModel: UserMongoDbType,
     @Body() inputLikeStatus: string,
   ) {
     const updateComment = await this.serviceComments.updateStatusLikeInUser(
       id,
-      userFind._id.toString(),
+      userModel._id.toString(),
       inputLikeStatus,
     );
 
