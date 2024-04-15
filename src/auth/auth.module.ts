@@ -17,6 +17,7 @@ import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 import { PassportModule } from '@nestjs/passport';
 import { BasicStrategy } from './strategies/basic.strategies';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { JwtStrategy } from './strategies/bearer.strategies';
 
 @Module({
   controllers: [AuthController],
@@ -27,6 +28,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     UserRepository,
     JwtService,
     BasicStrategy,
+    JwtStrategy,
   ],
   imports: [
     PassportModule,
@@ -54,6 +56,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     EmailManager,
     EmailAdapter,
     BasicStrategy,
+    JwtStrategy,
   ],
 })
 export class AuthModule {}
