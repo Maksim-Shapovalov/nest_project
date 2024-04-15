@@ -120,7 +120,7 @@ export class PostsController {
   async appropriationLike(
     @Param('id') id: string,
     @User() userModel: UserMongoDbType,
-    @Body() inputLikeStatus: AvailableStatusEnum,
+    @Body() inputLikeStatus: StatusLikes,
   ) {
     const findPosts = await this.postsRepository.getPostsById(id);
     if (!findPosts) throw new NotFoundException();
@@ -128,7 +128,7 @@ export class PostsController {
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
       userModel,
-      inputLikeStatus,
+      inputLikeStatus.toString(),
     );
 
     if (!updateComment) throw new NotFoundException();
