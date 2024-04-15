@@ -25,6 +25,7 @@ import { UserMongoDbType } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
 import { BodyPostToPut, BodyPostToRequest1 } from './Type/Posts.type';
 import { AuthGuard, User } from '../auth/guard/authGuard';
+import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 
 @injectable()
 @Controller('posts')
@@ -77,6 +78,7 @@ export class PostsController {
 
     return result;
   }
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createNewPost(@Body() postInputModel: BodyPostToRequest1) {
     const postBody = {
@@ -87,6 +89,7 @@ export class PostsController {
     };
     return this.postsService.createNewPosts(postBody);
   }
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updatePostByPostId(
@@ -127,6 +130,7 @@ export class PostsController {
 
     return HttpCode(204);
   }
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deletePostByPostId(@Param('id') id: string) {
