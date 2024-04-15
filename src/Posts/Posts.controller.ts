@@ -113,6 +113,8 @@ export class PostsController {
     @User() userModel: UserMongoDbType,
     @Body() inputLikeStatus: string,
   ) {
+    const findPosts = await this.postsRepository.getPostsById(id);
+    if (!findPosts) throw new NotFoundException();
     if (!userModel) throw new UnauthorizedException();
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
