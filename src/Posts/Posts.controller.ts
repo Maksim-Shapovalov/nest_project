@@ -106,6 +106,7 @@ export class PostsController {
       return HttpCode(204);
     }
   }
+  @UseGuards(AuthGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
