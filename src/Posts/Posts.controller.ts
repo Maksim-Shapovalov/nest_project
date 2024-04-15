@@ -23,9 +23,14 @@ import {
 import { WithId } from 'mongodb';
 import { UserMongoDbType } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
-import { BodyPostToPut, BodyPostToRequest1 } from './Type/Posts.type';
+import {
+  BodyPostToPut,
+  BodyPostToRequest1,
+  StatusLikes,
+} from './Type/Posts.type';
 import { AuthGuard, User } from '../auth/guard/authGuard';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
+import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 
 @injectable()
 @Controller('posts')
@@ -115,7 +120,7 @@ export class PostsController {
   async appropriationLike(
     @Param('id') id: string,
     @User() userModel: UserMongoDbType,
-    @Body() inputLikeStatus: string,
+    @Body() inputLikeStatus: AvailableStatusEnum,
   ) {
     const findPosts = await this.postsRepository.getPostsById(id);
     if (!findPosts) throw new NotFoundException();

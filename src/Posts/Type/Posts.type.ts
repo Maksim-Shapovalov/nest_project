@@ -1,5 +1,6 @@
 import { WithId } from 'mongodb';
 import { Length, Matches } from 'class-validator';
+import { Trim } from '../../Other/trim-validator';
 
 export class PostClass {
   constructor(
@@ -69,6 +70,10 @@ export type LastThreeLikeUserInPost = [
     createdAt: string;
   },
 ];
+export class StatusLikes {
+  @Trim()
+  likeStatus: string;
+}
 
 export class BodyPostToRequest {
   @Length(0, 15)
