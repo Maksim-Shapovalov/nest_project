@@ -31,6 +31,7 @@ import {
 import { AuthGuard, User } from '../auth/guard/authGuard';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
+import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 
 @injectable()
 @Controller('posts')
@@ -115,19 +116,20 @@ export class PostsController {
     }
   }
   // @UseGuards(AuthGuard)
+  @UseGuards(BearerAuthGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
     @Param('id') id: string,
-    @User() userModel: UserMongoDbType,
+    @User() userModel: { userId: string },
     @Body() inputLikeStatus: StatusLikes,
   ) {
     const findPosts = await this.postsRepository.getPostsById(id);
+    console.log(userModel);
     if (!findPosts) throw new NotFoundException();
-    if (!userModel) throw new UnauthorizedException();
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
-      userModel,
+      userModel.userId,
       inputLikeStatus.toString(),
     );
 

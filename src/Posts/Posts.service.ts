@@ -30,12 +30,8 @@ export class PostsService {
 
     return this.postsRepository.savePost(newPosts);
   }
-  async updateStatusLikeInUser(
-    postId: string,
-    user: UserMongoDbType,
-    status: string,
-  ) {
-    return this.postsRepository.updateStatusLikeUser(postId, user, status);
+  async updateStatusLikeInUser(postId: string, userID: string, status: string) {
+    return this.postsRepository.updateStatusLikeUser(postId, userID, status);
   }
 
   async updatePostsById(

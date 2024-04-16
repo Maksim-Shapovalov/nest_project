@@ -4,7 +4,7 @@ import { PaginationQueryType } from '../qurey-repo/query-filter';
 import { BlogsRepository } from '../Blogs/Blogs.repository';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
-import { UserMongoDbType } from '../Users/Type/User.type';
+
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -13,8 +13,10 @@ import {
   PostLikeDocument,
   PostsDocument,
 } from './Type/Posts.schemas';
-import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
+
 import { NotFoundException } from '@nestjs/common';
+
+import { UserRepository } from '../Users/User.repository';
 
 @injectable()
 export class PostsRepository {
@@ -23,6 +25,7 @@ export class PostsRepository {
     @InjectModel(Post.name) protected postModel: Model<PostsDocument>,
     @InjectModel(PostLike.name)
     protected postLikeModel: Model<PostLikeDocument>,
+    protected userRepository: UserRepository,
   ) {}
   async getAllPosts(filter: PaginationQueryType) {
     const pageSizeInQuery: number = filter.pageSize;
@@ -91,19 +94,17 @@ export class PostsRepository {
       items: items,
     };
   }
-  async updateStatusLikeUser(
-    postId: string,
-    user: UserMongoDbType,
-    status: string,
-  ) {
+  async updateStatusLikeUser(postId: string, userId: string, status: string) {
     const likeWithUserId = await this.postLikeModel
       .findOne({
-        userId: user._id.toString(),
+        userId: userId,
         postId: postId,
       })
       .exec();
     console.log(likeWithUserId);
-
+    const findUser = await this.userRepository.getUserById(
+      new ObjectId(userId),
+    );
     const comment = await this.postModel
       .findOne({
         _id: new ObjectId(postId),
@@ -116,7 +117,7 @@ export class PostsRepository {
 
     if (likeWithUserId) {
       const updateStatus = await this.postLikeModel.updateOne(
-        { postId: postId, userId: user._id.toString() },
+        { postId: postId, userId: userId },
         {
           $set: {
             likesStatus: status,
@@ -130,10 +131,10 @@ export class PostsRepository {
 
     await this.postLikeModel.create({
       postId,
-      userId: user._id.toString(),
+      userId: userId,
       likesStatus: status,
       createdAt: new Date().toISOString(),
-      login: user.login,
+      login: findUser.login,
     });
 
     return true;
