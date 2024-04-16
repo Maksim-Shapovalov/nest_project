@@ -1,5 +1,5 @@
 import { WithId } from 'mongodb';
-import { Length, Matches } from 'class-validator';
+import { IsEnum, Length, Matches } from 'class-validator';
 import { Trim } from '../../Other/trim-validator';
 import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
 
@@ -73,6 +73,7 @@ export type LastThreeLikeUserInPost = [
 ];
 export class StatusLikes {
   @Trim()
+  @IsEnum(AvailableStatusEnum)
   likeStatus: AvailableStatusEnum;
 }
 

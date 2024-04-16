@@ -130,7 +130,7 @@ export class PostsController {
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
       userModel.userId,
-      inputLikeStatus.toString(),
+      inputLikeStatus.likeStatus,
     );
 
     if (!updateComment) throw new NotFoundException();

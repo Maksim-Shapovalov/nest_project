@@ -4,6 +4,7 @@ import { BlogsRepository } from '../Blogs/Blogs.repository';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
 import { UserMongoDbType } from '../Users/Type/User.type';
+import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 @injectable()
 export class PostsService {
   constructor(
@@ -30,7 +31,11 @@ export class PostsService {
 
     return this.postsRepository.savePost(newPosts);
   }
-  async updateStatusLikeInUser(postId: string, userID: string, status: string) {
+  async updateStatusLikeInUser(
+    postId: string,
+    userID: string,
+    status: AvailableStatusEnum,
+  ) {
     return this.postsRepository.updateStatusLikeUser(postId, userID, status);
   }
 

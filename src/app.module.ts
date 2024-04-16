@@ -41,6 +41,7 @@ import { RefreshTokenRepo } from './Token/refreshToken-repo';
 import { EmailManager } from './Email/email-manager';
 import { EmailAdapter } from './Email/email-adapter';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { PassportModule } from '@nestjs/passport';
 export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,

@@ -17,6 +17,7 @@ import {
 import { NotFoundException } from '@nestjs/common';
 
 import { UserRepository } from '../Users/User.repository';
+import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 
 @injectable()
 export class PostsRepository {
@@ -94,14 +95,17 @@ export class PostsRepository {
       items: items,
     };
   }
-  async updateStatusLikeUser(postId: string, userId: string, status: string) {
+  async updateStatusLikeUser(
+    postId: string,
+    userId: string,
+    status: AvailableStatusEnum,
+  ) {
     const likeWithUserId = await this.postLikeModel
       .findOne({
         userId: userId,
         postId: postId,
       })
       .exec();
-    console.log(likeWithUserId);
     const findUser = await this.userRepository.getUserById(
       new ObjectId(userId),
     );
