@@ -27,7 +27,7 @@ export class CommentsRepository {
     protected commentsLikeModel: Model<CommentsLikeDocument>,
   ) {}
   async getCommentsInPost(postId: string, filter: PaginationQueryType) {
-    const findPost = await this.postsRepository.getPostsById(postId);
+    const findPost = await this.postsRepository.getPostsById(postId, null);
 
     if (!findPost) {
       return null;

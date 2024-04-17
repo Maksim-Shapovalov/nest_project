@@ -17,7 +17,7 @@ import {
   Post,
   Put,
   Query,
-  UnauthorizedException,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { WithId } from 'mongodb';
@@ -28,9 +28,8 @@ import {
   BodyPostToRequest1,
   StatusLikes,
 } from './Type/Posts.type';
-import { AuthGuard, User } from '../auth/guard/authGuard';
+import { BearerGuard, User } from '../auth/guard/authGuard';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
-import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 
 @injectable()
@@ -47,10 +46,15 @@ export class PostsController {
     const filter = queryFilter(query);
     return this.postsRepository.getAllPosts(filter);
   }
+  @UseGuards(BearerGuard)
   @Get(':id')
   @HttpCode(200)
-  async getPostByPostId(@Param('id') id: string) {
-    const post = await this.postsRepository.getPostsById(id);
+  async getPostByPostId(@Param('id') id: string, @Req() request) {
+    const user = request.user;
+    const post = await this.postsRepository.getPostsById(
+      id,
+      user ? user._id : null,
+    );
     if (!post) throw new NotFoundException();
     return post;
   }
@@ -124,7 +128,7 @@ export class PostsController {
     @User() userModel: { userId: string },
     @Body() inputLikeStatus: StatusLikes,
   ) {
-    const findPosts = await this.postsRepository.getPostsById(id);
+    const findPosts = await this.postsRepository.getPostsById(id, null);
     console.log(userModel);
     if (!findPosts) throw new NotFoundException();
     const updateComment = await this.postsService.updateStatusLikeInUser(
