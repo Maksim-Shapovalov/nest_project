@@ -212,7 +212,7 @@ export class PostsRepository {
         likesCount: +likeCount, //+likeCount
         dislikesCount: +dislikeCount, //+dislikeCount
         myStatus: myStatus ? myStatus.likesStatus : 'None', //myStatus ? myStatus.likesStatus : 'None'
-        newestLikes: { findThreeLastUser },
+        newestLikes: findThreeLastUser,
       },
     };
   }
