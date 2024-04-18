@@ -81,7 +81,7 @@ export class AuthService {
 
       const accessToken: string = await this.jwtService.signAsync(
         bodyToAccessToken,
-        { secret: setting.JWT_SECRET, expiresIn: '5m' },
+        { secret: setting.JWT_SECRET, expiresIn: '10m' },
       );
       const refreshToken: string = await this.jwtService.signAsync(
         bodyToRefreshToken,
