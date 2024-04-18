@@ -62,7 +62,11 @@ export class PostsRepository {
     return this.postsLikeMapper(findPosts, userId);
   }
 
-  async getPostInBlogs(blogId: string, filter: PaginationQueryType) {
+  async getPostInBlogs(
+    blogId: string,
+    filter: PaginationQueryType,
+    userId: string | null,
+  ) {
     const findBlog = await this.blogsRepository.getBlogsById(blogId);
     if (!findBlog) {
       return null;
@@ -84,7 +88,7 @@ export class PostsRepository {
       .lean();
     // const items = res.map((p) => postsLikeMapper(p,null))
     const itemsPromises = res.map((p) => {
-      return this.postsLikeMapper(p, null);
+      return this.postsLikeMapper(p, userId);
     });
     const items = await Promise.all(itemsPromises);
 

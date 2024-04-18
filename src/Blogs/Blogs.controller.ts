@@ -16,12 +16,13 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { BodyPostToRequest } from '../Posts/Type/Posts.type';
 import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
-import { AuthGuard } from '../auth/guard/authGuard';
+import { BearerGuard } from '../auth/guard/authGuard';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 
 @injectable()
@@ -47,10 +48,20 @@ export class BlogsController {
       throw new NotFoundException();
     }
   }
+  @UseGuards(BearerGuard)
   @Get(':id/posts')
-  async getPostsByBlogId(@Param('id') id: string, @Query() query: QueryType) {
+  async getPostsByBlogId(
+    @Param('id') id: string,
+    @Query() query: QueryType,
+    @Req() request,
+  ) {
+    const user = request.user;
     const filter = queryFilter(query);
-    const result = await this.postsRepository.getPostInBlogs(id, filter);
+    const result = await this.postsRepository.getPostInBlogs(
+      id,
+      filter,
+      user ? user.userId : null,
+    );
     if (!result) {
       throw new NotFoundException();
     }

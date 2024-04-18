@@ -92,13 +92,13 @@ export class PostsController {
   @UseGuards(BasicAuthGuard)
   @Post()
   async createNewPost(@Body() postInputModel: BodyPostToRequest1) {
-    const postBody = {
-      title: postInputModel.title,
-      shortDescription: postInputModel.shortDescription,
-      content: postInputModel.content,
-      blogId: postInputModel.blogId,
-    };
-    return this.postsService.createNewPosts(postBody);
+    // const postBody = {
+    //   title: postInputModel.title,
+    //   shortDescription: postInputModel.shortDescription,
+    //   content: postInputModel.content,
+    //   blogId: postInputModel.blogId,
+    // };
+    return this.postsService.createNewPosts(postInputModel);
   }
   @UseGuards(BasicAuthGuard)
   @Put(':id')
