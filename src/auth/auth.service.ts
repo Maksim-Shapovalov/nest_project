@@ -81,11 +81,11 @@ export class AuthService {
 
       const accessToken: string = await this.jwtService.signAsync(
         bodyToAccessToken,
-        { secret: setting.JWT_SECRET, expiresIn: '10s' },
+        { secret: setting.JWT_SECRET, expiresIn: '5m' },
       );
       const refreshToken: string = await this.jwtService.signAsync(
         bodyToRefreshToken,
-        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '20s' },
+        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '10m' },
       );
 
       return { accessToken, refreshToken };
