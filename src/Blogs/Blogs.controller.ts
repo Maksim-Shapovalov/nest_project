@@ -49,6 +49,7 @@ export class BlogsController {
     }
   }
   @UseGuards(BearerGuard)
+  @UseGuards(BasicAuthGuard)
   @Get(':id/posts')
   async getPostsByBlogId(
     @Param('id') id: string,
