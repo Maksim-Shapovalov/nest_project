@@ -48,7 +48,7 @@ export class BlogsController {
       throw new NotFoundException();
     }
   }
-  @UseGuards(BearerGuard)
+  // @UseGuards(BearerGuard)
   @UseGuards(BasicAuthGuard)
   @Get(':id/posts')
   async getPostsByBlogId(
@@ -74,6 +74,8 @@ export class BlogsController {
     @Param('id') id: string,
     @Body() blogsInputModel: BodyPostToRequest,
   ) {
+    const findBlog = await this.blogsRepository.getBlogsById(id);
+    if (!findBlog) throw new NotFoundException();
     const postBody = {
       title: blogsInputModel.title,
       shortDescription: blogsInputModel.shortDescription,
