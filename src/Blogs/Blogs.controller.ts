@@ -68,7 +68,7 @@ export class BlogsController {
     }
     return result;
   }
-  @UseGuards(BearerGuard)
+  @UseGuards(BasicAuthGuard)
   @Post(':id/posts')
   async createPostInBlogByBlogId(
     @Param('id') id: string,
