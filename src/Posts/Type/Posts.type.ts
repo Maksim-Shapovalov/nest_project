@@ -1,7 +1,8 @@
 import { WithId } from 'mongodb';
-import { IsEnum, Length, Matches } from 'class-validator';
+import { IsEnum, Length, Matches, Validate } from 'class-validator';
 import { Trim } from '../../Other/trim-validator';
 import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
+import { CustomBlogIdValidation } from '../validation/BlogExists.decorator';
 
 export class PostClass {
   constructor(
@@ -101,6 +102,7 @@ export class BodyPostToRequest1 {
   shortDescription: string;
   @Length(1, 1000)
   content: string;
+  @Validate(CustomBlogIdValidation)
   blogId: string;
 }
 
