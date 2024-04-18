@@ -55,11 +55,10 @@ export class BearerGuard implements CanActivate {
           { secret: setting.JWT_SECRET },
         );
         const userId = decodedToken.userId;
-        console.log(userId, '-------------------------');
 
         const user = await this.userRepository.getUserById(userId);
         if (user) {
-          request.user = user;
+          request.user = this.UserInReqMapper(user);
         }
       } catch (error) {
         return false;
@@ -67,5 +66,12 @@ export class BearerGuard implements CanActivate {
     }
 
     return true;
+  }
+  async UserInReqMapper(user: any) {
+    return {
+      userId: user.id,
+      addedAt: user.createdAt,
+      login: user.login,
+    };
   }
 }

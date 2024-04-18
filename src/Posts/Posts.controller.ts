@@ -130,6 +130,7 @@ export class PostsController {
   ) {
     const findPosts = await this.postsRepository.getPostsById(id, null);
     console.log(userModel);
+    console.log(inputLikeStatus, '23o84372394561238741');
     if (!findPosts) throw new NotFoundException();
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
