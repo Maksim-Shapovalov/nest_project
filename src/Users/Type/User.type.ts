@@ -11,7 +11,21 @@ export class UserDbType {
     public emailConfirmation: EmailConfirmations,
     public recoveryCode: string,
   ) {}
+
+  static UserInReqMapper(user: any): NewestPostLike {
+    return {
+      userId: user._id.toString(),
+      addedAt: user.createdAt,
+      login: user.login,
+    };
+  }
 }
+
+export type NewestPostLike = {
+  userId: string;
+  addedAt: string;
+  login: string;
+};
 
 export type UserOutputModel = {
   id: string;

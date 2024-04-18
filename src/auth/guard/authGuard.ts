@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../../Users/User.repository';
 import { setting } from '../../setting';
+import { UserDbType } from '../../Users/Type/User.type';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -58,7 +59,10 @@ export class BearerGuard implements CanActivate {
 
         const user = await this.userRepository.getUserById(userId);
         if (user) {
-          request.user = this.UserInReqMapper(user);
+          const mapUser = UserDbType.UserInReqMapper(user);
+          request.user = mapUser;
+          // request.user = user;
+          console.log(request.user, 'request user');
         }
       } catch (error) {
         return false;
@@ -66,12 +70,5 @@ export class BearerGuard implements CanActivate {
     }
 
     return true;
-  }
-  async UserInReqMapper(user: any) {
-    return {
-      userId: user.id,
-      addedAt: user.createdAt,
-      login: user.login,
-    };
   }
 }

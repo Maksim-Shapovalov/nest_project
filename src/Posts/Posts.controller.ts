@@ -21,7 +21,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { WithId } from 'mongodb';
-import { UserMongoDbType } from '../Users/Type/User.type';
+import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
 import {
   BodyPostToPut,
@@ -51,9 +51,10 @@ export class PostsController {
   @HttpCode(200)
   async getPostByPostId(@Param('id') id: string, @Req() request) {
     const user = request.user;
+    console.log(user, 'user');
     const post = await this.postsRepository.getPostsById(
       id,
-      user ? user._id : null,
+      user ? user.userId : null,
     );
     if (!post) throw new NotFoundException();
     return post;

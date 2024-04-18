@@ -18,6 +18,7 @@ import { NotFoundException } from '@nestjs/common';
 
 import { UserRepository } from '../Users/User.repository';
 import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
+import { UserDbType } from '../Users/Type/User.type';
 
 @injectable()
 export class PostsRepository {
@@ -212,7 +213,7 @@ export class PostsRepository {
         likesCount: +likeCount, //+likeCount
         dislikesCount: +dislikeCount, //+dislikeCount
         myStatus: myStatus ? myStatus.likesStatus : 'None', //myStatus ? myStatus.likesStatus : 'None'
-        newestLikes: findThreeLastUser,
+        newestLikes: findThreeLastUser.map(UserDbType.UserInReqMapper),
       },
     };
   }
