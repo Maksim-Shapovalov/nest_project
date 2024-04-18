@@ -40,6 +40,8 @@ import { Token, TokenSchema } from './Token/Token.schema';
 import { RefreshTokenRepo } from './Token/refreshToken-repo';
 import { EmailManager } from './Email/email-manager';
 import { EmailAdapter } from './Email/email-adapter';
+import { ValidatorConstraint } from 'class-validator';
+import { CustomBlogIdValidation } from './Posts/validation/BlogExists.decorator';
 export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,
@@ -94,6 +96,7 @@ export const HTTP_STATUS = {
     EmailAdapter,
     AppService,
     RefreshTokenRepo,
+    CustomBlogIdValidation,
   ],
 })
 export class AppModule {}
