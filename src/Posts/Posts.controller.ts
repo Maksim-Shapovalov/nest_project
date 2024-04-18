@@ -21,7 +21,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { WithId } from 'mongodb';
-import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
+import { UserMongoDbType } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
 import {
   BodyPostToPut,
@@ -100,7 +100,7 @@ export class PostsController {
     //   content: postInputModel.content,
     //   blogId: postInputModel.blogId,
     // };
-    return this.postsService.createNewPosts(postInputModel);
+    return this.postsService.createNewPosts(postInputModel, null);
   }
   @UseGuards(BasicAuthGuard)
   @Put(':id')
@@ -132,8 +132,6 @@ export class PostsController {
     @Body() inputLikeStatus: StatusLikes,
   ) {
     const findPosts = await this.postsRepository.getPostsById(id, null);
-    console.log(userModel);
-    console.log(inputLikeStatus, '23o84372394561238741');
     if (!findPosts) throw new NotFoundException();
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,

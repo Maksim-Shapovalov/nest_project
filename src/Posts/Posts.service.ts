@@ -3,7 +3,6 @@ import { PostsRepository } from './Posts.repository';
 import { BlogsRepository } from '../Blogs/Blogs.repository';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
-import { UserMongoDbType } from '../Users/Type/User.type';
 import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 @injectable()
 export class PostsService {
@@ -12,7 +11,11 @@ export class PostsService {
     protected blogsRepository: BlogsRepository,
   ) {}
 
-  async createNewPosts(bodyPost: BodyPostToRequest1, blogId?: string) {
+  async createNewPosts(
+    bodyPost: BodyPostToRequest1,
+    userId: string | null,
+    blogId?: string,
+  ) {
     const findBlogName = await this.blogsRepository.getBlogsById(
       blogId ?? bodyPost.blogId,
     );
@@ -29,7 +32,7 @@ export class PostsService {
       new Date().toISOString(),
     );
 
-    return this.postsRepository.savePost(newPosts);
+    return this.postsRepository.savePost(newPosts, userId);
   }
   async updateStatusLikeInUser(
     postId: string,

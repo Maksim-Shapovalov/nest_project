@@ -24,6 +24,7 @@ import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { BearerGuard } from '../auth/guard/authGuard';
+import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 
 @injectable()
 @Controller('blogs')
@@ -68,12 +69,15 @@ export class BlogsController {
     }
     return result;
   }
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @Post(':id/posts')
+  @HttpCode(200)
   async createPostInBlogByBlogId(
     @Param('id') id: string,
     @Body() blogsInputModel: BodyPostToRequest,
+    @Req() request,
   ) {
+    const user = request.user;
     const findBlog = await this.blogsRepository.getBlogsById(id);
     if (!findBlog) throw new NotFoundException();
     const postBody = {
@@ -82,7 +86,11 @@ export class BlogsController {
       content: blogsInputModel.content,
       blogId: id,
     };
-    const newPost = await this.postsService.createNewPosts(postBody, id);
+    const newPost = await this.postsService.createNewPosts(
+      postBody,
+      id,
+      user ? user.userId : null,
+    );
     if (!newPost) {
       throw new NotFoundException();
     }

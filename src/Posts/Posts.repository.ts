@@ -149,10 +149,10 @@ export class PostsRepository {
     return true;
   }
 
-  async savePost(post: PostClass) {
+  async savePost(post: PostClass, userId: string | null) {
     // await this.postsLikeMapper(post, null);
     const newPost = await this.postModel.create(post);
-    return this.postsLikeMapper(newPost, null);
+    return this.postsLikeMapper(newPost, userId);
   }
 
   async updatePostsById(
