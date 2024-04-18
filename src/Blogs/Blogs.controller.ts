@@ -22,8 +22,8 @@ import {
 import { BodyPostToRequest } from '../Posts/Type/Posts.type';
 import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
-import { BearerGuard } from '../auth/guard/authGuard';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
+import { BearerGuard } from '../auth/guard/authGuard';
 
 @injectable()
 @Controller('blogs')
@@ -48,7 +48,7 @@ export class BlogsController {
       throw new NotFoundException();
     }
   }
-  // @UseGuards(BearerGuard)
+  //
   @UseGuards(BasicAuthGuard)
   @Get(':id/posts')
   async getPostsByBlogId(
@@ -68,7 +68,7 @@ export class BlogsController {
     }
     return result;
   }
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(BearerGuard)
   @Post(':id/posts')
   async createPostInBlogByBlogId(
     @Param('id') id: string,
