@@ -79,19 +79,19 @@ export class StatusLikes {
 }
 
 export class BodyPostToRequest {
-  @Length(0, 15)
+  @Length(1, 30)
   title: string;
-  @Length(0, 500)
+  @Length(1, 100)
   shortDescription: string;
-  @Length(0, 100)
+  @Length(1, 1000)
   content: string;
 }
 export class BodyPostToPut {
-  @Length(0, 15)
+  @Length(0, 30)
   title: string;
-  @Length(0, 500)
-  shortDescription: string;
   @Length(0, 100)
+  shortDescription: string;
+  @Length(0, 1000)
   content: string;
   blogId: string;
 }
