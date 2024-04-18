@@ -41,10 +41,12 @@ export class PostsController {
     protected serviceComments: CommentsService,
     protected commentsRepository: CommentsRepository,
   ) {}
+  @UseGuards(BearerGuard)
   @Get()
-  async getAllPostsInDB(@Query() query: QueryType) {
+  async getAllPostsInDB(@Query() query: QueryType, @Req() request) {
+    const user = request.user;
     const filter = queryFilter(query);
-    return this.postsRepository.getAllPosts(filter);
+    return this.postsRepository.getAllPosts(filter, user ? user.userId : null);
   }
   @UseGuards(BearerGuard)
   @Get(':id')

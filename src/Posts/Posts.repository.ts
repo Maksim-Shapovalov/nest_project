@@ -29,7 +29,7 @@ export class PostsRepository {
     protected postLikeModel: Model<PostLikeDocument>,
     protected userRepository: UserRepository,
   ) {}
-  async getAllPosts(filter: PaginationQueryType) {
+  async getAllPosts(filter: PaginationQueryType, userId: string | null) {
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountBlogs = await this.postModel.countDocuments({});
 
@@ -42,7 +42,7 @@ export class PostsRepository {
       .limit(pageSizeInQuery)
       .lean();
     // const items = result.map((p) => postsLikeMapper(p,userId))
-    const itemsPromises = result.map((p) => this.postsLikeMapper(p, null));
+    const itemsPromises = result.map((p) => this.postsLikeMapper(p, userId));
     const items = await Promise.all(itemsPromises);
     return {
       pagesCount: pageCountBlogs,
