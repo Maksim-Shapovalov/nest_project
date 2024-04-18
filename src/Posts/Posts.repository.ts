@@ -213,7 +213,11 @@ export class PostsRepository {
         likesCount: +likeCount, //+likeCount
         dislikesCount: +dislikeCount, //+dislikeCount
         myStatus: myStatus ? myStatus.likesStatus : 'None', //myStatus ? myStatus.likesStatus : 'None'
-        newestLikes: findThreeLastUser.map(UserDbType.UserInReqMapper),
+        newestLikes: findThreeLastUser.map((r) => ({
+          addedAt: r.createdAt,
+          userId: r.userId,
+          login: r.login,
+        })), //findThreeLastUser.map(UserDbType.UserInReqMapper)
       },
     };
   }

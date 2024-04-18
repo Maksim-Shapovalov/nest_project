@@ -47,7 +47,6 @@ export class BearerGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
-    console.log(token);
 
     if (token) {
       try {
@@ -58,6 +57,7 @@ export class BearerGuard implements CanActivate {
         const userId = decodedToken.userId;
 
         const user = await this.userRepository.getUserById(userId);
+        console.log(user, 'this is user');
         if (user) {
           const mapUser = UserDbType.UserInReqMapper(user);
           request.user = mapUser;

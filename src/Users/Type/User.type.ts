@@ -1,5 +1,5 @@
 import { WithId } from 'mongodb';
-import { IsEmail, Length, Matches, Validate } from 'class-validator';
+import { IsEmail, Length, Matches } from 'class-validator';
 
 export class UserDbType {
   constructor(
