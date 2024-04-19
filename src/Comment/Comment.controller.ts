@@ -22,7 +22,7 @@ import { HTTP_STATUS } from '../app.module';
 import { AuthGuard, BearerGuard, User } from '../auth/guard/authGuard';
 
 @injectable()
-@Controller('users')
+@Controller('comments')
 export class CommentsController {
   constructor(
     protected serviceComments: CommentsService,
@@ -71,17 +71,17 @@ export class CommentsController {
     if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
     return HTTP_STATUS.NO_CONTENT_204;
   }
-  @UseGuards(AuthGuard)
+  @UseGuards(BearerGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
     @Param('id') id: string,
-    @User() userModel: UserMongoDbType,
     @Body() inputLikeStatus: string,
+    @User() userModel: { userId: string },
   ) {
     const updateComment = await this.serviceComments.updateStatusLikeInUser(
       id,
-      userModel._id.toString(),
+      userModel.userId,
       inputLikeStatus,
     );
 
