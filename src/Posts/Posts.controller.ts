@@ -30,6 +30,7 @@ import {
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
+import { HTTP_STATUS } from '../app.module';
 
 @injectable()
 @Controller('posts')
@@ -60,14 +61,22 @@ export class PostsController {
     if (!post) throw new NotFoundException();
     return post;
   }
+  @UseGuards(BearerGuard)
   @Get(':id/comments')
-  @HttpCode(204)
+  @HttpCode(200)
   async getCommentByCommendIdInPosts(
     @Query() query: QueryType,
     @Param('id') id: string,
+    @Req() request,
   ) {
+    const user = request.user;
     const filter = queryFilter(query);
-    const result = await this.commentsRepository.getCommentsInPost(id, filter);
+    const result = await this.commentsRepository.getCommentsInPost(
+      id,
+      filter,
+      user,
+    );
+    console.log(result, 'result');
     if (!result) {
       throw new NotFoundException();
     }

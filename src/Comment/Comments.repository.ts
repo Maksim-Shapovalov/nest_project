@@ -17,6 +17,7 @@ import {
   CommentsLike,
   CommentsLikeDocument,
 } from './Type/Comments.schemas';
+import { NewestPostLike } from '../Users/Type/User.type';
 
 @injectable()
 export class CommentsRepository {
@@ -26,8 +27,15 @@ export class CommentsRepository {
     @InjectModel(CommentsLike.name)
     protected commentsLikeModel: Model<CommentsLikeDocument>,
   ) {}
-  async getCommentsInPost(postId: string, filter: PaginationQueryType) {
-    const findPost = await this.postsRepository.getPostsById(postId, null);
+  async getCommentsInPost(
+    postId: string,
+    filter: PaginationQueryType,
+    user: NewestPostLike,
+  ) {
+    const findPost = await this.postsRepository.getPostsById(
+      postId,
+      user.userId,
+    );
 
     if (!findPost) {
       return null;
@@ -48,7 +56,7 @@ export class CommentsRepository {
       .limit(pageSizeInQuery)
       .lean();
 
-    const itemsPromises = res.map((c) => this.commentsMapper(c, null));
+    const itemsPromises = res.map((c) => this.commentsMapper(c, user.userId));
     const items = await Promise.all(itemsPromises);
 
     return {
