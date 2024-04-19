@@ -21,6 +21,7 @@ import { WithId } from 'mongodb';
 import { HTTP_STATUS } from '../app.module';
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { StatusLikes } from '../Posts/Type/Posts.type';
+import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 
 @injectable()
 @Controller('comments')
@@ -29,26 +30,16 @@ export class CommentsController {
     protected serviceComments: CommentsService,
     protected commentsRepository: CommentsRepository,
   ) {}
-  @UseGuards(BearerGuard)
+  @UseGuards(SoftAuthGuard)
   @Get(':id')
   async getCommentsById(@Param('id') id: string, @Req() request) {
     const user = request.user as NewestPostLike;
-    if (!user) {
-      const findComments = await this.commentsRepository.getCommentById(
-        id,
-        user.userId ? user.userId : null,
-      );
-
-      if (!findComments) throw new NotFoundException();
-      return findComments;
-    }
     const findComments = await this.commentsRepository.getCommentById(
       id,
-      user.userId ? user.userId : null,
+      user ? user.userId : null,
     );
 
     if (!findComments) throw new NotFoundException();
-
     return findComments;
   }
   @UseGuards(BearerGuard)

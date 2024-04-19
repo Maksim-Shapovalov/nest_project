@@ -31,6 +31,7 @@ import { BearerGuard, User } from '../auth/guard/authGuard';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 import { HTTP_STATUS } from '../app.module';
+import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 
 @injectable()
 @Controller('posts')
@@ -41,14 +42,14 @@ export class PostsController {
     protected serviceComments: CommentsService,
     protected commentsRepository: CommentsRepository,
   ) {}
-  @UseGuards(BearerGuard)
+  @UseGuards(SoftAuthGuard)
   @Get()
   async getAllPostsInDB(@Query() query: QueryType, @Req() request) {
     const user = request.user;
     const filter = queryFilter(query);
     return this.postsRepository.getAllPosts(filter, user ? user.userId : null);
   }
-  @UseGuards(BearerGuard)
+  @UseGuards(SoftAuthGuard)
   @Get(':id')
   @HttpCode(200)
   async getPostByPostId(@Param('id') id: string, @Req() request) {
@@ -61,7 +62,7 @@ export class PostsController {
     if (!post) throw new NotFoundException();
     return post;
   }
-  @UseGuards(BearerGuard)
+  @UseGuards(SoftAuthGuard)
   @Get(':id/comments')
   @HttpCode(200)
   async getCommentByCommendIdInPosts(
