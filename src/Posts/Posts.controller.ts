@@ -84,7 +84,7 @@ export class PostsController {
   }
   @UseGuards(BearerGuard)
   @Post(':id/comments')
-  @HttpCode(204)
+  @HttpCode(201)
   async createCommentsInPostById(
     @Body() contentInput: { content: string },
     @Param('id') id: string,
@@ -96,6 +96,7 @@ export class PostsController {
       contentInput.content,
       user ? user : null,
     );
+    console.log(result, 'result');
 
     if (!result) throw new NotFoundException();
 

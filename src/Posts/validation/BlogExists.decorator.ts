@@ -15,7 +15,7 @@ export class CustomBlogIdValidation implements ValidatorConstraintInterface {
     const blog = await this.blogRepository.getBlogsById(blogId);
     console.log(blog);
     if (!blog) {
-      throw new BadRequestException();
+      return false;
     }
     return true;
   }
