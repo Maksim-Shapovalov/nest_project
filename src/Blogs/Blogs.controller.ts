@@ -23,8 +23,7 @@ import { BodyPostToRequest } from '../Posts/Type/Posts.type';
 import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
-import { BearerGuard } from '../auth/guard/authGuard';
-import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
+import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 
 @injectable()
 @Controller('blogs')
@@ -50,7 +49,7 @@ export class BlogsController {
     }
   }
   //
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(SoftAuthGuard)
   @Get(':id/posts')
   async getPostsByBlogId(
     @Param('id') id: string,
