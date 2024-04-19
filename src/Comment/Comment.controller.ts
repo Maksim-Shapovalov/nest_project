@@ -19,7 +19,8 @@ import {
 import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
 import { WithId } from 'mongodb';
 import { HTTP_STATUS } from '../app.module';
-import { AuthGuard, BearerGuard, User } from '../auth/guard/authGuard';
+import { BearerGuard, User } from '../auth/guard/authGuard';
+import { StatusLikes } from '../Posts/Type/Posts.type';
 
 @injectable()
 @Controller('comments')
@@ -38,15 +39,15 @@ export class CommentsController {
         user.userId ? user.userId : null,
       );
 
-      if (!findComments) return HTTP_STATUS.NOT_FOUND_404;
+      if (!findComments) throw new NotFoundException();
       return findComments;
     }
     const findComments = await this.commentsRepository.getCommentById(
       id,
-      user.userId,
+      user.userId ? user.userId : null,
     );
 
-    if (!findComments) return HTTP_STATUS.NOT_FOUND_404;
+    if (!findComments) throw new NotFoundException();
 
     return findComments;
   }
@@ -76,32 +77,34 @@ export class CommentsController {
   @HttpCode(204)
   async appropriationLike(
     @Param('id') id: string,
-    @Body() inputLikeStatus: string,
+    @Body() inputLikeStatus: StatusLikes,
     @User() userModel: { userId: string },
   ) {
     const updateComment = await this.serviceComments.updateStatusLikeInUser(
       id,
       userModel.userId,
-      inputLikeStatus,
+      inputLikeStatus.likeStatus,
     );
 
     if (!updateComment) throw new NotFoundException();
 
     return HttpCode(204);
   }
+  @UseGuards(BearerGuard)
   @Delete('id')
   @HttpCode(204)
   async deleteCommentByCommentId(
     @Param('id') id: string,
     @Body() userFind: WithId<UserMongoDbType>,
+    @Req() request,
   ) {
-    const user = userFind;
+    const user = request.user as NewestPostLike;
     const comment = await this.commentsRepository.getCommentById(
       id,
-      user._id.toString(),
+      user.userId,
     );
 
-    if (comment?.commentatorInfo.userId != user._id.toString())
+    if (comment?.commentatorInfo.userId != user.userId)
       return HTTP_STATUS.Forbidden_403;
     const deletedComment = await this.serviceComments.deletedComment(id);
 
