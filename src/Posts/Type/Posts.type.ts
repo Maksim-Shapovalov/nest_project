@@ -79,29 +79,41 @@ export class StatusLikes {
 }
 
 export class BodyPostToRequest {
+  @Trim()
   @Length(1, 30)
   title: string;
+  @Trim()
   @Length(1, 100)
   shortDescription: string;
+  @Trim()
   @Length(1, 1000)
   content: string;
 }
 export class BodyPostToPut {
-  @Length(0, 30)
+  @Trim()
+  @Length(1, 30)
   title: string;
-  @Length(0, 100)
+  @Trim()
+  @Length(1, 100)
   shortDescription: string;
-  @Length(0, 1000)
+  @Trim()
+  @Length(1, 1000)
   content: string;
+  @Trim()
+  @Validate(CustomBlogIdValidation)
   blogId: string;
 }
 export class BodyPostToRequest1 {
+  @Trim()
   @Length(1, 30)
   title: string;
+  @Trim()
   @Length(1, 100)
   shortDescription: string;
+  @Trim()
   @Length(1, 1000)
   content: string;
+  @Trim()
   @Validate(CustomBlogIdValidation)
   blogId: string;
 }
