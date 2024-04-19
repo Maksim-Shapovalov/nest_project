@@ -77,14 +77,14 @@ export class PostsController {
   @Post(':id/comments')
   @HttpCode(204)
   async createCommentsInPostById(
-    @Body() contentInput: string,
+    @Body() contentInput: { content: string },
     @Param('id') id: string,
     @Req() request,
   ) {
     const user = request.user as NewestPostLike;
     const result = await this.serviceComments.createdNewComments(
       id,
-      contentInput,
+      contentInput.content,
       user ? user : null,
     );
 

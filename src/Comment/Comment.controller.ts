@@ -13,12 +13,13 @@ import {
   NotFoundException,
   Param,
   Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
-import { UserMongoDbType } from '../Users/Type/User.type';
+import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
 import { WithId } from 'mongodb';
 import { HTTP_STATUS } from '../app.module';
-import { AuthGuard, User } from '../auth/guard/authGuard';
+import { AuthGuard, BearerGuard, User } from '../auth/guard/authGuard';
 
 @injectable()
 @Controller('users')
@@ -27,16 +28,14 @@ export class CommentsController {
     protected serviceComments: CommentsService,
     protected commentsRepository: CommentsRepository,
   ) {}
+  @UseGuards(BearerGuard)
   @Get(':id')
-  async getCommentsById(
-    @Body() userFind: WithId<UserMongoDbType>,
-    @Param('id') id: string,
-  ) {
-    const user = userFind;
+  async getCommentsById(@Param('id') id: string, @Req() request) {
+    const user = request.user as NewestPostLike;
     if (!user) {
       const findComments = await this.commentsRepository.getCommentById(
         id,
-        null,
+        user.userId ? user.userId : null,
       );
 
       if (!findComments) return HTTP_STATUS.NOT_FOUND_404;
@@ -44,23 +43,27 @@ export class CommentsController {
     }
     const findComments = await this.commentsRepository.getCommentById(
       id,
-      user._id.toString(),
+      user.userId,
     );
 
     if (!findComments) return HTTP_STATUS.NOT_FOUND_404;
 
     return findComments;
   }
+  @UseGuards(BearerGuard)
   @Put(':id')
   async updateCommentByCommentId(
     @Param('id') id: string,
-    @Body() userFind: WithId<UserMongoDbType>,
     @Body() content: string,
+    @Req() request,
   ) {
-    const user = userFind;
-    const comment = await this.commentsRepository.getCommentById(id, null);
+    const user = request.user as NewestPostLike;
+    const comment = await this.commentsRepository.getCommentById(
+      id,
+      user.userId ? user.userId : null,
+    );
 
-    if (comment?.commentatorInfo.userId != user._id.toString())
+    if (comment?.commentatorInfo.userId != user.userId)
       return HTTP_STATUS.Forbidden_403;
 
     const updateComment = await this.serviceComments.updateComment(id, content);
