@@ -20,8 +20,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { WithId } from 'mongodb';
-import { UserMongoDbType } from '../Users/Type/User.type';
+import { NewestPostLike } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
 import {
   BodyPostToPut,
@@ -74,17 +73,19 @@ export class PostsController {
     }
     return result;
   }
-  @Post(':id')
+  @UseGuards(BearerGuard)
+  @Post(':id/comments')
   @HttpCode(204)
   async createCommentsInPostById(
     @Body() contentInput: string,
     @Param('id') id: string,
-    @Body() userFind: WithId<UserMongoDbType>,
+    @Req() request,
   ) {
+    const user = request.user as NewestPostLike;
     const result = await this.serviceComments.createdNewComments(
       id,
       contentInput,
-      userFind,
+      user ? user : null,
     );
 
     if (!result) throw new NotFoundException();

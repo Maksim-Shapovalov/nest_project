@@ -1,7 +1,7 @@
 import { CommentsRepository } from './Comments.repository';
 import { CommentsClass } from './Type/Comment.type';
 import { WithId } from 'mongodb';
-import { UserMongoDbType } from '../Users/Type/User.type';
+import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
 import { PostsRepository } from '../Posts/Posts.repository';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
@@ -15,9 +15,9 @@ export class CommentsService {
   async createdNewComments(
     postId: string,
     content: string,
-    user: WithId<UserMongoDbType>,
+    userId: NewestPostLike | null,
   ) {
-    const post = await this.postsRepository.getPostsById(postId, null);
+    const post = await this.postsRepository.getPostsById(postId, userId.userId);
 
     if (!post) {
       return null;
@@ -26,17 +26,14 @@ export class CommentsService {
     const newComment = new CommentsClass(
       content,
       {
-        userId: user._id.toString(),
-        userLogin: user.login,
+        userId: userId.userId,
+        userLogin: userId.login,
       },
       postId,
       new Date().toISOString(),
     );
 
-    return this.commentsRepository.saveComments(
-      newComment,
-      user._id.toString(),
-    );
+    return this.commentsRepository.saveComments(newComment, userId.userId);
   }
 
   async updateComment(commentId: string, content: string) {
