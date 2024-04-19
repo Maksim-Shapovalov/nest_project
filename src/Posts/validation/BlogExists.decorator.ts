@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import {
   ValidatorConstraint,
@@ -11,10 +11,11 @@ import { BlogsRepository } from '../../Blogs/Blogs.repository';
 export class CustomBlogIdValidation implements ValidatorConstraintInterface {
   constructor(private blogRepository: BlogsRepository) {}
 
-  async validate(id: string): Promise<boolean> {
-    const blog = await this.blogRepository.getBlogsById(id);
+  async validate(blogId: string): Promise<boolean> {
+    const blog = await this.blogRepository.getBlogsById(blogId);
+    console.log(blog);
     if (!blog) {
-      throw new Error('not found');
+      throw new BadRequestException();
     }
     return true;
   }
