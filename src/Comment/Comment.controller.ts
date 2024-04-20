@@ -8,6 +8,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -58,7 +59,7 @@ export class CommentsController {
     );
 
     if (comment?.commentatorInfo.userId != user.userId)
-      return HTTP_STATUS.Forbidden_403;
+      throw new ForbiddenException();
 
     const updateComment = await this.serviceComments.updateComment(
       id,
@@ -102,7 +103,7 @@ export class CommentsController {
     );
 
     if (comment?.commentatorInfo.userId != user.userId)
-      return HTTP_STATUS.Forbidden_403;
+      throw new ForbiddenException();
     const deletedComment = await this.serviceComments.deletedComment(id);
 
     if (!deletedComment) throw new NotFoundException();
