@@ -72,7 +72,10 @@ export class CommentsController {
     @Body() inputLikeStatus: StatusLikes,
     @User() userModel: { userId: string },
   ) {
-    const findComments = await this.commentsRepository.getCommentById(id, null);
+    const findComments = await this.commentsRepository.getCommentById(
+      id,
+      userModel.userId,
+    );
     if (!findComments) throw new NotFoundException();
     console.log(inputLikeStatus, 'status like');
     const updateComment = await this.serviceComments.updateStatusLikeInUser(
