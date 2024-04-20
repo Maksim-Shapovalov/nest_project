@@ -105,12 +105,15 @@ export class CommentsRepository {
     status: AvailableStatusEnum,
   ) {
     console.log(status, 'status in repositry 1');
+    console.log(userId, 'status in repositry 1');
+    console.log(commentId, 'status in repositry 1');
     const likeWithUserId = await this.commentsLikeModel
       .findOne({
         userId: userId,
-        _id: new ObjectId(commentId),
+        commentId: commentId,
       })
       .exec();
+    console.log(likeWithUserId, 'likeWithUserId');
 
     const comment = await this.commentModel
       .findOne({
@@ -135,14 +138,14 @@ export class CommentsRepository {
       console.log(updateStatus, ' update status');
 
       return updateStatus.matchedCount === 1;
+    } else {
+      await this.commentsLikeModel.create({
+        commentId,
+        userId,
+        likesStatus: status,
+      });
+      return true;
     }
-
-    await this.commentsLikeModel.create({
-      userId,
-      likesStatus: status,
-    });
-
-    return true;
   }
 
   async deleteCommentsByCommentId(commentId: string): Promise<boolean> {
@@ -167,6 +170,7 @@ export class CommentsRepository {
         commentId: comment._id.toString(),
       })
       .exec();
+    console.log(myStatus, 'myStatus');
 
     return {
       id: comment._id.toHexString(),

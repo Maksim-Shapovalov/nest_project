@@ -32,6 +32,8 @@ export type CommentsLikeDocument = HydratedDocument<CommentsLike>;
 @Schema()
 export class CommentsLike {
   @Prop({ required: true })
+  commentId: string;
+  @Prop({ required: true })
   userId: string;
   @Prop({
     required: true,
