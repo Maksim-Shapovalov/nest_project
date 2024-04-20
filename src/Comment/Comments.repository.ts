@@ -151,11 +151,11 @@ export class CommentsRepository {
   }
   async commentsMapper(comment: WithId<CommentsTypeDb>, userId: string | null) {
     const likeCount = await this.commentsLikeModel.countDocuments({
-      likeStatus: AvailableStatusEnum.like,
+      likesStatus: AvailableStatusEnum.like,
       commentId: comment._id.toString(),
     });
     const dislikeCount = await this.commentsLikeModel.countDocuments({
-      likeStatus: AvailableStatusEnum.dislike,
+      likesStatus: AvailableStatusEnum.dislike,
       commentId: comment._id.toString(),
     });
 
