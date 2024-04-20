@@ -75,6 +75,7 @@ export class CommentsRepository {
 
   async getCommentById(commentId: string, userId: string | null) {
     if (!ObjectId.isValid(commentId)) return null;
+    console.log(commentId, 'commentId');
     // const findComments = await this.commentModel.findOne({
     //   _id: new ObjectId(commentId),
     // });

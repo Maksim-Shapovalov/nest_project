@@ -45,21 +45,25 @@ export class CommentsController {
   }
   @UseGuards(BearerGuard)
   @Put(':id')
+  @HttpCode(204)
   async updateCommentByCommentId(
     @Param('id') id: string,
-    @Body() content: string,
+    @Body() content: { content: string },
     @Req() request,
   ) {
     const user = request.user as NewestPostLike;
     const comment = await this.commentsRepository.getCommentById(
       id,
-      user.userId ? user.userId : null,
+      user.userId,
     );
 
     if (comment?.commentatorInfo.userId != user.userId)
       return HTTP_STATUS.Forbidden_403;
 
-    const updateComment = await this.serviceComments.updateComment(id, content);
+    const updateComment = await this.serviceComments.updateComment(
+      id,
+      content.content,
+    );
 
     if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
     return HTTP_STATUS.NO_CONTENT_204;
