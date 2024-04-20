@@ -106,7 +106,7 @@ export class CommentsRepository {
   ) {
     const likeWithUserId = await this.commentsLikeModel
       .findOne({
-        userId,
+        userId: userId,
         commentId,
       })
       .exec();
