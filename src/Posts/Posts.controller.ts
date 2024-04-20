@@ -95,7 +95,7 @@ export class PostsController {
     const result = await this.serviceComments.createdNewComments(
       id,
       contentInput.content,
-      user ? user : null,
+      user,
     );
     console.log(result, 'result');
 

@@ -46,26 +46,25 @@ export class BearerGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
+    if (!token) return false;
 
-    if (token) {
-      try {
-        const decodedToken = this.jwtService.verify(
-          token.replace('Bearer ', ''),
-          { secret: setting.JWT_SECRET },
-        );
-        const userId = decodedToken.userId;
+    try {
+      const decodedToken = this.jwtService.verify(
+        token.replace('Bearer ', ''),
+        { secret: setting.JWT_SECRET },
+      );
+      const userId = decodedToken.userId;
 
-        const user = await this.userRepository.getUserById(userId);
-        console.log(user, 'this is user');
-        if (user) {
-          const mapUser = UserDbType.UserInReqMapper(user);
-          request.user = mapUser;
-          // request.user = user;
-          console.log(request.user, 'request user');
-        }
-      } catch (error) {
-        return false;
-      }
+      const user = await this.userRepository.getUserById(userId);
+      console.log(user, 'this is user');
+      if (!user) return false;
+
+      const mapUser = UserDbType.UserInReqMapper(user);
+      request.user = mapUser;
+      // request.user = user;
+      console.log(request.user, 'request user');
+    } catch (error) {
+      return false;
     }
 
     return true;

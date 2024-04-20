@@ -126,7 +126,7 @@ export class CommentsRepository {
         { commentId, userId },
         {
           $set: {
-            likeStatus: status,
+            likesStatus: status,
           },
         },
       );
@@ -137,7 +137,7 @@ export class CommentsRepository {
     await this.commentsLikeModel.create({
       commentId,
       userId,
-      likeStatus: status,
+      likesStatus: status,
     });
 
     return true;

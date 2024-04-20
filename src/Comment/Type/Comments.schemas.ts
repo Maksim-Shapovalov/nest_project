@@ -41,8 +41,8 @@ export class CommentsLike {
   likesStatus: {
     type: string;
   };
-  @Prop({ required: true })
-  content: string;
+  // @Prop({ required: true })
+  // content: string;
 }
 export const CommentsLikeSchema = SchemaFactory.createForClass(CommentsLike);
 

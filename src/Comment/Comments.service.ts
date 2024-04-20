@@ -15,7 +15,7 @@ export class CommentsService {
   async createdNewComments(
     postId: string,
     content: string,
-    userId: NewestPostLike | null,
+    userId: NewestPostLike,
   ) {
     const post = await this.postsRepository.getPostsById(postId, userId.userId);
 
