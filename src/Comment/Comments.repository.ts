@@ -104,30 +104,25 @@ export class CommentsRepository {
     userId: string,
     status: AvailableStatusEnum,
   ) {
-    console.log(status, 'status in repositry 1');
-    console.log(userId, 'status in repositry 1');
-    console.log(commentId, 'status in repositry 1');
     const likeWithUserId = await this.commentsLikeModel
       .findOne({
         userId: userId,
         commentId: commentId,
       })
       .exec();
-    console.log(likeWithUserId, 'likeWithUserId');
 
     const comment = await this.commentModel
       .findOne({
         _id: new ObjectId(commentId),
       })
       .exec();
-    console.log(comment, 'comment');
 
     if (!comment) {
       return false;
     }
 
     if (likeWithUserId) {
-      const updateStatus = await this.commentsLikeModel.updateOne(
+      await this.commentsLikeModel.updateOne(
         { _id: new ObjectId(commentId), userId: userId },
         {
           $set: {
@@ -135,9 +130,8 @@ export class CommentsRepository {
           },
         },
       );
-      console.log(updateStatus, ' update status');
 
-      return updateStatus.matchedCount === 1;
+      return true;
     } else {
       await this.commentsLikeModel.create({
         commentId,
