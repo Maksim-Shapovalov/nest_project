@@ -108,7 +108,7 @@ export class CommentsRepository {
     const likeWithUserId = await this.commentsLikeModel
       .findOne({
         userId: userId,
-        _id: commentId,
+        _id: new ObjectId(commentId),
       })
       .exec();
 
@@ -125,7 +125,7 @@ export class CommentsRepository {
 
     if (likeWithUserId) {
       const updateStatus = await this.commentsLikeModel.updateOne(
-        { _id: commentId, userId: userId },
+        { _id: new ObjectId(commentId), userId: userId },
         {
           $set: {
             likesStatus: status,
