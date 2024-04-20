@@ -47,6 +47,7 @@ export class CommentsService {
     userId: string,
     status: AvailableStatusEnum,
   ) {
+    console.log(status, 'status in service');
     return this.commentsRepository.updateStatusLikeUser(
       commentId,
       userId,

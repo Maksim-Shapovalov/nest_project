@@ -104,10 +104,11 @@ export class CommentsRepository {
     userId: string,
     status: AvailableStatusEnum,
   ) {
+    console.log(status, 'status in repositry 1');
     const likeWithUserId = await this.commentsLikeModel
       .findOne({
         userId: userId,
-        commentId,
+        _id: commentId,
       })
       .exec();
 
@@ -116,6 +117,7 @@ export class CommentsRepository {
         _id: new ObjectId(commentId),
       })
       .exec();
+    console.log(comment, 'comment');
 
     if (!comment) {
       return false;
@@ -130,12 +132,12 @@ export class CommentsRepository {
           },
         },
       );
+      console.log(updateStatus, ' update status');
 
       return updateStatus.matchedCount === 1;
     }
 
     await this.commentsLikeModel.create({
-      commentId,
       userId,
       likesStatus: status,
     });
