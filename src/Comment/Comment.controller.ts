@@ -14,7 +14,6 @@ import {
   Param,
   Put,
   Req,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
@@ -64,34 +63,21 @@ export class CommentsController {
     if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
     return HTTP_STATUS.NO_CONTENT_204;
   }
-  @UseGuards(SoftAuthGuard)
+  @UseGuards(BearerGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
     @Param('id') id: string,
     @Body() inputLikeStatus: StatusLikes,
     @User() userModel: { userId: string },
-    @Req() request,
   ) {
-    const user = request.user as NewestPostLike;
-    if (user) {
-      const updateComment = await this.serviceComments.updateStatusLikeInUser(
-        id,
-        user.userId,
-        inputLikeStatus.likeStatus,
-      );
-      if (!updateComment) throw new NotFoundException();
-    } else {
-      if (inputLikeStatus.likeStatus !== 'None')
-        throw new UnauthorizedException();
-      const updateComment = await this.serviceComments.updateStatusLikeInUser(
-        id,
-        userModel.userId,
-        inputLikeStatus.likeStatus,
-      );
+    const updateComment = await this.serviceComments.updateStatusLikeInUser(
+      id,
+      userModel.userId,
+      inputLikeStatus.likeStatus,
+    );
 
-      if (!updateComment) throw new NotFoundException();
-    }
+    if (!updateComment) throw new NotFoundException();
 
     return HttpCode(204);
   }

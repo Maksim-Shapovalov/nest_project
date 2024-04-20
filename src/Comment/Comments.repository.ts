@@ -102,7 +102,7 @@ export class CommentsRepository {
   async updateStatusLikeUser(
     commentId: string,
     userId: string,
-    status: string,
+    status: AvailableStatusEnum,
   ) {
     const likeWithUserId = await this.commentsLikeModel
       .findOne({

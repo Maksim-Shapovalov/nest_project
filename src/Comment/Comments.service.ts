@@ -1,5 +1,5 @@
 import { CommentsRepository } from './Comments.repository';
-import { CommentsClass } from './Type/Comment.type';
+import { AvailableStatusEnum, CommentsClass } from './Type/Comment.type';
 import { WithId } from 'mongodb';
 import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
 import { PostsRepository } from '../Posts/Posts.repository';
@@ -45,7 +45,7 @@ export class CommentsService {
   async updateStatusLikeInUser(
     commentId: string,
     userId: string,
-    status: string,
+    status: AvailableStatusEnum,
   ) {
     return this.commentsRepository.updateStatusLikeUser(
       commentId,
