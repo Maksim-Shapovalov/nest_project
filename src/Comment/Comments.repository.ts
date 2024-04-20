@@ -143,10 +143,10 @@ export class CommentsRepository {
   }
 
   async deleteCommentsByCommentId(commentId: string): Promise<boolean> {
-    const deletedComment = await this.commentModel.deleteOne({
+    await this.commentModel.deleteOne({
       _id: new ObjectId(commentId),
     });
-    return deletedComment.deletedCount === 1;
+    return true;
   }
   async commentsMapper(comment: WithId<CommentsTypeDb>, userId: string | null) {
     const likeCount = await this.commentsLikeModel.countDocuments({
