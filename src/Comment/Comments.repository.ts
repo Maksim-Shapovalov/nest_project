@@ -161,7 +161,7 @@ export class CommentsRepository {
 
     const myStatus = await this.commentsLikeModel
       .findOne({
-        userId,
+        userId: userId,
         commentId: comment._id.toString(),
       })
       .exec();

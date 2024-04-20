@@ -22,6 +22,7 @@ import { HTTP_STATUS } from '../app.module';
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { StatusLikes } from '../Posts/Type/Posts.type';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
+import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 
 @injectable()
 @Controller('comments')
@@ -63,7 +64,7 @@ export class CommentsController {
     if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
     return HTTP_STATUS.NO_CONTENT_204;
   }
-  @UseGuards(BearerGuard)
+  @UseGuards(BearerAuthGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
@@ -71,6 +72,8 @@ export class CommentsController {
     @Body() inputLikeStatus: StatusLikes,
     @User() userModel: { userId: string },
   ) {
+    const findComments = await this.commentsRepository.getCommentById(id, null);
+    if (!findComments) throw new NotFoundException();
     const updateComment = await this.serviceComments.updateStatusLikeInUser(
       id,
       userModel.userId,
