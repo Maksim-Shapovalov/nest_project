@@ -123,7 +123,7 @@ export class CommentsRepository {
 
     if (likeWithUserId) {
       await this.commentsLikeModel.updateOne(
-        { _id: new ObjectId(commentId), userId: userId },
+        { commentId: commentId, userId: userId },
         {
           $set: {
             likesStatus: status,

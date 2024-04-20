@@ -81,7 +81,6 @@ export class CommentsController {
       userModel.userId,
     );
     if (!findComments) throw new NotFoundException();
-    console.log(inputLikeStatus, 'status like');
     const updateComment = await this.serviceComments.updateStatusLikeInUser(
       id,
       userModel.userId,
@@ -93,13 +92,9 @@ export class CommentsController {
     return HttpCode(204);
   }
   @UseGuards(BearerGuard)
-  @Delete('id')
+  @Delete(':id')
   @HttpCode(204)
-  async deleteCommentByCommentId(
-    @Param('id') id: string,
-    @Body() userFind: WithId<UserMongoDbType>,
-    @Req() request,
-  ) {
+  async deleteCommentByCommentId(@Param('id') id: string, @Req() request) {
     const user = request.user as NewestPostLike;
     const comment = await this.commentsRepository.getCommentById(
       id,
