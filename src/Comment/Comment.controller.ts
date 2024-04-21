@@ -102,12 +102,10 @@ export class CommentsController {
       user.userId,
     );
 
-    if (comment?.commentatorInfo.userId != user.userId)
+    if (!comment || comment.commentatorInfo.userId !== user.userId)
       throw new ForbiddenException();
     const deletedComment = await this.serviceComments.deletedComment(id);
 
     if (!deletedComment) throw new NotFoundException();
-
-    return HttpCode(204);
   }
 }
