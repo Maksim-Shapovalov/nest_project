@@ -24,6 +24,7 @@ import { BearerGuard, User } from '../auth/guard/authGuard';
 import { StatusLikes } from '../Posts/Type/Posts.type';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
+import { ContentClass } from '../Posts/Posts.controller';
 
 @injectable()
 @Controller('comments')
@@ -49,7 +50,7 @@ export class CommentsController {
   @HttpCode(204)
   async updateCommentByCommentId(
     @Param('id') id: string,
-    @Body() content: { content: string },
+    @Body() content: ContentClass,
     @Req() request,
   ) {
     const user = request.user as NewestPostLike;

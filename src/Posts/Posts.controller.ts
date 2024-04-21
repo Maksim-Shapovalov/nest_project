@@ -35,7 +35,7 @@ import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { Trim } from '../Other/trim-validator';
 import { IsNotEmpty, Length } from 'class-validator';
 
-class ContentClass {
+export class ContentClass {
   @Trim()
   @IsNotEmpty()
   @Length(20, 300)
