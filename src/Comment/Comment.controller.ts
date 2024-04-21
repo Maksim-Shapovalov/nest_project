@@ -58,7 +58,7 @@ export class CommentsController {
       user.userId,
     );
 
-    if (comment?.commentatorInfo.userId != user.userId)
+    if (!comment || comment.commentatorInfo.userId !== user.userId)
       throw new ForbiddenException();
 
     const updateComment = await this.serviceComments.updateComment(

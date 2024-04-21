@@ -32,7 +32,15 @@ import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 import { HTTP_STATUS } from '../app.module';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
+import { Trim } from '../Other/trim-validator';
+import { IsNotEmpty, Length } from 'class-validator';
 
+class ContentClass {
+  @Trim()
+  @IsNotEmpty()
+  @Length(20, 300)
+  content: string;
+}
 @injectable()
 @Controller('posts')
 export class PostsController {
@@ -87,7 +95,7 @@ export class PostsController {
   @Post(':id/comments')
   @HttpCode(201)
   async createCommentsInPostById(
-    @Body() contentInput: { content: string },
+    @Body() contentInput: ContentClass,
     @Param('id') id: string,
     @Req() request,
   ) {
