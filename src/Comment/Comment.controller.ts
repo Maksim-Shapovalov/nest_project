@@ -37,6 +37,7 @@ export class CommentsController {
   @Get(':id')
   async getCommentsById(@Param('id') id: string, @Req() request) {
     const user = request.user as NewestPostLike;
+    if (!id) throw new NotFoundException();
     const findComments = await this.commentsRepository.getCommentById(
       id,
       user ? user.userId : null,
