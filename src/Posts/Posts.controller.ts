@@ -76,15 +76,14 @@ export class PostsController {
   @Get(':id/comments')
   @HttpCode(200)
   async getCommentByCommendIdInPosts(
-    @Headers() header,
     @Query() query: QueryType,
     @Param('id') id: string,
     @Req() request,
   ) {
-    if (!header) throw new NotFoundException();
     if (!ObjectId.isValid(id)) throw new NotFoundException();
     if (!id) throw new NotFoundException();
     const user = request.user;
+    if (!user) throw new NotFoundException();
     const filter = queryFilter(query);
     const result = await this.commentsRepository.getCommentsInPost(
       id,
