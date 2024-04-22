@@ -34,6 +34,7 @@ import { HTTP_STATUS } from '../app.module';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { Trim } from '../Other/trim-validator';
 import { IsNotEmpty, Length } from 'class-validator';
+import { ObjectId } from 'mongodb';
 
 export class ContentClass {
   @Trim()
@@ -78,6 +79,7 @@ export class PostsController {
     @Param('id') id: string,
     @Req() request,
   ) {
+    if (!ObjectId.isValid(id)) throw new NotFoundException();
     if (!id) throw new NotFoundException();
     const user = request.user;
     const filter = queryFilter(query);
