@@ -59,7 +59,7 @@ export class CommentsController {
       user.userId,
     );
 
-    if (!comment || comment.commentatorInfo.userId !== user.userId)
+    if (comment.commentatorInfo.userId !== user.userId)
       throw new ForbiddenException();
 
     const updateComment = await this.serviceComments.updateComment(
@@ -98,12 +98,14 @@ export class CommentsController {
   @HttpCode(204)
   async deleteCommentByCommentId(@Param('id') id: string, @Req() request) {
     const user = request.user as NewestPostLike;
+    if (!id) throw new NotFoundException();
     const comment = await this.commentsRepository.getCommentById(
       id,
       user.userId,
     );
+    if (!comment) throw new NotFoundException();
 
-    if (!comment || comment.commentatorInfo.userId !== user.userId)
+    if (comment.commentatorInfo.userId !== user.userId)
       throw new ForbiddenException();
     const deletedComment = await this.serviceComments.deletedComment(id);
 
