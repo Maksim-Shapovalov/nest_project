@@ -19,7 +19,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
-import { WithId } from 'mongodb';
+import { ObjectId, WithId } from 'mongodb';
 import { HTTP_STATUS } from '../app.module';
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { StatusLikes } from '../Posts/Type/Posts.type';
@@ -56,6 +56,7 @@ export class CommentsController {
     @Req() request,
   ) {
     if (!id) throw new NotFoundException();
+    if (!ObjectId.isValid(id)) throw new NotFoundException();
     const user = request.user as NewestPostLike;
     const comment = await this.commentsRepository.getCommentById(
       id,
@@ -64,7 +65,7 @@ export class CommentsController {
     if (!comment) throw new NotFoundException();
 
     if (comment.commentatorInfo.userId !== user.userId)
-      throw new UnauthorizedException();
+      throw new ForbiddenException();
 
     const updateComment = await this.serviceComments.updateComment(
       id,
