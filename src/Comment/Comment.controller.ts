@@ -58,6 +58,7 @@ export class CommentsController {
     if (!id) throw new NotFoundException();
     if (!ObjectId.isValid(id)) throw new NotFoundException();
     const user = request.user as NewestPostLike;
+    if (!user) throw new NotFoundException();
     const comment = await this.commentsRepository.getCommentById(
       id,
       user.userId,
