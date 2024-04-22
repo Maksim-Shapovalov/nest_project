@@ -53,11 +53,13 @@ export class CommentsController {
     @Body() content: ContentClass,
     @Req() request,
   ) {
+    if (!id) throw new NotFoundException();
     const user = request.user as NewestPostLike;
     const comment = await this.commentsRepository.getCommentById(
       id,
       user.userId,
     );
+    if (!comment) throw new NotFoundException();
 
     if (comment.commentatorInfo.userId !== user.userId)
       throw new ForbiddenException();
