@@ -15,6 +15,7 @@ import {
   Param,
   Put,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
@@ -63,7 +64,7 @@ export class CommentsController {
     if (!comment) throw new NotFoundException();
 
     if (comment.commentatorInfo.userId !== user.userId)
-      throw new ForbiddenException();
+      throw new UnauthorizedException();
 
     const updateComment = await this.serviceComments.updateComment(
       id,

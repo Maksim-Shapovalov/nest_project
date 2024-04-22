@@ -78,15 +78,14 @@ export class PostsController {
     @Param('id') id: string,
     @Req() request,
   ) {
+    if (!id) throw new NotFoundException();
     const user = request.user;
     const filter = queryFilter(query);
-    if (!id) throw new NotFoundException();
     const result = await this.commentsRepository.getCommentsInPost(
       id,
       filter,
       user,
     );
-    console.log(result, 'result');
     if (!result) {
       throw new NotFoundException();
     }
