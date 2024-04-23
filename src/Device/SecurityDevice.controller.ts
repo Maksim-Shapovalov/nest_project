@@ -27,7 +27,7 @@ export class DeviceController {
   ) {}
   @UseGuards(BearerGuard)
   @Get()
-  @HttpCode(HTTP_STATUS.OK_200)
+  @HttpCode(200)
   async getAllDevice(@Req() request) {
     const user = request.user as NewestPostLike;
     const devices: OutpatModelDevicesUser[] | null =
@@ -37,7 +37,7 @@ export class DeviceController {
   }
   @UseGuards(BearerGuard)
   @Delete(':id')
-  @HttpCode(HTTP_STATUS.NO_CONTENT_204)
+  @HttpCode(204)
   async deleteDeviceUserById(@Param('id') id: string, @Req() request) {
     const user = request.user as NewestPostLike;
     const findDevice: any = await this.securityDevicesRepo.getDevice(
@@ -54,7 +54,7 @@ export class DeviceController {
   }
   @UseGuards(BearerGuard)
   @Delete()
-  @HttpCode(HTTP_STATUS.NO_CONTENT_204)
+  @HttpCode(204)
   async deleteAllDeviceUserExceptCurrent(
     @Req() request,
     @Body() deviceIdInBody: string,
