@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   createParamDecorator,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
@@ -46,7 +47,7 @@ export class BearerGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
-    if (!token) return false;
+    if (!token) throw new UnauthorizedException();
 
     try {
       const decodedToken = this.jwtService.verify(
@@ -56,15 +57,12 @@ export class BearerGuard implements CanActivate {
       const userId = decodedToken.userId;
 
       const user = await this.userRepository.getUserById(userId);
-      console.log(user, 'this is user');
-      if (!user) return false;
+      if (!user) throw new Error();
 
       const mapUser = UserDbType.UserInReqMapper(user);
       request.user = mapUser;
-      // request.user = user;
-      console.log(request.user, 'request user');
     } catch (error) {
-      return false;
+      throw new UnauthorizedException();
     }
 
     return true;

@@ -55,8 +55,7 @@ export class CommentsController {
     @Body() content: ContentClass,
     @Req() request,
   ) {
-    if (!id) throw new NotFoundException();
-    if (!ObjectId.isValid(id)) throw new NotFoundException();
+    if (!id || !ObjectId.isValid(id)) throw new NotFoundException();
     const user = request.user as NewestPostLike;
     if (!user) throw new NotFoundException();
     const comment = await this.commentsRepository.getCommentById(
@@ -73,7 +72,7 @@ export class CommentsController {
       content.content,
     );
 
-    if (!updateComment) return HTTP_STATUS.NOT_FOUND_404;
+    if (!updateComment) throw new NotFoundException();
     return HTTP_STATUS.NO_CONTENT_204;
   }
   @UseGuards(BearerAuthGuard)
