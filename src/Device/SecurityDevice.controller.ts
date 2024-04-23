@@ -1,7 +1,6 @@
 import { injectable } from 'inversify';
 import { SecurityDeviceService } from './SecurityDevice.service';
 import { SecurityDevicesRepository } from './SecurityDevicesRepository';
-import { OutpatModeldevicesUser } from './Type/Device.user';
 import 'reflect-metadata';
 import {
   Body,
@@ -11,9 +10,13 @@ import {
   HttpCode,
   NotFoundException,
   Param,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
-import { WithId } from 'mongodb';
-import { UserMongoDbType } from '../Users/Type/User.type';
+import { NewestPostLike } from '../Users/Type/User.type';
+import { OutpatModelDevicesUser } from './Type/Device.user';
+import { HTTP_STATUS } from '../app.module';
+import { BearerGuard } from '../auth/guard/authGuard';
 
 @injectable()
 @Controller('devices')
@@ -22,47 +25,44 @@ export class DeviceController {
     protected securityDeviceService: SecurityDeviceService,
     protected securityDevicesRepo: SecurityDevicesRepository,
   ) {}
+  @UseGuards(BearerGuard)
   @Get()
-  @HttpCode(200)
-  async getAllDevice(@Body() userFind: WithId<UserMongoDbType>) {
-    const user = userFind;
-    const devices: OutpatModeldevicesUser[] | null =
-      await this.securityDeviceService.getAllDevices(user._id.toString());
+  @HttpCode(HTTP_STATUS.OK_200)
+  async getAllDevice(@Req() request) {
+    const user = request.user as NewestPostLike;
+    const devices: OutpatModelDevicesUser[] | null =
+      await this.securityDeviceService.getAllDevices(user.userId);
     if (!devices) throw new NotFoundException();
     return devices;
   }
+  @UseGuards(BearerGuard)
   @Delete(':id')
-  @HttpCode(204)
-  async deleteDeviceUserById(
-    @Param('id') id: string,
-    @Body() userFind: WithId<UserMongoDbType>,
-  ) {
-    const user = userFind;
+  @HttpCode(HTTP_STATUS.NO_CONTENT_204)
+  async deleteDeviceUserById(@Param('id') id: string, @Req() request) {
+    const user = request.user as NewestPostLike;
     const findDevice: any = await this.securityDevicesRepo.getDevice(
       id,
-      user._id.toString(),
+      user.userId,
     );
 
     if (!findDevice) return HttpCode(404);
     if (findDevice === 5) return HttpCode(403);
 
     const deletedDevice =
-      await this.securityDeviceService.deletingDevicesExceptId(
-        user._id.toString(),
-        id,
-      );
+      await this.securityDeviceService.deletingDevicesExceptId(user.userId, id);
     if (!deletedDevice) throw new NotFoundException();
-    return HttpCode(204);
   }
+  @UseGuards(BearerGuard)
   @Delete()
+  @HttpCode(HTTP_STATUS.NO_CONTENT_204)
   async deleteAllDeviceUserExceptCurrent(
-    @Body() userFind: WithId<UserMongoDbType>,
+    @Req() request,
     @Body() deviceIdInBody: string,
   ) {
+    const user = request.user as NewestPostLike;
     await this.securityDeviceService.deletingAllDevices(
-      userFind._id.toString(),
+      user.userId,
       deviceIdInBody,
     );
-    return HttpCode(204);
   }
 }

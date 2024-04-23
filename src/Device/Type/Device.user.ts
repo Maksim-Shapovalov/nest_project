@@ -16,7 +16,7 @@ export type DevicesUserDB = {
   deviceId: string;
   userId: string;
 };
-export type OutpatModeldevicesUser = {
+export type OutpatModelDevicesUser = {
   ip: string;
   title: string;
   lastActiveDate: string;

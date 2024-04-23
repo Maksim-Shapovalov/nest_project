@@ -40,8 +40,8 @@ import { Token, TokenSchema } from './Token/Token.schema';
 import { RefreshTokenRepo } from './Token/refreshToken-repo';
 import { EmailManager } from './Email/email-manager';
 import { EmailAdapter } from './Email/email-adapter';
-import { ValidatorConstraint } from 'class-validator';
 import { CustomBlogIdValidation } from './Posts/validation/BlogExists.decorator';
+import { ThrottlerModule } from '@nestjs/throttler';
 export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,
@@ -57,6 +57,12 @@ export const HTTP_STATUS = {
   imports: [
     AuthModule,
     ConfigModule.forRoot(),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10000,
+        limit: 5,
+      },
+    ]),
     MongooseModule.forRoot(
       process.env.MONGO_URL || 'mongodb://localhost:27017',
     ),

@@ -15,11 +15,10 @@ import {
   Param,
   Put,
   Req,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
-import { ObjectId, WithId } from 'mongodb';
+import { NewestPostLike } from '../Users/Type/User.type';
+import { ObjectId } from 'mongodb';
 import { HTTP_STATUS } from '../app.module';
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { StatusLikes } from '../Posts/Type/Posts.type';

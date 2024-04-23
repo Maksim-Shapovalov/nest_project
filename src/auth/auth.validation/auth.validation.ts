@@ -1,17 +1,4 @@
-import {
-  Length,
-  Matches,
-  Validate,
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
-} from 'class-validator';
-import {
-  BadRequestException,
-  Injectable,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import { FindUserByRecoveryCode } from '../../Users/Type/User.type';
-import { UserRepository } from '../../Users/User.repository';
+import { Length, Matches } from 'class-validator';
 
 export class bodyUserForRegistration {
   @Length(3, 10)
