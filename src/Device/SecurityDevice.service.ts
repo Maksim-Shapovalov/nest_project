@@ -1,15 +1,15 @@
 import { SecurityDevicesRepository } from './SecurityDevicesRepository';
-import { OutpatModeldevicesUser } from './Type/Device.user';
 import { ObjectId } from 'mongodb';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
+import { OutpatModelDevicesUser } from './Type/Device.user';
 
 @injectable()
 export class SecurityDeviceService {
   constructor(protected securityDevicesRepo: SecurityDevicesRepository) {}
   async getAllDevices(
     userId: string,
-  ): Promise<OutpatModeldevicesUser[] | null> {
+  ): Promise<OutpatModelDevicesUser[] | null> {
     const devices = await this.securityDevicesRepo.getAllDevices(
       new ObjectId(userId).toString(),
     );

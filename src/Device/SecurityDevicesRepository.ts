@@ -1,4 +1,4 @@
-import { DevicesUserDB, OutpatModeldevicesUser } from './Type/Device.user';
+import { DevicesUserDB, OutpatModelDevicesUser } from './Type/Device.user';
 import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
@@ -31,7 +31,7 @@ export class SecurityDevicesRepository {
 
   async getAllDevices(
     userId: string,
-  ): Promise<OutpatModeldevicesUser[] | null> {
+  ): Promise<OutpatModelDevicesUser[] | null> {
     const devices = await this.deviceModel.find({ userId: userId }).lean();
     if (!devices) {
       return null;
@@ -55,7 +55,7 @@ export class SecurityDevicesRepository {
 
 const deviceMapper = (
   device: WithId<DevicesUserDB>,
-): OutpatModeldevicesUser => {
+): OutpatModelDevicesUser => {
   return {
     ip: device.ip,
     title: device.title,
