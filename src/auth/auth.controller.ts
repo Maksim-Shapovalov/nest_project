@@ -16,9 +16,10 @@ import { Request, Response } from 'express';
 import { userMapper, UserRepository } from '../Users/User.repository';
 import { DeletedTokenRepoRepository } from '../Token/deletedTokenRepo-repository';
 import { UserService } from '../Users/User.service';
-import { AuthGuard, User } from './guard/authGuard';
+import { AuthGuard, BearerGuard, User } from './guard/authGuard';
 import {
   FindUserByRecoveryCode,
+  NewestPostLike,
   UserBasicRequestBody,
   UserMongoDbType,
 } from '../Users/Type/User.type';
@@ -63,7 +64,7 @@ export class AuthController {
     });
     return { accessToken };
   }
-  @UseGuards(AuthGuard)
+  @UseGuards(BearerGuard)
   @Post('refresh-token')
   async refreshToken(
     @Req() request: Request,
@@ -167,7 +168,6 @@ export class AuthController {
     await this.authService.findUserByEmail(findUser);
     return HttpCode(204);
   }
-  @UseGuards(AuthGuard)
   @Post('logout')
   @HttpCode(204)
   async logoutInApp(
@@ -189,15 +189,16 @@ export class AuthController {
 
     if (!bannedToken) throw new BadRequestException();
     if (!deletedDevice) throw new BadRequestException();
-    return HttpCode(204);
   }
-  @UseGuards(AuthGuard)
+  @UseGuards(BearerGuard)
   @Post('me')
   @HttpCode(204)
-  async me(@Body() code: string, @User() userModel: UserMongoDbType) {
-    if (!userModel) throw new UnauthorizedException();
+  async me(@Body() code: string, @Req() request) {
+    const user = request.user as NewestPostLike;
+    if (!user) throw new UnauthorizedException();
     const result = await this.authService.confirmatoryUser(code);
     if (!result) throw new NotFoundException();
     return HttpCode(204);
   }
+  //@User() userModel: UserMongoDbType
 }
