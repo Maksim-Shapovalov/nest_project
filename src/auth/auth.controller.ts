@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Headers,
   HttpCode,
   NotFoundException,
@@ -16,7 +17,7 @@ import { Request, Response } from 'express';
 import { userMapper, UserRepository } from '../Users/User.repository';
 import { DeletedTokenRepoRepository } from '../Token/deletedTokenRepo-repository';
 import { UserService } from '../Users/User.service';
-import { AuthGuard, BearerGuard, User } from './guard/authGuard';
+import { BearerGuard, User } from './guard/authGuard';
 import {
   FindUserByRecoveryCode,
   NewestPostLike,
@@ -26,6 +27,7 @@ import {
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 import { injectable } from 'inversify';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { ObjectId } from 'mongodb';
 
 @injectable()
 @Controller('auth')
@@ -65,7 +67,7 @@ export class AuthController {
     return { accessToken };
   }
   @UseGuards(BearerGuard)
-  @Post('refresh-token')
+  @Post('/refresh-token')
   async refreshToken(
     @Req() request: Request,
     @User() userModel: UserMongoDbType,
@@ -91,7 +93,7 @@ export class AuthController {
     });
     return accessToken;
   }
-  @Post('password-recovery')
+  @Post('/password-recovery')
   @HttpCode(204)
   async passwordRecovery(@Body() email: string) {
     const requestEmail = email;
@@ -99,7 +101,7 @@ export class AuthController {
     await this.authService.sendEmailMessage(requestEmail);
     return HttpCode;
   }
-  @Post('new-password')
+  @Post('/new-password')
   @HttpCode(204)
   async newPassword(
     @Body() bodyRequest = { newPassword: String, recoveryCode: String },
@@ -114,7 +116,7 @@ export class AuthController {
     if (!user) throw new BadRequestException();
     return HttpCode;
   }
-  @Post('registration-confirmation')
+  @Post('/registration-confirmation')
   @HttpCode(204)
   async registrationConfirmation(@Body('code') code: string) {
     const result = await this.authService.confirmatoryUser(code);
@@ -127,7 +129,7 @@ export class AuthController {
   }
   // @UseGuards(AuthGuard)
   @UseGuards(ThrottlerGuard)
-  @Post('registration')
+  @Post('/registration')
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
     const findUserInDB = await this.userRepository.findByLoginAndEmail(
@@ -155,7 +157,7 @@ export class AuthController {
     await this.authService.doOperation(findUser);
     return HttpCode(204);
   }
-  @Post('registration-email-resending')
+  @Post('/registration-email-resending')
   @HttpCode(204)
   async registrationEmailResending(@Body('email') email: string) {
     const findUser: FindUserByRecoveryCode =
@@ -168,7 +170,7 @@ export class AuthController {
     await this.authService.findUserByEmail(findUser);
     return HttpCode(204);
   }
-  @Post('logout')
+  @Post('/logout')
   @HttpCode(204)
   async logoutInApp(
     @Body() deviceIdInput: string,
@@ -191,14 +193,19 @@ export class AuthController {
     if (!deletedDevice) throw new BadRequestException();
   }
   @UseGuards(BearerGuard)
-  @Post('me')
-  @HttpCode(204)
-  async me(@Body() code: string, @Req() request) {
+  @Get('/me')
+  @HttpCode(200)
+  async me(@Req() request) {
     const user = request.user as NewestPostLike;
     if (!user) throw new UnauthorizedException();
-    const result = await this.authService.confirmatoryUser(code);
-    if (!result) throw new NotFoundException();
-    return HttpCode(204);
+    const result = await this.userRepository.getUserById(
+      new ObjectId(user.userId),
+    );
+    return {
+      email: result.email,
+      login: result.login,
+      userId: result._id.toString(),
+    };
   }
   //@User() userModel: UserMongoDbType
 }
