@@ -6,6 +6,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -51,7 +52,7 @@ export class DeviceController {
 
     const deletedDevice =
       await this.securityDeviceService.deletingDevicesExceptId(userId, id);
-    if (!deletedDevice) throw new NotFoundException();
+    if (!deletedDevice) throw new ForbiddenException();
   }
   @UseGuards(TokenRefreshGuard)
   @Delete()
