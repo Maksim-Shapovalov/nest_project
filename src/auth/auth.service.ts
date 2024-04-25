@@ -73,11 +73,11 @@ export class AuthService {
 
       const accessToken: string = await this.jwtService.signAsync(
         bodyToAccessToken,
-        { secret: setting.JWT_SECRET, expiresIn: '10000s' },
+        { secret: setting.JWT_SECRET, expiresIn: '10s' },
       );
       const refreshToken: string = await this.jwtService.signAsync(
         bodyToRefreshToken,
-        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '20000s' },
+        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '20s' },
       );
       await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
 
@@ -103,12 +103,12 @@ export class AuthService {
       { userId: userId },
       {
         secret: setting.JWT_SECRET,
-        expiresIn: '1000s',
+        expiresIn: '10s',
       },
     );
     const refreshToken: string = this.jwtService.sign(
       { userId: userId, deviceId: createRefreshTokenMeta.deviceId },
-      { secret: setting.JWT_REFRESH_SECRET, expiresIn: '2000s' },
+      { secret: setting.JWT_REFRESH_SECRET, expiresIn: '20s' },
     );
     await this.refreshTokenRepo.UpdateRefreshTokenInData(refreshToken);
     // await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
