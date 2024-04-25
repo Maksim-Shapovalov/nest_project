@@ -20,13 +20,7 @@ import { randomUUID } from 'crypto';
 import { newDataUser2, UserRepository } from '../Users/User.repository';
 import { EmailManager } from '../Email/email-manager';
 import bcrypt from 'bcrypt';
-
-type PayloadTypeRefresh = {
-  userId: string;
-  deviceId: string;
-  iat: number;
-  exp: number;
-} | null;
+import { PayloadTypeRefresh } from '../Token/refreshToken-type';
 
 @Injectable()
 export class AuthService {
@@ -68,48 +62,46 @@ export class AuthService {
       );
 
       //
-      await this.refreshTokenRepo.AddRefreshTokenInData(createRefreshTokenMeta);
       const bodyToAccessToken = {
         userId: user.id,
-        expiresIn: '10sec',
       };
       const bodyToRefreshToken = {
         userId: user.id,
         deviceId: createRefreshTokenMeta.deviceId,
-        expiresIn: '20sec',
       };
 
       const accessToken: string = await this.jwtService.signAsync(
         bodyToAccessToken,
-        { secret: setting.JWT_SECRET, expiresIn: '10s' },
+        { secret: setting.JWT_SECRET, expiresIn: '1000s' },
       );
       const refreshToken: string = await this.jwtService.signAsync(
         bodyToRefreshToken,
-        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '20s' },
+        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '2000s' },
       );
+      await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
 
       return { accessToken, refreshToken };
     }
     throw new UnauthorizedException();
   }
-  async updateJWT(user: UserToPostsOutputModel, oldRefreshToken: string) {
+  async updateJWT(userId: string, oldRefreshToken: string) {
     const parser = jwt.decode(oldRefreshToken) as PayloadTypeRefresh;
     if (!parser) {
       return null;
     }
     const createRefreshTokenMeta = {
       deviceId: parser.deviceId,
-      userId: user.id,
+      userId: userId,
     };
     await this.deleteDevice.updateDevice(createRefreshTokenMeta.deviceId);
 
     const accessToken: string = jwt.sign(
-      { userId: user.id },
+      { userId: userId },
       setting.JWT_SECRET,
       { expiresIn: '10sec' },
     );
     const refreshToken: string = jwt.sign(
-      { userId: user.id, deviceId: createRefreshTokenMeta.deviceId },
+      { userId: userId, deviceId: createRefreshTokenMeta.deviceId },
       setting.JWT_REFRESH_SECRET,
       { expiresIn: '20sec' },
     );

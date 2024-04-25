@@ -19,7 +19,7 @@ import { HTTP_STATUS } from '../app.module';
 import { BearerGuard } from '../auth/guard/authGuard';
 
 @injectable()
-@Controller('devices')
+@Controller('security/devices')
 export class DeviceController {
   constructor(
     protected securityDeviceService: SecurityDeviceService,

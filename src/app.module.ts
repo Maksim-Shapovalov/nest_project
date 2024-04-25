@@ -36,7 +36,7 @@ import { join } from 'path';
 import { DeviceController } from './Device/SecurityDevice.controller';
 import { Device, DeviceSchema } from './Device/Type/DataId.schemas';
 import { AuthModule } from './auth/auth.module';
-import { Token, TokenSchema } from './Token/Token.schema';
+import { RefreshToken, TokenRefreshSchema } from './Token/Token.schema';
 import { RefreshTokenRepo } from './Token/refreshToken-repo';
 import { EmailManager } from './Email/email-manager';
 import { EmailAdapter } from './Email/email-adapter';
@@ -78,7 +78,8 @@ export const HTTP_STATUS = {
       { name: PostLike.name, schema: PostLikeSchema },
       { name: CommentsLike.name, schema: CommentsLikeSchema },
       { name: Device.name, schema: DeviceSchema },
-      { name: Token.name, schema: TokenSchema },
+      // { name: Token.name, schema: TokenSchema },
+      { name: RefreshToken.name, schema: TokenRefreshSchema },
     ]),
   ],
   controllers: [

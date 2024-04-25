@@ -4,6 +4,7 @@ import 'reflect-metadata';
 
 @injectable()
 export class DeletedTokenRepoRepository {
+  constructor() {}
   async deletedTokens(token: any) {
     return BlackListModel.insertMany({ token });
   }

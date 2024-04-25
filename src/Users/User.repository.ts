@@ -171,7 +171,7 @@ export class UserRepository {
 
 export const userMapper = (user: WithId<UserMongoDbType>): UserOutputModel => {
   return {
-    id: user._id.toHexString(),
+    id: user._id.toString(),
     login: user.login,
     email: user.email,
     passwordHash: user.passwordHash,

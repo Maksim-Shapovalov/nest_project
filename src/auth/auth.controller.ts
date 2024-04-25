@@ -28,17 +28,18 @@ import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 import { injectable } from 'inversify';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { ObjectId } from 'mongodb';
+import { RefreshTokenRepo } from '../Token/refreshToken-repo';
+import { TokenRefreshGuard } from '../Token/token-guard';
 
 @injectable()
 @Controller('auth')
 export class AuthController {
   constructor(
     protected authService: AuthService,
-    protected deleteToken: DeletedTokenRepoRepository,
     protected serviceUser: UserService,
     protected userRepository: UserRepository,
     protected securityDeviceService: SecurityDeviceService,
-    protected deletedTokenRepoRepository: DeletedTokenRepoRepository,
+    protected refreshTokenRepo: RefreshTokenRepo,
   ) {}
   @Post('/login')
   @HttpCode(200)
@@ -66,26 +67,23 @@ export class AuthController {
     });
     return { accessToken };
   }
-  @UseGuards(BearerGuard)
+  @UseGuards(TokenRefreshGuard)
   @Post('/refresh-token')
   async refreshToken(
     @Req() request: Request,
-    @User() userModel: UserMongoDbType,
+    @User() userModel: NewestPostLike,
     @Res({ passthrough: true }) response: Response,
   ) {
     const user = userModel;
-    const refreshTokenToRequest = request.cookies.refreshTokenToRequest;
-
+    const refreshTokenToRequest = request.cookies.refreshToken;
     const token = await this.authService.updateJWT(
-      userMapper(user),
+      user.userId,
       refreshTokenToRequest,
     ); //update
 
     if (!token) throw new NotFoundException();
 
     const { accessToken, refreshToken } = token;
-
-    await this.deleteToken.deletedTokens(refreshTokenToRequest);
 
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -170,6 +168,7 @@ export class AuthController {
     await this.authService.findUserByEmail(findUser);
     return HttpCode(204);
   }
+  @UseGuards(TokenRefreshGuard)
   @Post('/logout')
   @HttpCode(204)
   async logoutInApp(
@@ -187,7 +186,7 @@ export class AuthController {
         device,
       );
     const bannedToken =
-      await this.deletedTokenRepoRepository.deletedTokens(token);
+      await this.refreshTokenRepo.DeleteRefreshTokenInData(token);
 
     if (!bannedToken) throw new BadRequestException();
     if (!deletedDevice) throw new BadRequestException();
