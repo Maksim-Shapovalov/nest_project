@@ -13,9 +13,8 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { NewestPostLike } from '../Users/Type/User.type';
 import { OutpatModelDevicesUser } from './Type/Device.user';
-import { BearerGuard } from '../auth/guard/authGuard';
+import { CustomRequest, TokenRefreshGuard } from '../Token/token-guard';
 
 @injectable()
 @Controller('security/devices')
@@ -24,44 +23,44 @@ export class DeviceController {
     protected securityDeviceService: SecurityDeviceService,
     protected securityDevicesRepo: SecurityDevicesRepository,
   ) {}
-  @UseGuards(BearerGuard)
+  @UseGuards(TokenRefreshGuard)
   @Get()
   @HttpCode(200)
-  async getAllDevice(@Req() request) {
-    const user = request.user as NewestPostLike;
+  async getAllDevice(@Req() request: CustomRequest) {
+    const user = request.token.userId;
     const devices: OutpatModelDevicesUser[] | null =
-      await this.securityDeviceService.getAllDevices(user.userId);
+      await this.securityDeviceService.getAllDevices(user);
     if (!devices) throw new NotFoundException();
     return devices;
   }
-  @UseGuards(BearerGuard)
+  @UseGuards(TokenRefreshGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteDeviceUserById(@Param('id') id: string, @Req() request) {
-    const user = request.user as NewestPostLike;
+  async deleteDeviceUserById(
+    @Param('id') id: string,
+    @Req() request: CustomRequest,
+  ) {
+    const userId = request.token.userId;
     const findDevice: any = await this.securityDevicesRepo.getDevice(
       id,
-      user.userId,
+      userId,
     );
 
     if (!findDevice) return HttpCode(404);
     if (findDevice === 5) return HttpCode(403);
 
     const deletedDevice =
-      await this.securityDeviceService.deletingDevicesExceptId(user.userId, id);
+      await this.securityDeviceService.deletingDevicesExceptId(userId, id);
     if (!deletedDevice) throw new NotFoundException();
   }
-  @UseGuards(BearerGuard)
+  @UseGuards(TokenRefreshGuard)
   @Delete()
   @HttpCode(204)
   async deleteAllDeviceUserExceptCurrent(
-    @Req() request,
+    @Req() request: CustomRequest,
     @Body() deviceIdInBody: string,
   ) {
-    const user = request.user as NewestPostLike;
-    await this.securityDeviceService.deletingAllDevices(
-      user.userId,
-      deviceIdInBody,
-    );
+    const userId = request.token.userId;
+    await this.securityDeviceService.deletingAllDevices(userId, deviceIdInBody);
   }
 }
