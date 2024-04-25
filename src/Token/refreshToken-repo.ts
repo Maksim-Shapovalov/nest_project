@@ -42,7 +42,8 @@ export class RefreshTokenRepo {
     const parser = await this.jwtService.verify(refreshToken, {
       secret: setting.JWT_REFRESH_SECRET,
     });
-    return this.tokenRefreshModel.findOneAndDelete({
+
+    return this.tokenRefreshModel.deleteOne({
       userId: parser.userId,
       deviceId: parser.deviceId,
       iat: parser.iat,

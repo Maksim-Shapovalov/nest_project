@@ -183,8 +183,9 @@ export class AuthController {
       );
     const validToken =
       await this.refreshTokenRepo.DeleteRefreshTokenInData(token);
-
+    console.log(validToken, 'validToken');
     if (!validToken) throw new BadRequestException();
+    console.log(deletedDevice, 'deletedDevice');
     if (!deletedDevice) throw new BadRequestException();
   }
   @UseGuards(BearerGuard)
