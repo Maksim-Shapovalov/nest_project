@@ -31,7 +31,7 @@ import { ObjectId } from 'mongodb';
 import { RefreshTokenRepo } from '../Token/refreshToken-repo';
 import { CustomRequest, TokenRefreshGuard } from '../Token/token-guard';
 import { RefreshToken } from '../Token/Token.schema';
-
+@UseGuards(ThrottlerGuard)
 @injectable()
 @Controller('auth')
 export class AuthController {
@@ -91,7 +91,7 @@ export class AuthController {
       httpOnly: true,
       secure: true,
     });
-    return accessToken;
+    return { accessToken };
   }
   @Post('/password-recovery')
   @HttpCode(204)
@@ -128,7 +128,7 @@ export class AuthController {
     return HttpCode(204);
   }
   // @UseGuards(AuthGuard)
-  @UseGuards(ThrottlerGuard)
+
   @Post('/registration')
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
