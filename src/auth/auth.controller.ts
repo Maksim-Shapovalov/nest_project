@@ -70,6 +70,7 @@ export class AuthController {
   }
   @UseGuards(TokenRefreshGuard)
   @Post('/refresh-token')
+  @HttpCode(200)
   async refreshToken(
     @Req() request: CustomRequest,
     @Res({ passthrough: true }) response: Response,

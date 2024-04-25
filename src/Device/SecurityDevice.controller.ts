@@ -40,6 +40,7 @@ export class DeviceController {
     @Param('id') id: string,
     @Req() request: CustomRequest,
   ) {
+    if (!id) throw new NotFoundException();
     const userId = request.token.userId;
     const findDevice: any = await this.securityDevicesRepo.getDevice(
       id,
@@ -56,11 +57,8 @@ export class DeviceController {
   @UseGuards(TokenRefreshGuard)
   @Delete()
   @HttpCode(204)
-  async deleteAllDeviceUserExceptCurrent(
-    @Req() request: CustomRequest,
-    @Body() deviceIdInBody: string,
-  ) {
-    const userId = request.token.userId;
-    await this.securityDeviceService.deletingAllDevices(userId, deviceIdInBody);
+  async deleteAllDeviceUserExceptCurrent(@Req() request: CustomRequest) {
+    const { userId, deviceId } = request.token;
+    await this.securityDeviceService.deletingAllDevices(userId, deviceId);
   }
 }
