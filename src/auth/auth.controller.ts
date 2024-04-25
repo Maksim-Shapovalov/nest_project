@@ -185,10 +185,10 @@ export class AuthController {
         user._id.toString(),
         device,
       );
-    const bannedToken =
+    const validToken =
       await this.refreshTokenRepo.DeleteRefreshTokenInData(token);
 
-    if (!bannedToken) throw new BadRequestException();
+    if (!validToken) throw new BadRequestException();
     if (!deletedDevice) throw new BadRequestException();
   }
   @UseGuards(BearerGuard)
