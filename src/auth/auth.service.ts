@@ -86,6 +86,7 @@ export class AuthService {
     throw new UnauthorizedException();
   }
   async updateJWT(userId: string, oldRefreshToken: string) {
+    await this.refreshTokenRepo.DeleteRefreshTokenInData(oldRefreshToken);
     const parser = jwt.decode(oldRefreshToken) as PayloadTypeRefresh;
     if (!parser) {
       return null;

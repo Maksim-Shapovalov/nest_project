@@ -84,7 +84,6 @@ export class AuthController {
     ); //update
 
     if (!token) throw new NotFoundException();
-
     const { accessToken, refreshToken } = token;
 
     response.cookie('refreshToken', refreshToken, {
@@ -176,17 +175,14 @@ export class AuthController {
   async logoutInApp(@Req() request: CustomRequest) {
     const { userId, deviceId } = request.token;
     const token = request.cookies.refreshToken;
-    console.log(userId, deviceId, 'userId, deviceId --------');
 
     const deletedDevice =
       await this.securityDeviceService.deletingDevicesExceptId(
         userId,
         deviceId,
       );
-    console.log(deletedDevice, 'deletedDevice');
     const validToken =
       await this.refreshTokenRepo.DeleteRefreshTokenInData(token);
-    console.log(validToken, 'validToken');
 
     if (!validToken) throw new BadRequestException();
     if (!deletedDevice) throw new BadRequestException();
