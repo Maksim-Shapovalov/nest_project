@@ -21,6 +21,9 @@ export class SecurityDevicesRepository {
     }
     return device;
   }
+  async addDeviceInDB(token: DevicesUserDB) {
+    return this.deviceModel.insertMany(token);
+  }
 
   async updateDevice(deviceId: string) {
     return this.deviceModel.findOneAndUpdate(

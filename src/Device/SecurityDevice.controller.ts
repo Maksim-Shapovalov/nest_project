@@ -15,7 +15,6 @@ import {
 } from '@nestjs/common';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { OutpatModelDevicesUser } from './Type/Device.user';
-import { HTTP_STATUS } from '../app.module';
 import { BearerGuard } from '../auth/guard/authGuard';
 
 @injectable()

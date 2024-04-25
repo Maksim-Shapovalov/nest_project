@@ -34,7 +34,6 @@ export class AuthGuard implements CanActivate {
 export const User = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    console.log(request.user);
     return request.user;
   },
 );

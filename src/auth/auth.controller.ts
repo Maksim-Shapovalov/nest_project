@@ -29,7 +29,8 @@ import { injectable } from 'inversify';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { ObjectId } from 'mongodb';
 import { RefreshTokenRepo } from '../Token/refreshToken-repo';
-import { TokenRefreshGuard } from '../Token/token-guard';
+import { CustomRequest, TokenRefreshGuard } from '../Token/token-guard';
+import { RefreshToken } from '../Token/Token.schema';
 
 @injectable()
 @Controller('auth')
@@ -70,14 +71,14 @@ export class AuthController {
   @UseGuards(TokenRefreshGuard)
   @Post('/refresh-token')
   async refreshToken(
-    @Req() request: Request,
-    @User() userModel: NewestPostLike,
+    @Req() request: CustomRequest,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const user = userModel;
+    const { userId } = request.token;
+    console.log(userId, 'user');
     const refreshTokenToRequest = request.cookies.refreshToken;
     const token = await this.authService.updateJWT(
-      user.userId,
+      userId,
       refreshTokenToRequest,
     ); //update
 
@@ -171,22 +172,20 @@ export class AuthController {
   @UseGuards(TokenRefreshGuard)
   @Post('/logout')
   @HttpCode(204)
-  async logoutInApp(
-    @Body() deviceIdInput: string,
-    @Req() request: Request,
-    @User() userModel: UserMongoDbType,
-  ) {
-    const user = userModel;
-    const device = deviceIdInput;
+  async logoutInApp(@Req() request: CustomRequest) {
+    const { userId, deviceId } = request.token;
     const token = request.cookies.refreshToken;
+    console.log(userId, deviceId, 'userId, deviceId --------');
 
     const deletedDevice =
       await this.securityDeviceService.deletingDevicesExceptId(
-        user._id.toString(),
-        device,
+        userId,
+        deviceId,
       );
+    console.log(deletedDevice, 'deletedDevice');
     const validToken =
       await this.refreshTokenRepo.DeleteRefreshTokenInData(token);
+    console.log(validToken, 'validToken');
 
     if (!validToken) throw new BadRequestException();
     if (!deletedDevice) throw new BadRequestException();

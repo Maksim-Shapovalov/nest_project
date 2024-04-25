@@ -11,15 +11,24 @@ import { InjectModel } from '@nestjs/mongoose';
 import { RefreshToken, RefreshTokenDocuments } from './Token.schema';
 import { Model } from 'mongoose';
 
+export interface CustomRequest extends Request {
+  token: {
+    userId: string;
+    deviceId: string;
+  };
+  cookies: {
+    [key: string]: string;
+  };
+}
+
 @Injectable()
 export class TokenRefreshGuard implements CanActivate {
   constructor(
-    protected refreshTokenRepo: RefreshTokenRepo,
     @InjectModel(RefreshToken.name)
     protected tokenRefreshModel: Model<RefreshTokenDocuments>,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest() as CustomRequest;
     const refreshToken = request.cookies.refreshToken;
     if (!refreshToken) throw new UnauthorizedException();
     const parser = jwt.decode(refreshToken) as PayloadTypeRefresh;
@@ -28,8 +37,12 @@ export class TokenRefreshGuard implements CanActivate {
       deviceId: parser.deviceId,
       iat: parser.iat,
     });
-
+    console.log(validToken, 'validToken');
     if (!validToken) throw new UnauthorizedException();
+    request.token = {
+      userId: validToken.userId,
+      deviceId: validToken.deviceId,
+    };
 
     return true;
   }

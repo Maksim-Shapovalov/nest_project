@@ -28,7 +28,7 @@ export class AuthService {
     private usersService: UserService,
     private refreshTokenRepo: RefreshTokenRepo,
     private jwtService: JwtService,
-    protected deleteDevice: SecurityDevicesRepository,
+    protected deviceRepo: SecurityDevicesRepository,
     protected userRepository: UserRepository,
     protected emailManager: EmailManager,
   ) {}
@@ -60,6 +60,7 @@ export class AuthService {
         uuidv4(),
         user.id,
       );
+      await this.deviceRepo.addDeviceInDB(createRefreshTokenMeta);
 
       //
       const bodyToAccessToken = {
@@ -93,7 +94,7 @@ export class AuthService {
       deviceId: parser.deviceId,
       userId: userId,
     };
-    await this.deleteDevice.updateDevice(createRefreshTokenMeta.deviceId);
+    await this.deviceRepo.updateDevice(createRefreshTokenMeta.deviceId);
 
     const accessToken: string = jwt.sign(
       { userId: userId },
