@@ -73,11 +73,11 @@ export class AuthService {
 
       const accessToken: string = await this.jwtService.signAsync(
         bodyToAccessToken,
-        { secret: setting.JWT_SECRET, expiresIn: '10s' },
+        { secret: setting.JWT_SECRET, expiresIn: '10000s' },
       );
       const refreshToken: string = await this.jwtService.signAsync(
         bodyToRefreshToken,
-        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '20s' },
+        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '20000s' },
       );
       await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
 
@@ -86,7 +86,7 @@ export class AuthService {
     throw new UnauthorizedException();
   }
   async updateJWT(userId: string, oldRefreshToken: string) {
-    await this.refreshTokenRepo.DeleteRefreshTokenInData(oldRefreshToken);
+    // await this.refreshTokenRepo.DeleteRefreshTokenInData(oldRefreshToken);
     const parser = await this.jwtService.verify(oldRefreshToken, {
       secret: setting.JWT_REFRESH_SECRET,
     });
@@ -99,17 +99,19 @@ export class AuthService {
     };
     await this.deviceRepo.updateDevice(createRefreshTokenMeta.deviceId);
 
-    const accessToken: string = jwt.sign(
+    const accessToken: string = this.jwtService.sign(
       { userId: userId },
-      setting.JWT_SECRET,
-      { expiresIn: '10s' },
+      {
+        secret: setting.JWT_SECRET,
+        expiresIn: '1000s',
+      },
     );
-    const refreshToken: string = jwt.sign(
+    const refreshToken: string = this.jwtService.sign(
       { userId: userId, deviceId: createRefreshTokenMeta.deviceId },
-      setting.JWT_REFRESH_SECRET,
-      { expiresIn: '20s' },
+      { secret: setting.JWT_REFRESH_SECRET, expiresIn: '2000s' },
     );
-    await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
+    await this.refreshTokenRepo.UpdateRefreshTokenInData(refreshToken);
+    // await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
     return { accessToken, refreshToken };
   }
 

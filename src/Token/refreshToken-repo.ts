@@ -31,12 +31,14 @@ export class RefreshTokenRepo {
   //   });
   // }
   async UpdateRefreshTokenInData(refreshToken: string) {
-    const parser = jwt.decode(refreshToken) as PayloadTypeRefresh;
-    return this.tokenRefreshModel.findOneAndUpdate({
-      userId: parser.userId,
-      deviceId: parser.deviceId,
-      iat: parser.iat,
-    });
+    const parser = this.jwtService.decode(refreshToken) as PayloadTypeRefresh;
+    return this.tokenRefreshModel.findOneAndUpdate(
+      {
+        userId: parser.userId,
+        deviceId: parser.deviceId,
+      },
+      { $set: { iat: parser.iat, exp: parser.exp } },
+    );
   }
   async DeleteRefreshTokenInData(refreshToken: string) {
     const parser = await this.jwtService.verify(refreshToken, {

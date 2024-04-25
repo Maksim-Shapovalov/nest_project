@@ -40,31 +40,31 @@ export class TokenRefreshGuard implements CanActivate {
       parser = this.jwtService.verify(refreshToken, {
         secret: setting.JWT_REFRESH_SECRET,
       });
-      // jwt.verify(refreshToken) as PayloadTypeRefresh;
       console.log(parser, 'parser');
-    } catch (e) {
-      console.log(e);
-      throw new UnauthorizedException();
-    }
-
-    const validToken: PayloadTypeRefresh = await this.tokenRefreshModel.findOne(
-      {
-        userId: parser.userId,
-        deviceId: parser.deviceId,
-        iat: parser.iat,
-      },
-    );
-    if (validToken.userId !== parser.userId) throw new ForbiddenException();
-    if (!validToken) throw new UnauthorizedException();
-    if (validToken.iat === parser.iat) {
+      const validToken: PayloadTypeRefresh =
+        await this.tokenRefreshModel.findOne({
+          userId: parser.userId,
+          deviceId: parser.deviceId,
+        });
       console.log(validToken, 'validToken');
-      request.token = {
-        userId: validToken.userId,
-        deviceId: validToken.deviceId,
-      };
 
-      return true;
-    } else {
+      if (!validToken) throw new UnauthorizedException();
+      console.log('bd.iat', validToken.iat);
+      console.log('token.iat', parser.iat);
+      console.log('***', validToken.iat === parser.iat);
+
+      if (validToken.iat === parser.iat) {
+        console.log(validToken, 'validToken');
+        request.token = {
+          userId: validToken.userId,
+          deviceId: validToken.deviceId,
+        };
+
+        return true;
+      }
+      throw new UnauthorizedException();
+      // jwt.verify(refreshToken) as PayloadTypeRefresh;
+    } catch (e) {
       throw new UnauthorizedException();
     }
   }

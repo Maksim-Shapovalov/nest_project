@@ -76,7 +76,6 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const { userId } = request.token;
-    console.log(userId, 'user');
     const refreshTokenToRequest = request.cookies.refreshToken;
     const token = await this.authService.updateJWT(
       userId,
