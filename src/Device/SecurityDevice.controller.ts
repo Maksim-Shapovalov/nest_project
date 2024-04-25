@@ -47,8 +47,7 @@ export class DeviceController {
       userId,
     );
 
-    if (!findDevice) return HttpCode(404);
-    if (findDevice === 5) return HttpCode(403);
+    if (!findDevice) throw new NotFoundException();
 
     const deletedDevice =
       await this.securityDeviceService.deletingDevicesExceptId(userId, id);

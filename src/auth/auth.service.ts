@@ -87,7 +87,9 @@ export class AuthService {
   }
   async updateJWT(userId: string, oldRefreshToken: string) {
     await this.refreshTokenRepo.DeleteRefreshTokenInData(oldRefreshToken);
-    const parser = jwt.decode(oldRefreshToken) as PayloadTypeRefresh;
+    const parser = await this.jwtService.verify(oldRefreshToken, {
+      secret: setting.JWT_REFRESH_SECRET,
+    });
     if (!parser) {
       return null;
     }
@@ -100,13 +102,14 @@ export class AuthService {
     const accessToken: string = jwt.sign(
       { userId: userId },
       setting.JWT_SECRET,
-      { expiresIn: '10sec' },
+      { expiresIn: '10s' },
     );
     const refreshToken: string = jwt.sign(
       { userId: userId, deviceId: createRefreshTokenMeta.deviceId },
       setting.JWT_REFRESH_SECRET,
-      { expiresIn: '20sec' },
+      { expiresIn: '20s' },
     );
+    await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
     return { accessToken, refreshToken };
   }
 

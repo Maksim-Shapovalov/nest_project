@@ -17,6 +17,7 @@ import {
 import { Blog, UserDocument } from '../Blogs/Type/Blogs.schemas';
 import { User, UserDocuments } from '../Users/Type/User.schemas';
 import { Device, DeviceDocuments } from '../Device/Type/DataId.schemas';
+import { RefreshToken, RefreshTokenDocuments } from '../Token/Token.schema';
 
 @injectable()
 export class AllDataClearRepo {
@@ -30,6 +31,8 @@ export class AllDataClearRepo {
     @InjectModel(Blog.name) protected blogModel: Model<UserDocument>,
     @InjectModel(User.name) protected userModel: Model<UserDocuments>,
     @InjectModel(Device.name) protected deviceModel: Model<DeviceDocuments>,
+    @InjectModel(RefreshToken.name)
+    protected tokenRefreshModel: Model<RefreshTokenDocuments>,
   ) {}
 
   async dataClear() {
@@ -41,6 +44,7 @@ export class AllDataClearRepo {
       this.blogModel.deleteMany({}),
       this.userModel.deleteMany({}),
       this.deviceModel.deleteMany({}),
+      this.tokenRefreshModel.deleteMany({}),
     ]);
     return true;
   }

@@ -5,10 +5,13 @@ import 'reflect-metadata';
 import { InjectModel } from '@nestjs/mongoose';
 import { Device, DeviceDocuments } from './Type/DataId.schemas';
 import { Model } from 'mongoose';
+import { RefreshToken, RefreshTokenDocuments } from '../Token/Token.schema';
 @injectable()
 export class SecurityDevicesRepository {
   constructor(
     @InjectModel(Device.name) protected deviceModel: Model<DeviceDocuments>,
+    @InjectModel(RefreshToken.name)
+    protected tokenRefreshModel: Model<RefreshTokenDocuments>,
   ) {}
   async getDevice(sessionId: string, id: string) {
     const device = await this.deviceModel.findOne({ deviceId: sessionId });
@@ -44,11 +47,16 @@ export class SecurityDevicesRepository {
 
   async deletingDevicesExceptId(userId: string, deviceId: string) {
     const deleted = await this.deviceModel.deleteOne({ userId, deviceId });
+    await this.tokenRefreshModel.deleteOne({ userId, deviceId });
     return deleted.deletedCount === 1;
   }
 
   async deletingAllDevices(user: string, device: string) {
     const deleted = await this.deviceModel.deleteMany({
+      userId: user,
+      deviceId: { $ne: device },
+    });
+    await this.tokenRefreshModel.deleteMany({
       userId: user,
       deviceId: { $ne: device },
     });

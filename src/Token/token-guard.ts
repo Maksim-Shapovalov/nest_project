@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -46,18 +47,25 @@ export class TokenRefreshGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const validToken = await this.tokenRefreshModel.findOne({
-      userId: parser.userId,
-      deviceId: parser.deviceId,
-      iat: parser.iat,
-    });
-    console.log(validToken, 'validToken');
+    const validToken: PayloadTypeRefresh = await this.tokenRefreshModel.findOne(
+      {
+        userId: parser.userId,
+        deviceId: parser.deviceId,
+        iat: parser.iat,
+      },
+    );
+    if (validToken.userId !== parser.userId) throw new ForbiddenException();
     if (!validToken) throw new UnauthorizedException();
-    request.token = {
-      userId: validToken.userId,
-      deviceId: validToken.deviceId,
-    };
+    if (validToken.iat === parser.iat) {
+      console.log(validToken, 'validToken');
+      request.token = {
+        userId: validToken.userId,
+        deviceId: validToken.deviceId,
+      };
 
-    return true;
+      return true;
+    } else {
+      throw new UnauthorizedException();
+    }
   }
 }
