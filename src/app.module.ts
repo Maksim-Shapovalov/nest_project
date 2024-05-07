@@ -42,6 +42,8 @@ import { EmailManager } from './Email/email-manager';
 import { EmailAdapter } from './Email/email-adapter';
 import { CustomBlogIdValidation } from './Posts/validation/BlogExists.decorator';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { UserSQLRepository } from './Users/User.SqlRepositories';
+import { TypeOrmModule } from '@nestjs/typeorm';
 export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,
@@ -57,6 +59,16 @@ export const HTTP_STATUS = {
   imports: [
     AuthModule,
     ConfigModule.forRoot(),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'sf',
+      database: 'PostgreHomwork',
+      autoLoadEntities: false,
+      synchronize: false,
+    }),
     ThrottlerModule.forRoot([
       {
         ttl: 10000,
@@ -104,6 +116,7 @@ export const HTTP_STATUS = {
     AppService,
     RefreshTokenRepo,
     CustomBlogIdValidation,
+    UserSQLRepository,
   ],
 })
 export class AppModule {}

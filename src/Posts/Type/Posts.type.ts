@@ -12,9 +12,6 @@ export class PostClass {
     public blogId: string,
     public blogName: string,
     public createdAt: string,
-    // public commentatorInfo: {
-    //     userId: string
-    //     userLogin: string
   ) {}
 }
 export type PostsOutputType = {

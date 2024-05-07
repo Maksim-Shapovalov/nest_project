@@ -187,6 +187,7 @@ export const userToPostMapper = (user: WithId<UserMongoDbType>): UserToShow => {
     createdAt: user.createdAt,
   };
 };
+
 export const userToResendMessageMapper = (
   user: WithId<UserMongoDbType>,
 ): FindUserByRecoveryCode => {

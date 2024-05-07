@@ -18,6 +18,9 @@ import { BasicStrategy } from './strategies/basic.strategies';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtStrategy } from './strategies/bearer.strategies';
 import { RefreshToken, TokenRefreshSchema } from '../Token/Token.schema';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserSQLRepository } from '../Users/User.SqlRepositories';
+import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceSQLRepository';
 
 @Module({
   controllers: [AuthController],
@@ -31,6 +34,16 @@ import { RefreshToken, TokenRefreshSchema } from '../Token/Token.schema';
     JwtStrategy,
   ],
   imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'sf',
+      database: 'PostgreHomwork',
+      autoLoadEntities: false,
+      synchronize: false,
+    }),
     PassportModule,
     ThrottlerModule.forRoot([
       {
@@ -58,6 +71,8 @@ import { RefreshToken, TokenRefreshSchema } from '../Token/Token.schema';
     EmailAdapter,
     BasicStrategy,
     JwtStrategy,
+    UserSQLRepository,
+    SecurityDevicesSQLRepository,
   ],
 })
 export class AuthModule {}

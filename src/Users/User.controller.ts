@@ -18,11 +18,13 @@ import { QueryType } from '../Other/Query.Type';
 import { UserBasicRequestBody } from './Type/User.type';
 import { isMongoIdPipe } from './user-chto-to';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
+import { UserSQLRepository } from './User.SqlRepositories';
 
 @injectable()
 @Controller('users')
 export class UserController {
   constructor(
+    protected userSQLRepository: UserSQLRepository,
     protected userRepository: UserRepository,
     protected serviceUser: UserService,
   ) {}
@@ -30,7 +32,7 @@ export class UserController {
   @HttpCode(200)
   async getAllUserInDB(@Query() query: QueryType) {
     const filter = searchLogAndEmailInUsers(query);
-    return this.userRepository.getAllUsers(filter);
+    return this.userSQLRepository.getAllUsers(filter);
   }
   @Get(':id')
   @HttpCode(200)
@@ -55,7 +57,7 @@ export class UserController {
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteUserInDB(@Param('id', isMongoIdPipe) userId) {
+  async deleteUserInDB(@Param('id') userId) {
     const deletedUs = await this.serviceUser.deleteUserById(userId);
     if (!deletedUs) {
       throw new NotFoundException();
@@ -63,3 +65,4 @@ export class UserController {
     return HttpCode(204);
   }
 }
+// async deleteUserInDB(@Param('id', isMongoIdPipe) userId) {

@@ -7,43 +7,24 @@ import { HttpExceptionFilter } from './exception.filter';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';
+import { appSettings } from './app.settings';
 
 const serverUrl = 'http://localhost:3000';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
-  app.use(cookieParser());
-  app.useGlobalGuards();
-  useContainer(app.select(AppModule), { fallbackOnErrors: true });
-  app.useGlobalPipes(
-    new ValidationPipe({
-      stopAtFirstError: true,
-      transform: true,
-      exceptionFactory: (errors) => {
-        const errorsForResponse = [];
-
-        errors.forEach((e) => {
-          const constrainsKeys = Object.keys(e.constraints);
-          constrainsKeys.forEach((ckey) => {
-            errorsForResponse.push({
-              message: e.constraints[ckey],
-              field: e.property,
-            });
-          });
-        });
-        throw new BadRequestException(errorsForResponse);
-      },
-    }),
-  );
-  app.useGlobalFilters(new HttpExceptionFilter());
-  const config = new DocumentBuilder()
-    .setTitle('api example')
-    .setDescription('The cats API description')
-    .setVersion('1.0')
-    .addTag('api')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('swagger', app, document);
+  // app.enableCors();
+  // app.use(cookieParser());
+  // app.useGlobalGuards();
+  // useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  // const config = new DocumentBuilder()
+  //   .setTitle('api example')
+  //   .setDescription('The cats API description')
+  //   .setVersion('1.0')
+  //   .addTag('api')
+  //   .build();
+  // const document = SwaggerModule.createDocument(app, config);
+  // SwaggerModule.setup('swagger', app, document);
+  appSettings(app);
   await app.listen(3000);
   if (process.env.NODE_ENV === 'development') {
     get(`${serverUrl}/swagger/swagger-ui-bundle.js`, function (response) {

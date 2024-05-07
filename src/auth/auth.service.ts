@@ -21,6 +21,7 @@ import { newDataUser2, UserRepository } from '../Users/User.repository';
 import { EmailManager } from '../Email/email-manager';
 import bcrypt from 'bcrypt';
 import { PayloadTypeRefresh } from '../Token/refreshToken-type';
+import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceSQLRepository';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +30,7 @@ export class AuthService {
     private refreshTokenRepo: RefreshTokenRepo,
     private jwtService: JwtService,
     protected deviceRepo: SecurityDevicesRepository,
+    protected deviceSQLRepo: SecurityDevicesSQLRepository,
     protected userRepository: UserRepository,
     protected emailManager: EmailManager,
   ) {}
@@ -57,10 +59,10 @@ export class AuthService {
         userAgent.IP || '123',
         userAgent.deviceName || 'internet',
         new Date().toISOString(),
-        uuidv4(),
+        Math.floor(10000 + Math.random() * 90000).toString(),
         user.id,
       );
-      await this.deviceRepo.addDeviceInDB(createRefreshTokenMeta);
+      // await this.deviceSQLRepo.addDeviceInDB(createRefreshTokenMeta);
 
       //
       const bodyToAccessToken = {
@@ -79,7 +81,12 @@ export class AuthService {
         bodyToRefreshToken,
         { secret: setting.JWT_REFRESH_SECRET, expiresIn: '20s' },
       );
+      // await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
       await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
+      await this.deviceSQLRepo.addDeviceInDB(
+        createRefreshTokenMeta,
+        refreshToken,
+      );
 
       return { accessToken, refreshToken };
     }
@@ -97,7 +104,7 @@ export class AuthService {
       deviceId: parser.deviceId,
       userId: userId,
     };
-    await this.deviceRepo.updateDevice(createRefreshTokenMeta.deviceId);
+    await this.deviceSQLRepo.updateDevice(createRefreshTokenMeta.deviceId);
 
     const accessToken: string = this.jwtService.sign(
       { userId: userId },
