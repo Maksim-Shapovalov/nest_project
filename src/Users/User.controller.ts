@@ -16,7 +16,6 @@ import {
 } from '@nestjs/common';
 import { QueryType } from '../Other/Query.Type';
 import { UserBasicRequestBody } from './Type/User.type';
-import { isMongoIdPipe } from './user-chto-to';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { UserSQLRepository } from './User.SqlRepositories';
 
