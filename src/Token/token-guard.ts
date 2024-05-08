@@ -16,8 +16,8 @@ import { JwtService } from '@nestjs/jwt';
 
 export interface CustomRequest extends Request {
   token: {
-    userId: string;
-    deviceId: string;
+    userId: number;
+    deviceId: number;
   };
   cookies: {
     [key: string]: string;

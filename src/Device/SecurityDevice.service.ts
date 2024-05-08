@@ -3,10 +3,14 @@ import { ObjectId } from 'mongodb';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
 import { OutpatModelDevicesUser } from './Type/Device.user';
+import { SecurityDevicesSQLRepository } from './postgres/SecurityDeviceSQLRepository';
 
 @injectable()
 export class SecurityDeviceService {
-  constructor(protected securityDevicesRepo: SecurityDevicesRepository) {}
+  constructor(
+    protected securityDevicesRepo: SecurityDevicesRepository,
+    protected securitySQLDevicesRepo: SecurityDevicesSQLRepository,
+  ) {}
   async getAllDevices(
     userId: string,
   ): Promise<OutpatModelDevicesUser[] | null> {
@@ -19,8 +23,11 @@ export class SecurityDeviceService {
     return devices;
   }
 
-  async deletingDevicesExceptId(userId: string, deviceId: string) {
-    return this.securityDevicesRepo.deletingDevicesExceptId(userId, deviceId);
+  async deletingDevicesExceptId(userId: number, deviceId: number) {
+    return this.securitySQLDevicesRepo.deletingDevicesExceptId(
+      userId,
+      deviceId,
+    );
   }
 
   async deletingAllDevices(user: string, device: string) {

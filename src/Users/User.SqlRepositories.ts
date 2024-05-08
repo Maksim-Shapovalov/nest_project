@@ -96,18 +96,14 @@ export class UserSQLRepository {
     return mappedUser;
   }
   async findUsersByCode(codeUser: string): Promise<FindUserByRecoveryCode> {
-    const getUsersQuery =
-      'SELECT * FROM "Users" WHERE email_confirmation_confirmation_code = $1';
-    const getUsersValues = [codeUser];
-    const result = await this.dataSource
-      .query(getUsersQuery, getUsersValues)
-      .then((result) => result.rows);
-
-    if (result.length === 0) {
+    const getUsersQuery = await this.dataSource.query(
+      `SELECT * FROM "Users" WHERE "email_confirmation_confirmation_code" = ''${codeUser}`,
+    );
+    if (getUsersQuery.length === 0) {
       return null;
     }
 
-    const user = result[0];
+    const user = getUsersQuery[0];
 
     return user;
   }
@@ -143,35 +139,26 @@ export class UserSQLRepository {
     login: string,
     email: string,
   ): Promise<FindUserByRecoveryCode> {
-    const findUserQuery =
-      'SELECT * FROM "Users" WHERE login = $1 AND email = $2';
-    const findUserValues = [login, email];
-    const result = await this.dataSource
-      .query(findUserQuery, findUserValues)
-      .then((result) => result.rows);
+    const findUserQuery = await this.dataSource.query(
+      `SELECT * FROM "Users" WHERE login = '${login}' AND email = '${email}'`,
+    );
 
-    if (result.length === 0) {
+    if (findUserQuery.length === 0) {
       return null;
     }
 
-    const user = result[0];
+    const user = findUserQuery[0];
     const mappedUser = userToResendMessageMapper(user);
 
     return mappedUser;
   }
 
   async findByEmailAndAddRecoveryCode(possibleUser: possibleUser) {
-    const updateUserQuery =
-      'UPDATE "Users" SET recovery_code = $1 WHERE email = $2';
-    const updateUserValues = [possibleUser.recoveryCode, possibleUser.email];
-    const result = await this.dataSource.query(
-      updateUserQuery,
-      updateUserValues,
+    const updateUserQuery = await this.dataSource.query(
+      `UPDATE "Users" SET recovery_code = ${possibleUser.recoveryCode} WHERE email = ${possibleUser.email}`,
     );
 
-    if (result.rowCount === 0) {
-      return false;
-    }
+    if (!updateUserQuery) return false;
 
     return true;
   }
@@ -195,26 +182,19 @@ export class UserSQLRepository {
   }
 
   async findUserByRecoveryCode(newDataUser: newDataUser2) {
-    const findUserQuery =
-      'UPDATE "Users" SET password_hash = $1, password_salt = $2 WHERE recovery_code = $3 RETURNING *';
-    const findUserValues = [
-      newDataUser.newPassword,
-      newDataUser.newSalt,
-      newDataUser.recoveryCode,
-    ];
-    const result = await this.dataSource
-      .query(findUserQuery, findUserValues)
-      .then((result) => result.rows);
+    const findUserQuery = await this.dataSource.query(
+      `UPDATE "Users" SET "password_hash" = '${newDataUser.newPassword}', "password_salt" = '${newDataUser.newSalt}' WHERE "recovery_code" = '${newDataUser.recoveryCode}' RETURNING *`,
+    );
 
-    if (result.length === 0) {
+    if (findUserQuery.length === 0) {
       return false;
     }
 
-    const user = result[0];
+    const user = findUserQuery[0];
 
-    const deleteUserQuery = 'DELETE FROM "Users" WHERE recovery_code = $1';
-    const deleteUserValues = [newDataUser.recoveryCode];
-    await this.dataSource.query(deleteUserQuery, deleteUserValues);
+    // const deleteUserQuery = 'DELETE FROM "Users" WHERE "recovery_code" = ${}';
+    // const deleteUserValues = [newDataUser.recoveryCode];
+    // await this.dataSource.query(deleteUserQuery, deleteUserValues);
 
     return user;
   }

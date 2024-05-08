@@ -22,6 +22,7 @@ import { EmailManager } from '../Email/email-manager';
 import bcrypt from 'bcrypt';
 import { PayloadTypeRefresh } from '../Token/refreshToken-type';
 import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceSQLRepository';
+import { UserSQLRepository } from '../Users/User.SqlRepositories';
 
 @Injectable()
 export class AuthService {
@@ -32,6 +33,7 @@ export class AuthService {
     protected deviceRepo: SecurityDevicesRepository,
     protected deviceSQLRepo: SecurityDevicesSQLRepository,
     protected userRepository: UserRepository,
+    protected userSQLRepository: UserSQLRepository,
     protected emailManager: EmailManager,
   ) {}
 
@@ -92,7 +94,7 @@ export class AuthService {
     }
     throw new UnauthorizedException();
   }
-  async updateJWT(userId: string, oldRefreshToken: string) {
+  async updateJWT(userId: number, oldRefreshToken: string) {
     // await this.refreshTokenRepo.DeleteRefreshTokenInData(oldRefreshToken);
     const parser = await this.jwtService.verify(oldRefreshToken, {
       secret: setting.JWT_REFRESH_SECRET,
@@ -128,7 +130,7 @@ export class AuthService {
       email: email,
       recoveryCode: recoveryCode,
     };
-    await this.userRepository.findByEmailAndAddRecoveryode(possibleUser);
+    await this.userSQLRepository.findByEmailAndAddRecoveryCode(possibleUser);
     await this.emailManager.sendEmailWithTheCode(email, recoveryCode);
   }
 
@@ -139,11 +141,11 @@ export class AuthService {
       newDataUser.newSalt,
     );
 
-    return this.userRepository.findUserByRecoveryCode(newDataUser);
+    return this.userSQLRepository.findUserByRecoveryCode(newDataUser);
   }
 
   async confirmatoryUser(code: string) {
-    const findUser = await this.userRepository.findUsersByCode(code);
+    const findUser = await this.userSQLRepository.findUsersByCode(code);
     if (!findUser) return null;
     if (findUser.emailConfirmation.isConfirmed)
       throw new BadRequestException({

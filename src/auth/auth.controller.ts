@@ -31,6 +31,7 @@ import { ObjectId } from 'mongodb';
 import { RefreshTokenRepo } from '../Token/refreshToken-repo';
 import { CustomRequest, TokenRefreshGuard } from '../Token/token-guard';
 import { RefreshToken } from '../Token/Token.schema';
+import { UserSQLRepository } from '../Users/User.SqlRepositories';
 @UseGuards(ThrottlerGuard)
 @injectable()
 @Controller('auth')
@@ -39,6 +40,7 @@ export class AuthController {
     protected authService: AuthService,
     protected serviceUser: UserService,
     protected userRepository: UserRepository,
+    protected userSQLRepository: UserSQLRepository,
     protected securityDeviceService: SecurityDeviceService,
     protected refreshTokenRepo: RefreshTokenRepo,
   ) {}
@@ -130,7 +132,7 @@ export class AuthController {
   @Post('/registration')
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
-    const findUserInDB = await this.userRepository.findByLoginAndEmail(
+    const findUserInDB = await this.userSQLRepository.findByLoginAndEmail(
       bodyUser.login,
       bodyUser.email,
     );
@@ -159,7 +161,7 @@ export class AuthController {
   @HttpCode(204)
   async registrationEmailResending(@Body('email') email: string) {
     const findUser: FindUserByRecoveryCode =
-      await this.userRepository.findByLoginOrEmail(email);
+      await this.userSQLRepository.findByLoginOrEmail(email);
     if (!findUser)
       throw new BadRequestException({
         message: 'email is not exist',
@@ -177,8 +179,8 @@ export class AuthController {
 
     const deletedDevice =
       await this.securityDeviceService.deletingDevicesExceptId(
-        userId,
-        deviceId,
+        +userId,
+        +deviceId,
       );
     const validToken =
       await this.refreshTokenRepo.DeleteRefreshTokenInData(token);

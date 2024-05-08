@@ -1,6 +1,6 @@
 export type PayloadTypeRefresh = {
-  userId: string;
-  deviceId: string;
+  userId: number;
+  deviceId: number;
   iat: number;
   exp: number;
 } | null;
