@@ -38,7 +38,7 @@ export class DeviceController {
   @Delete(':id')
   @HttpCode(204)
   async deleteDeviceUserById(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Req() request: CustomRequest,
   ) {
     if (!id) throw new NotFoundException();

@@ -13,7 +13,7 @@ export class SecurityDevicesRepository {
     @InjectModel(RefreshToken.name)
     protected tokenRefreshModel: Model<RefreshTokenDocuments>,
   ) {}
-  async getDevice(sessionId: string, id: string) {
+  async getDevice(sessionId: number, id: number) {
     const device = await this.deviceModel.findOne({ deviceId: sessionId });
 
     if (!device) {
@@ -51,7 +51,7 @@ export class SecurityDevicesRepository {
     return deleted.deletedCount === 1;
   }
 
-  async deletingAllDevices(user: string, device: string) {
+  async deletingAllDevices(user: number, device: number) {
     const deleted = await this.deviceModel.deleteMany({
       userId: user,
       deviceId: { $ne: device },

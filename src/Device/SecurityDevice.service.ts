@@ -12,7 +12,7 @@ export class SecurityDeviceService {
     protected securitySQLDevicesRepo: SecurityDevicesSQLRepository,
   ) {}
   async getAllDevices(
-    userId: string,
+    userId: number,
   ): Promise<OutpatModelDevicesUser[] | null> {
     const devices = await this.securityDevicesRepo.getAllDevices(
       new ObjectId(userId).toString(),
@@ -30,7 +30,7 @@ export class SecurityDeviceService {
     );
   }
 
-  async deletingAllDevices(user: string, device: string) {
+  async deletingAllDevices(user: number, device: number) {
     return this.securityDevicesRepo.deletingAllDevices(user, device);
   }
 }
