@@ -21,7 +21,7 @@ import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { UserSQLRepository } from './User.SqlRepositories';
 
 @injectable()
-@Controller('users')
+@Controller('sa/users')
 export class UserController {
   constructor(
     protected userSQLRepository: UserSQLRepository,

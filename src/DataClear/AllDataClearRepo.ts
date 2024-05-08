@@ -18,6 +18,8 @@ import { Blog, UserDocument } from '../Blogs/Type/Blogs.schemas';
 import { User, UserDocuments } from '../Users/Type/User.schemas';
 import { Device, DeviceDocuments } from '../Device/Type/DataId.schemas';
 import { RefreshToken, RefreshTokenDocuments } from '../Token/Token.schema';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @injectable()
 export class AllDataClearRepo {
@@ -33,6 +35,7 @@ export class AllDataClearRepo {
     @InjectModel(Device.name) protected deviceModel: Model<DeviceDocuments>,
     @InjectModel(RefreshToken.name)
     protected tokenRefreshModel: Model<RefreshTokenDocuments>,
+    @InjectDataSource() protected dataSource: DataSource,
   ) {}
 
   async dataClear() {
@@ -45,6 +48,9 @@ export class AllDataClearRepo {
       this.userModel.deleteMany({}),
       this.deviceModel.deleteMany({}),
       this.tokenRefreshModel.deleteMany({}),
+      this.dataSource.query(
+        `DELETE FROM public."device"; DELETE FROM public."Users";`,
+      ),
     ]);
     return true;
   }
