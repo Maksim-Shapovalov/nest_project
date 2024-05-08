@@ -31,6 +31,7 @@ export class UserController {
   @HttpCode(200)
   async getAllUserInDB(@Query() query: QueryType) {
     const filter = searchLogAndEmailInUsers(query);
+    console.log(1);
     return this.userSQLRepository.getAllUsers(filter);
   }
   @Get(':id')
