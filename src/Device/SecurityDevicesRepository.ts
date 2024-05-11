@@ -70,7 +70,7 @@ export const deviceMapper = (
   return {
     ip: device.ip,
     title: device.title,
-    deviceId: device.deviceId,
+    deviceId: device.deviceId.toString(),
     lastActiveDate: device.lastActiveDate,
   };
 };
