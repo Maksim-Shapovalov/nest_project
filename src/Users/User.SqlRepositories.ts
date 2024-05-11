@@ -54,14 +54,14 @@ export class UserSQLRepository {
     );
 
     const items = result.map((u) => userToPostMapper(u));
-    console.log(items);
+    console.log(items, 'items------------');
 
     return {
       pagesCount: pageCountUsers,
       page: filter.pageNumber,
       pageSize: pageSizeInQuery,
       totalCount: totalCount,
-      items: items[0],
+      items: items,
     };
   }
   async getUserById(id: number): Promise<UserMongoDbType | null> {
