@@ -40,21 +40,15 @@ export class TokenRefreshGuard implements CanActivate {
       parser = this.jwtService.verify(refreshToken, {
         secret: setting.JWT_REFRESH_SECRET,
       });
-      console.log(parser, 'parser');
       const validToken: PayloadTypeRefresh =
         await this.tokenRefreshModel.findOne({
           userId: parser.userId,
           deviceId: parser.deviceId,
         });
-      console.log(validToken, 'validToken');
 
       if (!validToken) throw new UnauthorizedException();
-      console.log('bd.iat', validToken.iat);
-      console.log('token.iat', parser.iat);
-      console.log('***', validToken.iat === parser.iat);
 
       if (validToken.iat === parser.iat) {
-        console.log(validToken, 'validToken');
         request.token = {
           userId: validToken.userId,
           deviceId: validToken.deviceId,

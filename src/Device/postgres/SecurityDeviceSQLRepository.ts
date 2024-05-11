@@ -2,9 +2,10 @@ import { injectable } from 'inversify';
 import 'reflect-metadata';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { DevicesUserDB } from '../Type/Device.user';
+import { DevicesUserDB, OutpatModelDevicesUser } from '../Type/Device.user';
 import { setting } from '../../setting';
 import { JwtService } from '@nestjs/jwt';
+import { deviceMapper } from '../SecurityDevicesRepository';
 @injectable()
 export class SecurityDevicesSQLRepository {
   constructor(
@@ -48,15 +49,17 @@ export class SecurityDevicesSQLRepository {
     return updateDevice;
   }
 
-  // async getAllDevices(
-  //   userId: string,
-  // ): Promise<OutpatModelDevicesUser[] | null> {
-  //   const devices = await this.deviceModel.find({ userId: userId }).lean();
-  //   if (!devices) {
-  //     return null;
-  //   }
-  //   return devices.map(deviceMapper);
-  // }
+  async getAllDevices(
+    userId: number,
+  ): Promise<OutpatModelDevicesUser[] | null> {
+    const devices = await this.dataSource.query(
+      `SELECT * FROM "device" WHERE "userId" = ${userId}`,
+    );
+    if (!devices) {
+      return null;
+    }
+    return devices.map(deviceMapper);
+  }
 
   async deletingDevicesExceptId(userId: number, deviceId: number) {
     const findDeviceInDB = await this.dataSource.query(

@@ -64,7 +64,7 @@ export class SecurityDevicesRepository {
   }
 }
 
-const deviceMapper = (
+export const deviceMapper = (
   device: WithId<DevicesUserDB>,
 ): OutpatModelDevicesUser => {
   return {

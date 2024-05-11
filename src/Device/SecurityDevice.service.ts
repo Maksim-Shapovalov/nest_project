@@ -14,9 +14,7 @@ export class SecurityDeviceService {
   async getAllDevices(
     userId: number,
   ): Promise<OutpatModelDevicesUser[] | null> {
-    const devices = await this.securityDevicesRepo.getAllDevices(
-      new ObjectId(userId).toString(),
-    );
+    const devices = await this.securitySQLDevicesRepo.getAllDevices(userId);
     if (!devices) {
       return null;
     }
@@ -31,6 +29,6 @@ export class SecurityDeviceService {
   }
 
   async deletingAllDevices(user: number, device: number) {
-    return this.securityDevicesRepo.deletingAllDevices(user, device);
+    return this.securitySQLDevicesRepo.deletingAllDevices(user, device);
   }
 }
