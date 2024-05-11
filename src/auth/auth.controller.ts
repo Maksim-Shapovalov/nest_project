@@ -151,9 +151,10 @@ export class AuthController {
     }
 
     const newUser = await this.serviceUser.getNewUser(bodyUser);
-    const findUser = await this.userRepository.findByLoginOrEmail(
+    const findUser = await this.userSQLRepository.findByLoginOrEmail(
       newUser.login,
     );
+    console.log(findUser);
     await this.authService.doOperation(findUser);
     return HttpCode(204);
   }

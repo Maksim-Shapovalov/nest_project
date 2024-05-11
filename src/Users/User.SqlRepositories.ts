@@ -302,7 +302,11 @@ export const userToResendMessageMapper = (
     createdAt: user.createdAt,
     passwordHash: user.passwordHash,
     passwordSalt: user.passwordSalt,
-    emailConfirmation: user.emailConfirmation,
+    emailConfirmation: {
+      confirmationCode: user.confirmationCode,
+      expirationDate: user.expirationDate,
+      isConfirmed: user.isConfirmed,
+    },
     recoveryCode: user.recoveryCode,
   };
 };
