@@ -61,7 +61,7 @@ export class UserSQLRepository {
       page: filter.pageNumber,
       pageSize: pageSizeInQuery,
       totalCount: totalCount,
-      items: items,
+      items: items[0],
     };
   }
   async getUserById(id: number): Promise<UserMongoDbType | null> {
@@ -288,7 +288,7 @@ export const userMapper = (user: any): UserOutputModel => {
 
 export const userToPostMapper = (user: any): UserToShow => {
   return {
-    id: user.id,
+    id: user.id.toString(),
     login: user.login,
     email: user.email,
     createdAt: user.createdAt,
