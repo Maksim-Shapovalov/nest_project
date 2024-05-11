@@ -48,6 +48,7 @@ export class UserController {
   @Post()
   @HttpCode(201)
   async createNewUser(@Body() inputModel: UserBasicRequestBody) {
+    console.log('i');
     const user = {
       login: inputModel.login,
       password: inputModel.password,
