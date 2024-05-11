@@ -1,18 +1,17 @@
 import {
   UserBasicRequestBody,
   UserDbType,
-  UserMongoDbType,
   UserOutputModel,
   UserToShow,
 } from './Type/User.type';
-import { UserRepository, userToPostMapper } from './User.repository';
+import { UserRepository } from './User.repository';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
 import { addHours } from 'date-fns';
 import { UnauthorizedException } from '@nestjs/common';
-import { UserSQLRepository } from './User.SqlRepositories';
+import { UserSQLRepository, userToPostMapper } from './User.SqlRepositories';
 @injectable()
 export class UserService {
   constructor(
@@ -39,7 +38,7 @@ export class UserService {
       Math.floor(10000 + Math.random() * 90000).toString(),
     );
     const createdNewUser = await this.userSQLRepository.saveUser(newUser);
-    return createdNewUser[0];
+    return userToPostMapper(createdNewUser[0]);
   }
   async deleteUserById(userId: number): Promise<boolean> {
     return await this.userSQLRepository.deleteUserById(userId);
