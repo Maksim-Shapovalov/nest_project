@@ -64,18 +64,15 @@ export class UserSQLRepository {
       items: items,
     };
   }
-  async getUserById(id: number): Promise<UserMongoDbType | null> {
-    const getUserQuery = 'SELECT * FROM "Users" WHERE id = $1';
-    const getUserValues = [id];
-    const result = await this.dataSource
-      .query(getUserQuery, getUserValues)
-      .then((result) => result.rows);
-
-    if (result.length === 0) {
+  async getUserById(id: number): Promise<FindUserByRecoveryCode | null> {
+    const getUserQuery = await this.dataSource.query(
+      `SELECT * FROM "Users" WHERE id = ${id}`,
+    );
+    if (getUserQuery.length === 0) {
       return null;
     }
 
-    const user = result[0];
+    const user = getUserQuery[0];
 
     return user;
   }

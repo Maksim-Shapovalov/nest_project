@@ -152,7 +152,7 @@ export class PostsController {
   @HttpCode(204)
   async appropriationLike(
     @Param('id') id: string,
-    @User() userModel: { userId: string },
+    @User() userModel: { userId: number },
     @Body() inputLikeStatus: StatusLikes,
   ) {
     const findPosts = await this.postsRepository.getPostsById(id, null);

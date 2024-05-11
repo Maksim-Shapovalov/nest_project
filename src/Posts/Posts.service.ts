@@ -36,7 +36,7 @@ export class PostsService {
   }
   async updateStatusLikeInUser(
     postId: string,
-    userID: string,
+    userID: number,
     status: AvailableStatusEnum,
   ) {
     return this.postsRepository.updateStatusLikeUser(postId, userID, status);

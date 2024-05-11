@@ -68,10 +68,10 @@ export class AuthService {
 
       //
       const bodyToAccessToken = {
-        userId: user.id,
+        userId: user.id.toString(),
       };
       const bodyToRefreshToken = {
-        userId: user.id,
+        userId: user.id.toString(),
         deviceId: createRefreshTokenMeta.deviceId,
       };
 

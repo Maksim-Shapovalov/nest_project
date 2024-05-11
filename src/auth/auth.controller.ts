@@ -195,13 +195,11 @@ export class AuthController {
   async me(@Req() request) {
     const user = request.user as NewestPostLike;
     if (!user) throw new UnauthorizedException();
-    const result = await this.userRepository.getUserById(
-      new ObjectId(user.userId),
-    );
+    const result = await this.userSQLRepository.getUserById(+user.userId);
     return {
       email: result.email,
       login: result.login,
-      userId: result._id.toString(),
+      userId: result.id.toString(),
     };
   }
   //@User() userModel: UserMongoDbType

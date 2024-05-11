@@ -102,7 +102,7 @@ export class PostsRepository {
   }
   async updateStatusLikeUser(
     postId: string,
-    userId: string,
+    userId: number,
     status: AvailableStatusEnum,
   ) {
     const likeWithUserId = await this.postLikeModel
@@ -111,9 +111,7 @@ export class PostsRepository {
         postId: postId,
       })
       .exec();
-    const findUser = await this.userRepository.getUserById(
-      new ObjectId(userId),
-    );
+    const findUser = await this.userRepository.getUserById(userId);
     const comment = await this.postModel
       .findOne({
         _id: new ObjectId(postId),

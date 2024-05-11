@@ -62,7 +62,7 @@ export class UserRepository {
       items: items,
     };
   }
-  async getUserById(id: ObjectId): Promise<UserMongoDbType | null> {
+  async getUserById(id: number): Promise<UserMongoDbType | null> {
     const user = await this.userModel.findOne({ _id: id }).lean();
     if (!user) return null;
     return user;
