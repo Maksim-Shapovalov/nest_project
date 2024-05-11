@@ -3,6 +3,7 @@ import { UserRepository } from './User.repository';
 import { UserService } from './User.service';
 import { searchLogAndEmailInUsers } from '../qurey-repo/query-filter';
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -52,6 +53,11 @@ export class UserController {
       password: inputModel.password,
       email: inputModel.email,
     };
+    const findUser = await this.userSQLRepository.findByLoginAndEmail(
+      user.login,
+      user.email,
+    );
+    if (findUser) throw new BadRequestException();
     return this.serviceUser.getNewUser(user);
   }
   @UseGuards(BasicAuthGuard)

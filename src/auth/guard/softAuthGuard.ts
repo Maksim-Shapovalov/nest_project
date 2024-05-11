@@ -3,12 +3,13 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../../Users/User.repository';
 import { setting } from '../../setting';
 import { UserDbType } from '../../Users/Type/User.type';
+import { UserSQLRepository } from '../../Users/User.SqlRepositories';
 
 @Injectable()
 export class SoftAuthGuard implements CanActivate {
   constructor(
     protected jwtService: JwtService,
-    protected userRepository: UserRepository,
+    protected userSQLRepository: UserSQLRepository,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -22,7 +23,7 @@ export class SoftAuthGuard implements CanActivate {
         );
         const userId = decodedToken.userId;
 
-        const user = await this.userRepository.getUserById(userId);
+        const user = await this.userSQLRepository.getUserById(userId);
         if (user) {
           request.user = UserDbType.UserInReqMapper(user);
         }

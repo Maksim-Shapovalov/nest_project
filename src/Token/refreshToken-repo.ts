@@ -40,7 +40,7 @@ export class RefreshTokenRepo {
       { $set: { iat: parser.iat, exp: parser.exp } },
     );
   }
-  async DeleteRefreshTokenInData(refreshToken: string) {
+  async DeleteRefreshTokenInData(refreshToken: string): Promise<any> {
     const parser = await this.jwtService.verify(refreshToken, {
       secret: setting.JWT_REFRESH_SECRET,
     });

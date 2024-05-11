@@ -54,6 +54,7 @@ export const HTTP_STATUS = {
   NOT_FOUND_404: 404,
   TOO_MANY_REQUESTS_429: 429,
 };
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 
 @Module({
   imports: [
@@ -61,13 +62,14 @@ export const HTTP_STATUS = {
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: PGHOST,
       port: 5432,
-      username: 'postgres',
-      password: 'sf',
-      database: 'PostgreHomwork',
+      username: PGUSER,
+      password: PGPASSWORD,
+      database: PGDATABASE,
       autoLoadEntities: false,
       synchronize: false,
+      ssl: true,
     }),
     ThrottlerModule.forRoot([
       {

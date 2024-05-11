@@ -21,7 +21,8 @@ import { RefreshToken, TokenRefreshSchema } from '../Token/Token.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserSQLRepository } from '../Users/User.SqlRepositories';
 import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceSQLRepository';
-
+import process from 'process';
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 @Module({
   controllers: [AuthController],
   exports: [
@@ -33,17 +34,9 @@ import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceS
     BasicStrategy,
     JwtStrategy,
   ],
+
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'sf',
-      database: 'PostgreHomwork',
-      autoLoadEntities: false,
-      synchronize: false,
-    }),
+    TypeOrmModule,
     PassportModule,
     ThrottlerModule.forRoot([
       {
