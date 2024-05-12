@@ -14,10 +14,11 @@ export class SecurityDevicesSQLRepository {
   ) {}
   async getDevice(sessionId: number, id: number) {
     const device = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE "id" = ${id}`,
+      `SELECT * FROM "device" WHERE "userId" = ${id} and "deviceId" = ${sessionId}`,
     );
+    console.log(device, 'device');
 
-    if (!device) {
+    if (!device[0]) {
       return null;
     }
     if (device?.userId !== id.toString()) {
@@ -63,11 +64,11 @@ export class SecurityDevicesSQLRepository {
 
   async deletingDevicesExceptId(userId: number, deviceId: number) {
     const findDeviceInDB = await this.dataSource.query(
-      `SELECT * FROM "device" WHERE "userId" = '${userId}' AND "deviceId" = '${deviceId}'`,
+      `SELECT * FROM "device" WHERE "userId" = ${userId} AND "deviceId" = ${deviceId}`,
     );
     if (!findDeviceInDB) return null;
     await this.dataSource.query(
-      `DELETE FROM public."device" WHERE "userId" = '${userId}' AND "deviceId" = '${deviceId}'`,
+      `DELETE FROM public."device" WHERE "userId" = ${userId} AND "deviceId" = ${deviceId}`,
     );
 
     return true;
