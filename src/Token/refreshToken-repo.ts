@@ -7,6 +7,8 @@ import jwt from 'jsonwebtoken';
 import { PayloadTypeRefresh } from './refreshToken-type';
 import { setting } from '../setting';
 import { JwtService } from '@nestjs/jwt';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @injectable()
 export class RefreshTokenRepo {
@@ -14,6 +16,7 @@ export class RefreshTokenRepo {
     private jwtService: JwtService,
     @InjectModel(RefreshToken.name)
     protected tokenRefreshModel: Model<RefreshTokenDocuments>,
+    @InjectDataSource() protected dataSource: DataSource,
   ) {}
   async AddRefreshTokenInData(refreshToken: string) {
     const parser = await this.jwtService.verify(refreshToken, {
@@ -32,13 +35,16 @@ export class RefreshTokenRepo {
   // }
   async UpdateRefreshTokenInData(refreshToken: string) {
     const parser = this.jwtService.decode(refreshToken) as PayloadTypeRefresh;
-    return this.tokenRefreshModel.findOneAndUpdate(
-      {
-        userId: parser.userId,
-        deviceId: parser.deviceId,
-      },
-      { $set: { iat: parser.iat, exp: parser.exp } },
+    return this.dataSource.query(
+      `UPDATE "device" SET "iat" = ${parser.iat}, "exp" = ${parser.exp}  WHERE "userId" = ${parser.userId} and "deviceId" = ${parser.deviceId}`,
     );
+    // return this.tokenRefreshModel.findOneAndUpdate(
+    //   {
+    //     userId: parser.userId,
+    //     deviceId: parser.deviceId,
+    //   },
+    //   { $set: { iat: parser.iat, exp: parser.exp } },
+    // );
   }
   async DeleteRefreshTokenInData(refreshToken: string): Promise<any> {
     const parser = await this.jwtService.verify(refreshToken, {

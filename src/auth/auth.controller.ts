@@ -82,7 +82,7 @@ export class AuthController {
     const token = await this.authService.updateJWT(
       userId,
       refreshTokenToRequest,
-    ); //update
+    );
 
     if (!token) throw new NotFoundException();
     const { accessToken, refreshToken } = token;
