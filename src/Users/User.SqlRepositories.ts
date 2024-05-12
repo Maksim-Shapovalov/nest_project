@@ -49,9 +49,9 @@ export class UserSQLRepository {
     const pageOffset: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
     const result = await this.dataSource.query(
-      `SELECT * FROM "Users" ${logOrEm} ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT ${pageSizeInQuery} OFFSET ${pageOffset}`,
+      `SELECT * FROM "Users" ${logOrEm} ORDER BY "${filter.sortBy}" LIMIT ${pageSizeInQuery} OFFSET ${pageOffset}`,
     );
-
+    //${filter.sortDirection}
     const items = result.map((u) => userToPostMapper(u));
 
     return {
