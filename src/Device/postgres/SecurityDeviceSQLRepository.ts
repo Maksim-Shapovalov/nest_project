@@ -63,11 +63,11 @@ export class SecurityDevicesSQLRepository {
 
   async deletingDevicesExceptId(userId: number, deviceId: number) {
     const findDeviceInDB = await this.dataSource.query(
-      `SELECT * FROM "device" WHERE "userId" = ${userId} AND "deviceId" = ${deviceId}`,
+      `SELECT * FROM "device" WHERE "userId" = '${userId}' AND "deviceId" = '${deviceId}'`,
     );
     if (!findDeviceInDB) return null;
     await this.dataSource.query(
-      `DELETE FROM public."device" WHERE "userId" = ${userId} AND "deviceId" = ${deviceId}`,
+      `DELETE FROM public."device" WHERE "userId" = '${userId}' AND "deviceId" = '${deviceId}'`,
     );
 
     return true;
