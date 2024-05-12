@@ -37,7 +37,7 @@ export class UserSQLRepository {
     const logOrEm = searchLoginTerm
       ? `WHERE login LIKE '${searchLoginTerm}'`
       : searchEmailTerm
-        ? `WHERE email LIKE '${searchEmailTerm}'`
+        ? `WHERE email LIKE '%${searchEmailTerm}%'`
         : '';
 
     const pageSizeInQuery: number = filter.pageSize;
@@ -246,13 +246,13 @@ export class UserSQLRepository {
   // }
   async deleteUserById(userId: number): Promise<boolean> {
     const findUserInDB = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE "id" = ${userId}`,
+      `SELECT * FROM "Users" WHERE id = ${userId}`,
     );
-    if (!findUserInDB) return false;
-    await this.dataSource.query(
+    if (!findUserInDB[0]) return false;
+    const user = await this.dataSource.query(
       `DELETE FROM public."Users" WHERE "id" = ${userId} ;`,
     );
-    return true;
+    if (user[1] > 0) return true;
   }
   //: Promise<UserMongoDbType>
   async saveUser(user: UserDbType): Promise<UserToShow> {
