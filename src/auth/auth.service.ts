@@ -152,7 +152,7 @@ export class AuthService {
         message: 'code is not exist',
         field: 'code',
       });
-    return this.userRepository.getUserByCode(code);
+    return this.userSQLRepository.getUserByCode(code);
   }
 
   async doOperation(user: any) {
@@ -178,7 +178,7 @@ export class AuthService {
     await this.emailManager.repeatSendEmailRecoveryMessage(
       result!.email,
       result!.login,
-      result!.emailConfirmation.confirmationCode,
+      result!.confirmationCode,
     );
   }
 }

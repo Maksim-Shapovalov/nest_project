@@ -44,7 +44,6 @@ export class UserSQLRepository {
     const totalCountUsersQuery = await this.dataSource.query(
       `SELECT COUNT(*) FROM "Users" ${logOrEm}`,
     );
-    console.log(totalCountUsersQuery, totalCountUsersQuery[0].count);
     const totalCount = parseInt(totalCountUsersQuery[0].count);
     const pageCountUsers: number = Math.ceil(totalCount / pageSizeInQuery);
     const pageOffset: number = (filter.pageNumber - 1) * pageSizeInQuery;
@@ -93,33 +92,27 @@ export class UserSQLRepository {
   }
   async findUsersByCode(codeUser: string): Promise<FindUserByRecoveryCode> {
     const getUsersQuery = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE "email_confirmation_confirmation_code" = ''${codeUser}`,
+      `SELECT * FROM "Users" WHERE "confirmationCode" = '${codeUser}'`,
     );
     if (getUsersQuery.length === 0) {
       return null;
     }
-
     const user = getUsersQuery[0];
 
-    return user;
+    return userToResendMessageMapper(user);
   }
   async getUserByCode(codeUser: string): Promise<boolean> {
-    const updateUserQuery =
-      'UPDATE "Users" SET email_confirmation_is_confirmed = true WHERE email_confirmation_confirmation_code = $1';
-    const updateUserValues = [codeUser];
-    const result = await this.dataSource.query(
-      updateUserQuery,
-      updateUserValues,
-    );
+    await this.dataSource.query(`
+      UPDATE "Users" SET "isConfirmed" = true WHERE "confirmationCode" = '${codeUser}'`);
 
-    return result.rowCount === 1;
+    return true;
   }
 
   async findByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<FindUserByRecoveryCode> {
     const findUserQuery = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE login = '${loginOrEmail}' OR email = '${loginOrEmail}'`,
+      `SELECT * FROM "Users" WHERE "login" = '${loginOrEmail}' OR "email" = '${loginOrEmail}'`,
     );
 
     if (findUserQuery.length === 0) {
@@ -220,12 +213,12 @@ export class UserSQLRepository {
 
     await this.dataSource.query(`
     UPDATE "Users"
-    SET "confirmationCode" = ${info.confirmationCode}, "expirationDate" = ${expirationDate}
-    WHERE "email" = ${userEmail}
+    SET "confirmationCode" = '${info.confirmationCode}', "expirationDate" = '${expirationDate}'
+    WHERE "email" = '${userEmail}'
     RETURNING * `);
 
     const findUserQuery = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE email = ${userEmail}`,
+      `SELECT * FROM "Users" WHERE "email" = '${userEmail}'`,
     );
 
     if (findUserQuery.length === 0) {

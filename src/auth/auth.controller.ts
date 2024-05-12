@@ -155,7 +155,6 @@ export class AuthController {
     const findUser = await this.userSQLRepository.findByLoginOrEmail(
       newUser.login,
     );
-    console.log(findUser);
     await this.authService.doOperation(findUser);
     return HttpCode(204);
   }
@@ -186,9 +185,9 @@ export class AuthController {
       );
     const validToken =
       await this.refreshTokenRepo.DeleteRefreshTokenInData(token);
-    console.log(validToken, 'validToken');
+
     if (!validToken) throw new BadRequestException();
-    console.log(deletedDevice, 'deletedDevice');
+
     if (!deletedDevice) throw new BadRequestException();
   }
   @UseGuards(BearerGuard)
