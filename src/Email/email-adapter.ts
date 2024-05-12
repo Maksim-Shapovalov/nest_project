@@ -27,6 +27,7 @@ export class EmailAdapter {
     }
   }
   async resendEmail(userEmail: string, userLogin: string, message: string) {
+    console.log(userEmail, userLogin, message);
     try {
       const transporter = nodemailer.createTransport({
         service: 'gmail',

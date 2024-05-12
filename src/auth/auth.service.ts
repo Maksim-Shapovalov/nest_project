@@ -146,6 +146,7 @@ export class AuthService {
 
   async confirmatoryUser(code: string) {
     const findUser = await this.userSQLRepository.findUsersByCode(code);
+    console.log(findUser, 'findUser');
     if (!findUser) return null;
     if (findUser.emailConfirmation.isConfirmed)
       throw new BadRequestException({
@@ -163,6 +164,7 @@ export class AuthService {
     const findConfirmCode = await this.userSQLRepository.findByLoginOrEmail(
       user.login,
     );
+    console.log(findConfirmCode, 'findConfirmCode----------------------');
     if (findConfirmCode.emailConfirmation.isConfirmed)
       throw new BadRequestException({
         message: 'email is not exist',
@@ -175,6 +177,7 @@ export class AuthService {
       user.email,
       newConfirmationCode,
     );
+    console.log(result, 'result----------------------');
     await this.emailManager.repeatSendEmailRecoveryMessage(
       result!.email,
       result!.login,
