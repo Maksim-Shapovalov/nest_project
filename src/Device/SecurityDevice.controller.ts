@@ -59,6 +59,10 @@ export class DeviceController {
   @HttpCode(204)
   async deleteAllDeviceUserExceptCurrent(@Req() request: CustomRequest) {
     const { userId, deviceId } = request.token;
-    await this.securityDeviceService.deletingAllDevices(userId, deviceId);
+    const deletedDevice = await this.securityDeviceService.deletingAllDevices(
+      userId,
+      deviceId,
+    );
+    if (!deletedDevice) throw new ForbiddenException();
   }
 }
