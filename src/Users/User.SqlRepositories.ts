@@ -50,11 +50,10 @@ export class UserSQLRepository {
     const pageOffset: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
     const result = await this.dataSource.query(
-      `SELECT * FROM "Users" ${logOrEm} ORDER BY "${filter.sortBy || 'createdAt'}" LIMIT ${pageSizeInQuery} OFFSET ${pageOffset}`,
+      `SELECT * FROM "Users" ${logOrEm} ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT ${pageSizeInQuery} OFFSET ${pageOffset}`,
     );
 
     const items = result.map((u) => userToPostMapper(u));
-    console.log(items, 'items------------');
 
     return {
       pagesCount: pageCountUsers,
@@ -197,7 +196,7 @@ export class UserSQLRepository {
 
   async findUserByRecoveryCode(newDataUser: newDataUser2) {
     const findUserQuery = await this.dataSource.query(
-      `UPDATE "Users" SET "password_hash" = '${newDataUser.newPassword}', "password_salt" = '${newDataUser.newSalt}' WHERE "recovery_code" = '${newDataUser.recoveryCode}' RETURNING *`,
+      `UPDATE "Users" SET "passwordHash" = '${newDataUser.newPassword}', "passwordSalt" = '${newDataUser.newSalt}' WHERE "recoveryCode" = '${newDataUser.recoveryCode}' RETURNING *`,
     );
 
     if (findUserQuery.length === 0) {
@@ -214,30 +213,26 @@ export class UserSQLRepository {
   }
 
   async updateCodeToResendingMessage(userEmail: string, info: any) {
-    const updateCodeQuery = `
-    UPDATE "Users"
-    SET email_confirmation_confirmation_code = $1, email_confirmation_expiration_date = $2
-    WHERE email = $3
-    RETURNING *
-  `;
     const expirationDate = add(new Date(), {
       hours: 1,
       minutes: 3,
     }).toISOString();
-    const updateCodeValues = [info.confirmationCode, expirationDate, userEmail];
-    await this.dataSource.query(updateCodeQuery, updateCodeValues);
 
-    const findUserQuery = 'SELECT * FROM "Users" WHERE email = $1';
-    const findUserValues = [userEmail];
-    const result = await this.dataSource
-      .query(findUserQuery, findUserValues)
-      .then((result) => result.rows);
+    await this.dataSource.query(`
+    UPDATE "Users"
+    SET "confirmationCode" = ${info.confirmationCode}, "expirationDate" = ${expirationDate}
+    WHERE "email" = ${userEmail}
+    RETURNING * `);
 
-    if (result.length === 0) {
+    const findUserQuery = await this.dataSource.query(
+      `SELECT * FROM "Users" WHERE email = ${userEmail}`,
+    );
+
+    if (findUserQuery.length === 0) {
       return null;
     }
 
-    const user = result[0];
+    const user = findUserQuery[0];
     return user;
   }
 
@@ -275,7 +270,6 @@ export class UserSQLRepository {
     RETURNING *
   `;
     const result = await this.dataSource.query(saveUserQuery);
-    console.log(result);
     const newUser = result.map((e) => {
       return {
         id: e.id,
@@ -284,7 +278,6 @@ export class UserSQLRepository {
         createdAt: e.createdAt,
       };
     });
-    console.log(newUser, 'newUser');
     return newUser;
   }
 }

@@ -160,7 +160,7 @@ export class AuthService {
   }
 
   async findUserByEmail(user: FindUserByRecoveryCode) {
-    const findConfirmCode = await this.userRepository.findByLoginOrEmail(
+    const findConfirmCode = await this.userSQLRepository.findByLoginOrEmail(
       user.login,
     );
     if (findConfirmCode.emailConfirmation.isConfirmed)

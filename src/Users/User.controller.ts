@@ -32,7 +32,6 @@ export class UserController {
   @HttpCode(200)
   async getAllUserInDB(@Query() query: QueryType) {
     const filter = searchLogAndEmailInUsers(query);
-    console.log(1);
     return this.userSQLRepository.getAllUsers(filter);
   }
   @Get(':id')
@@ -49,7 +48,6 @@ export class UserController {
   @Post()
   @HttpCode(201)
   async createNewUser(@Body() inputModel: UserBasicRequestBody) {
-    console.log('i');
     const user = {
       login: inputModel.login,
       password: inputModel.password,
@@ -66,6 +64,7 @@ export class UserController {
   @Delete(':id')
   @HttpCode(204)
   async deleteUserInDB(@Param('id') userId) {
+    if (!userId) throw new NotFoundException();
     const deletedUs = await this.serviceUser.deleteUserById(userId);
     if (!deletedUs) {
       throw new NotFoundException();
