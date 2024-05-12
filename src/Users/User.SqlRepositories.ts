@@ -35,7 +35,7 @@ export class UserSQLRepository {
     const searchLoginTerm = filter.searchLoginTerm;
     const searchEmailTerm = filter.searchEmailTerm;
     const logOrEm = searchLoginTerm
-      ? `WHERE login LIKE '${searchLoginTerm}'`
+      ? `WHERE login LIKE '%${searchLoginTerm}%'`
       : searchEmailTerm
         ? `WHERE email LIKE '%${searchEmailTerm}%'`
         : '';
