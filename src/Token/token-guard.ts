@@ -64,7 +64,7 @@ export class TokenRefreshGuard implements CanActivate {
         };
         return true;
       }
-      throw new UnauthorizedException();
+      throw new ForbiddenException();
       // jwt.verify(refreshToken) as PayloadTypeRefresh;
     } catch (e) {
       throw new UnauthorizedException();
