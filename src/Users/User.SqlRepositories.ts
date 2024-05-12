@@ -35,9 +35,9 @@ export class UserSQLRepository {
     const searchLoginTerm = filter.searchLoginTerm;
     const searchEmailTerm = filter.searchEmailTerm;
     const logOrEm = searchLoginTerm
-      ? `WHERE login LIKE '%${searchLoginTerm}%'`
+      ? `WHERE LOWER(login) like LOWER('%${searchLoginTerm}%')`
       : searchEmailTerm
-        ? `WHERE email LIKE '%${searchEmailTerm}%'`
+        ? `WHERE LOWER(email) like LOWER('%${searchEmailTerm}%')`
         : '';
 
     const pageSizeInQuery: number = filter.pageSize;
@@ -49,7 +49,7 @@ export class UserSQLRepository {
     const pageOffset: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
     const result = await this.dataSource.query(
-      `SELECT * FROM "Users" ${logOrEm} ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT ${pageSizeInQuery} OFFSET ${pageOffset}`,
+      `SELECT * FROM "Users" ${logOrEm}  ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT ${pageSizeInQuery} OFFSET ${pageOffset}`,
     );
 
     const items = result.map((u) => userToPostMapper(u));
