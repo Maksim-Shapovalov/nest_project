@@ -8,10 +8,8 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import {
-  EmailConfirmations,
   FindUserByRecoveryCode,
   UserDbType,
-  UserMongoDbType,
   UserOutputModel,
   UserToShow,
 } from './Type/User.type';

@@ -12,7 +12,7 @@ export class SecurityDevicesSQLRepository {
     private jwtService: JwtService,
     @InjectDataSource() protected dataSource: DataSource,
   ) {}
-  async getDevice(sessionId: string, id: number) {
+  async getDevice(sessionId: number, id: number) {
     const device = await this.dataSource.query(
       `SELECT * FROM "Users" WHERE "id" = ${id}`,
     );

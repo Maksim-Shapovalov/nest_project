@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { OutpatModelDevicesUser } from './Type/Device.user';
 import { CustomRequest, TokenRefreshGuard } from '../Token/token-guard';
+import { SecurityDevicesSQLRepository } from './postgres/SecurityDeviceSQLRepository';
 
 @injectable()
 @Controller('security/devices')
@@ -23,12 +24,14 @@ export class DeviceController {
   constructor(
     protected securityDeviceService: SecurityDeviceService,
     protected securityDevicesRepo: SecurityDevicesRepository,
+    protected securitySQLDevicesRepo: SecurityDevicesSQLRepository,
   ) {}
   @UseGuards(TokenRefreshGuard)
   @Get()
   @HttpCode(200)
   async getAllDevice(@Req() request: CustomRequest) {
     const user = request.token.userId;
+    console.log(user);
     const devices: OutpatModelDevicesUser[] | null =
       await this.securityDeviceService.getAllDevices(user);
     if (!devices) throw new NotFoundException();
@@ -43,7 +46,7 @@ export class DeviceController {
   ) {
     if (!id) throw new NotFoundException();
     const userId = request.token.userId;
-    const findDevice: any = await this.securityDevicesRepo.getDevice(
+    const findDevice: any = await this.securitySQLDevicesRepo.getDevice(
       id,
       userId,
     );
