@@ -44,6 +44,7 @@ import { CustomBlogIdValidation } from './Posts/validation/BlogExists.decorator'
 import { ThrottlerModule } from '@nestjs/throttler';
 import { UserSQLRepository } from './Users/User.SqlRepositories';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SecurityDevicesSQLRepository } from './Device/postgres/SecurityDeviceSQLRepository';
 export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,
@@ -119,6 +120,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     RefreshTokenRepo,
     CustomBlogIdValidation,
     UserSQLRepository,
+    SecurityDevicesSQLRepository,
   ],
 })
 export class AppModule {}
