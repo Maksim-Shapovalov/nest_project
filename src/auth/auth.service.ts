@@ -77,11 +77,11 @@ export class AuthService {
 
       const accessToken: string = await this.jwtService.signAsync(
         bodyToAccessToken,
-        { secret: setting.JWT_SECRET, expiresIn: '10s' },
+        { secret: setting.JWT_SECRET, expiresIn: '300s' },
       );
       const refreshToken: string = await this.jwtService.signAsync(
         bodyToRefreshToken,
-        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '20s' },
+        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '400s' },
       );
       // await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
       await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
@@ -171,7 +171,7 @@ export class AuthService {
     const newConfirmationCode = {
       confirmationCode: uuidv4(),
     };
-    const result = await this.userRepository.updateCodeToResendingMessage(
+    const result = await this.userSQLRepository.updateCodeToResendingMessage(
       user.email,
       newConfirmationCode,
     );

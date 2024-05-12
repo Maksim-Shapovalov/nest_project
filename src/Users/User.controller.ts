@@ -38,6 +38,7 @@ export class UserController {
   @Get(':id')
   @HttpCode(200)
   async getUserByCodeIdInDB(@Param('id') userId) {
+    if (!userId) throw new NotFoundException();
     const user = await this.userRepository.getUserByIdWithMapper(
       userId.toString(),
     );

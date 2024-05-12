@@ -132,23 +132,25 @@ export class AuthController {
   @Post('/registration')
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
-    const findUserInDB = await this.userSQLRepository.findByLoginAndEmail(
-      bodyUser.login,
-      bodyUser.email,
-    );
-    if (findUserInDB) {
-      if (findUserInDB.login === bodyUser.login) {
-        throw new BadRequestException({
-          message: 'login is not exist',
-          field: 'login',
-        });
-      } else if (findUserInDB.email === bodyUser.email) {
-        throw new BadRequestException({
-          message: 'email is not exist',
-          field: 'email',
-        });
-      }
-    }
+    const findUserInDB =
+      await this.userSQLRepository.findByLoginOrEmailByOneUser(
+        bodyUser.login,
+        bodyUser.email,
+      );
+    if (findUserInDB) throw new BadRequestException();
+    // if (findUserInDB) {
+    //   if (findUserInDB.login === bodyUser.login) {
+    //     throw new BadRequestException({
+    //       message: 'login is not exist',
+    //       field: 'login',
+    //     });
+    //   } else if (findUserInDB.email === bodyUser.email) {
+    //     throw new BadRequestException({
+    //       message: 'email is not exist',
+    //       field: 'email',
+    //     });
+    //   }
+    // }
 
     const newUser = await this.serviceUser.getNewUser(bodyUser);
     const findUser = await this.userSQLRepository.findByLoginOrEmail(
@@ -163,7 +165,7 @@ export class AuthController {
   async registrationEmailResending(@Body('email') email: string) {
     const findUser: FindUserByRecoveryCode =
       await this.userSQLRepository.findByLoginOrEmail(email);
-    if (!findUser)
+    if (!findUser || findUser.emailConfirmation.isConfirmed)
       throw new BadRequestException({
         message: 'email is not exist',
         field: 'email',

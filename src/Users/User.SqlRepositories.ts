@@ -132,6 +132,23 @@ export class UserSQLRepository {
 
     return mappedUser;
   }
+  async findByLoginOrEmailByOneUser(
+    login: string,
+    email: string,
+  ): Promise<FindUserByRecoveryCode> {
+    const findUserQuery = await this.dataSource.query(
+      `SELECT * FROM "Users" WHERE login = '${login}' OR email = '${email}'`,
+    );
+
+    if (findUserQuery.length === 0) {
+      return null;
+    }
+
+    const user = findUserQuery[0];
+    const mappedUser = userToResendMessageMapper(user);
+
+    return mappedUser;
+  }
   async findByLoginAndEmail(
     login: string,
     email: string,
