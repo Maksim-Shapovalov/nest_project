@@ -43,23 +43,15 @@ export class TokenRefreshGuard implements CanActivate {
       parser = this.jwtService.verify(refreshToken, {
         secret: setting.JWT_REFRESH_SECRET,
       });
-      console.log(parser, 'parser123');
       const validToken2: PayloadTypeRefresh = await this.dataSource.query(
         `SELECT * FROM "device" WHERE "userId" = ${parser.userId} AND "deviceId" = ${parser.deviceId}`,
       );
       const validToken1 = validToken2[0];
-      console.log(validToken1, 'validToken1');
       // const validToken: PayloadTypeRefresh =
       //   await this.tokenRefreshModel.findOne({
       //     userId: parser.userId,
       //     deviceId: parser.deviceId,
       //   });
-      if (
-        validToken1.userId.toString() !== parser.userId.toString() &&
-        validToken1.deviceId !== parser.deviceId
-      )
-        throw new ForbiddenException();
-      if (!validToken1) throw new ForbiddenException();
       if (validToken1.iat === parser.iat) {
         request.token = {
           userId: validToken1.userId,
@@ -67,7 +59,6 @@ export class TokenRefreshGuard implements CanActivate {
         };
         return true;
       }
-      throw new ForbiddenException();
       // jwt.verify(refreshToken) as PayloadTypeRefresh;
     } catch (e) {
       throw new UnauthorizedException();
