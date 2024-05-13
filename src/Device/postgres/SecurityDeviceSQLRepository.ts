@@ -14,7 +14,7 @@ export class SecurityDevicesSQLRepository {
   ) {}
   async getDevice(sessionId: number, id: number) {
     const device = await this.dataSource.query(
-      `SELECT * FROM "device" WHERE "userId" = ${id} OR "deviceId" = ${sessionId}`,
+      `SELECT * FROM "device" WHERE "userId" = ${id} AND "deviceId" = ${sessionId}`,
     );
 
     if (!device[0]) {
