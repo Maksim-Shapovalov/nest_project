@@ -56,7 +56,7 @@ export class TokenRefreshGuard implements CanActivate {
       //   });
       if (validToken1.userId.toString() !== parser.userId.toString())
         throw new ForbiddenException();
-      if (!validToken1) throw new UnauthorizedException();
+      if (!validToken1) throw new ForbiddenException();
       if (validToken1.iat === parser.iat) {
         request.token = {
           userId: validToken1.userId,
@@ -64,10 +64,10 @@ export class TokenRefreshGuard implements CanActivate {
         };
         return true;
       }
-      throw new UnauthorizedException();
+      throw new ForbiddenException();
       // jwt.verify(refreshToken) as PayloadTypeRefresh;
     } catch (e) {
-      throw new ForbiddenException();
+      throw new UnauthorizedException();
     }
   }
 }
