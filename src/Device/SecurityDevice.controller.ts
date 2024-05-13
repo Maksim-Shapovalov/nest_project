@@ -46,14 +46,10 @@ export class DeviceController {
   ) {
     if (!id) throw new NotFoundException();
     const userId = request.token.userId;
-    const findDevice: any = await this.securitySQLDevicesRepo.getDevice(
-      id,
-      userId,
-    );
-    console.log(findDevice, 'findDevice');
-
+    const findDevice: any = await this.securitySQLDevicesRepo.getDevice(id);
     if (!findDevice) throw new NotFoundException();
-    // if (findDevice.userId !== userId) throw new ForbiddenException();
+    console.log(findDevice, 'findDevice');
+    if (findDevice.deviceId !== id) throw new ForbiddenException();
 
     const deletedDevice =
       await this.securityDeviceService.deletingDevicesExceptId(userId, id);

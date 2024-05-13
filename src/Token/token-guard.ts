@@ -43,7 +43,7 @@ export class TokenRefreshGuard implements CanActivate {
       parser = this.jwtService.verify(refreshToken, {
         secret: setting.JWT_REFRESH_SECRET,
       });
-      console.log(parser, 'parser');
+      console.log(parser, 'parser123');
       const validToken2: PayloadTypeRefresh = await this.dataSource.query(
         `SELECT * FROM "device" WHERE "userId" = ${parser.userId} AND "deviceId" = ${parser.deviceId}`,
       );

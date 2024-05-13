@@ -12,10 +12,11 @@ export class SecurityDevicesSQLRepository {
     private jwtService: JwtService,
     @InjectDataSource() protected dataSource: DataSource,
   ) {}
-  async getDevice(sessionId: number, id: number) {
+  async getDevice(sessionId: number) {
     const device = await this.dataSource.query(
-      `SELECT * FROM "device" WHERE "userId" = ${id} AND "deviceId" = ${sessionId}`,
+      `SELECT * FROM "device" WHERE "deviceId" = ${sessionId}`,
     );
+    //"userId" = ${id} AND
 
     if (!device[0]) {
       return null;
