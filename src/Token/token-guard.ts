@@ -54,7 +54,10 @@ export class TokenRefreshGuard implements CanActivate {
       //     userId: parser.userId,
       //     deviceId: parser.deviceId,
       //   });
-      if (validToken1.userId.toString() !== parser.userId.toString())
+      if (
+        validToken1.userId.toString() !== parser.userId.toString() &&
+        validToken1.deviceId !== parser.deviceId
+      )
         throw new ForbiddenException();
       if (!validToken1) throw new ForbiddenException();
       if (validToken1.iat === parser.iat) {
