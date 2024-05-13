@@ -38,7 +38,6 @@ export class SecurityDevicesSQLRepository {
   }
   async updateDevice(deviceId: number) {
     const currencyDay = new Date().toISOString();
-    console.log(currencyDay);
     const updateDevice = await this.dataSource.query(
       `UPDATE public.device
     SET "lastActiveDate"= '${currencyDay}'

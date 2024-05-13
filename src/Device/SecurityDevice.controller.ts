@@ -31,7 +31,6 @@ export class DeviceController {
   @HttpCode(200)
   async getAllDevice(@Req() request: CustomRequest) {
     const user = request.token.userId;
-    console.log(user);
     const devices: OutpatModelDevicesUser[] | null =
       await this.securityDeviceService.getAllDevices(user);
     if (!devices) throw new NotFoundException();
@@ -48,7 +47,6 @@ export class DeviceController {
     const userId = request.token.userId;
     const findDevice: any = await this.securitySQLDevicesRepo.getDevice(id);
     if (!findDevice) throw new NotFoundException();
-    console.log(findDevice, 'findDevice');
     if (findDevice.deviceId !== id) throw new ForbiddenException();
 
     const deletedDevice =
