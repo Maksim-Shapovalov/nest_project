@@ -47,6 +47,7 @@ export class TokenRefreshGuard implements CanActivate {
         `SELECT * FROM "device" WHERE "userId" = ${parser.userId} AND "deviceId" = ${parser.deviceId}`,
       );
       const validToken1 = validToken2[0];
+      if (!validToken1) throw new ForbiddenException();
       console.log(validToken1);
       if (validToken1.iat === parser.iat) {
         request.token = {
