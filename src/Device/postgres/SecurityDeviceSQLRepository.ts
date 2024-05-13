@@ -14,15 +14,11 @@ export class SecurityDevicesSQLRepository {
   ) {}
   async getDevice(sessionId: number, id: number) {
     const device = await this.dataSource.query(
-      `SELECT * FROM "device" WHERE "userId" = ${id} and "deviceId" = ${sessionId}`,
+      `SELECT * FROM "device" WHERE "userId" = ${id} AND "deviceId" = ${sessionId}`,
     );
-    console.log(device, 'device');
 
     if (!device[0]) {
       return null;
-    }
-    if (device?.userId !== id.toString()) {
-      return 5;
     }
     return device;
   }

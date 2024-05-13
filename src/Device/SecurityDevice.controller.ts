@@ -50,6 +50,7 @@ export class DeviceController {
       id,
       userId,
     );
+    if (findDevice[0].userId !== id) throw new ForbiddenException();
 
     if (!findDevice) throw new NotFoundException();
 
