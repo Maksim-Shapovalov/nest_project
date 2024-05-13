@@ -53,7 +53,7 @@ export class DeviceController {
     console.log(findDevice, 'findDevice');
 
     if (!findDevice) throw new NotFoundException();
-    if (findDevice.userId !== userId) throw new ForbiddenException();
+    // if (findDevice.userId !== userId) throw new ForbiddenException();
 
     const deletedDevice =
       await this.securityDeviceService.deletingDevicesExceptId(userId, id);

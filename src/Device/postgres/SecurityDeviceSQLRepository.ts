@@ -63,6 +63,7 @@ export class SecurityDevicesSQLRepository {
       `SELECT * FROM "device" WHERE "userId" = ${userId} AND "deviceId" = ${deviceId}`,
     );
     if (!findDeviceInDB) return null;
+    if (findDeviceInDB[0].userId !== userId) return null;
     await this.dataSource.query(
       `DELETE FROM public."device" WHERE "userId" = ${userId} AND "deviceId" = ${deviceId}`,
     );
