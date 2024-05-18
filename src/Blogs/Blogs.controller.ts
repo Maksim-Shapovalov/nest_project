@@ -24,6 +24,7 @@ import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
+import { BlogsSQLRepository } from './postgres/Blogs.postgress.repository';
 
 @injectable()
 @Controller('blogs')
@@ -32,16 +33,17 @@ export class BlogsController {
     protected postsService: PostsService,
     protected blogsService: BlogsService,
     protected blogsRepository: BlogsRepository,
+    protected blogsSQLRepository: BlogsSQLRepository,
     protected postsRepository: PostsRepository,
   ) {}
   @Get()
   async getAllBlogs(@Query() query: QueryType) {
     const filter = searchNameInBlog(query);
-    return this.blogsRepository.getAllBlogs(filter);
+    return this.blogsSQLRepository.getAllBlogs(filter);
   }
   @Get(':id')
-  async getBlogById(@Param('id') id: string) {
-    const blog = await this.blogsRepository.getBlogsById(id);
+  async getBlogById(@Param('id') id: number) {
+    const blog = await this.blogsSQLRepository.getBlogsById(id);
     if (blog) {
       return blog;
     } else {

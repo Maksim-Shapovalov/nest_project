@@ -41,6 +41,7 @@ export class BlogsSQLController {
     const filter = searchNameInBlog(query);
     return this.blogsRepository.getAllBlogs(filter);
   }
+  @UseGuards(BasicAuthGuard)
   @Get(':id')
   async getBlogById(@Param('id') id: number) {
     const blog = await this.blogsSQLRepository.getBlogsById(id);
