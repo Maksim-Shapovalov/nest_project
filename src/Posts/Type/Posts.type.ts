@@ -9,7 +9,7 @@ export class PostClass {
     public title: string,
     public shortDescription: string,
     public content: string,
-    public blogId: string,
+    public blogId: number,
     public blogName: string,
     public createdAt: string,
   ) {}
@@ -28,6 +28,16 @@ export type PostsOutputType = {
       login: string;
     }[];
   };
+  title: string;
+  shortDescription: string;
+  blogId: string;
+  blogName: string;
+};
+
+export type PostsOutputSQLType = {
+  id: string;
+  content: string;
+  createdAt: string;
   title: string;
   shortDescription: string;
   blogId: string;
@@ -98,21 +108,17 @@ export class BodyPostToPut {
   content: string;
   @Trim()
   @Validate(CustomBlogIdValidation)
-  blogId: string;
+  blogId: number;
 }
 export class BodyPostToRequest1 {
-  @Trim()
   @Length(1, 30)
   title: string;
-  @Trim()
   @Length(1, 100)
   shortDescription: string;
-  @Trim()
   @Length(1, 1000)
   content: string;
-  @Trim()
   @Validate(CustomBlogIdValidation)
-  blogId: string;
+  blogId: number;
 }
 
 export type PostsType = WithId<{

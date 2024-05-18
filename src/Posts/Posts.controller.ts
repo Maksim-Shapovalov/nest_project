@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { injectable } from 'inversify';
 import { PostsService } from './Posts.service';
-import { PostsRepository } from './Posts.repository';
 import { CommentsService } from '../Comment/Comments.service';
 import { CommentsRepository } from '../Comment/Comments.repository';
 import { queryFilter } from '../qurey-repo/query-filter';
@@ -11,7 +10,6 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   HttpCode,
   NotFoundException,
   Param,
@@ -23,19 +21,15 @@ import {
 } from '@nestjs/common';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
-import {
-  BodyPostToPut,
-  BodyPostToRequest1,
-  StatusLikes,
-} from './Type/Posts.type';
-import { BearerGuard, User } from '../auth/guard/authGuard';
+import { BodyPostToPut, BodyPostToRequest1 } from './Type/Posts.type';
+import { BearerGuard } from '../auth/guard/authGuard';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
-import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
-import { HTTP_STATUS } from '../app.module';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { Trim } from '../Other/trim-validator';
 import { IsNotEmpty, Length } from 'class-validator';
 import { ObjectId } from 'mongodb';
+import { PostsRepository } from './PostsSQLRepository';
+import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
 
 export class ContentClass {
   @Trim()
@@ -48,27 +42,25 @@ export class ContentClass {
 export class PostsController {
   constructor(
     protected postsService: PostsService,
-    protected postsRepository: PostsRepository,
+    // protected postsRepository: PostsRepository,
+    protected postsRepository: PostsPostgresRepository,
     protected serviceComments: CommentsService,
     protected commentsRepository: CommentsRepository,
   ) {}
   @UseGuards(SoftAuthGuard)
   @Get()
-  async getAllPostsInDB(@Query() query: QueryType, @Req() request) {
-    const user = request.user;
+  async getAllPostsInDB(@Query() query: QueryType) {
+    // const user = request.user;
     const filter = queryFilter(query);
-    return this.postsRepository.getAllPosts(filter, user ? user.userId : null);
+    return this.postsRepository.getAllPosts(filter);
   }
   @UseGuards(SoftAuthGuard)
   @Get(':id')
   @HttpCode(200)
-  async getPostByPostId(@Param('id') id: string, @Req() request) {
+  async getPostByPostId(@Param('id') id: number, @Req() request) {
     const user = request.user;
     console.log(user, 'user');
-    const post = await this.postsRepository.getPostsById(
-      id,
-      user ? user.userId : null,
-    );
+    const post = await this.postsRepository.getPostsById(id);
     if (!post) throw new NotFoundException();
     return post;
   }
@@ -124,14 +116,18 @@ export class PostsController {
       content: postInputModel.content,
       blogId: postInputModel.blogId,
     };
+    console.log(postInputModel);
+    console.log(Body);
+    console.log();
+    console.log(postBody, '------');
     return this.postsService.createNewPosts(postBody, null);
   }
   @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updatePostByPostId(
-    @Param('id') userId: string,
-    @Body() postInputModel: BodyPostToPut,
+    @Param('id') userId: number,
+    @Body() postInputModel: BodyPostToRequest1,
   ) {
     const result = await this.postsService.updatePostsById(
       userId,
@@ -147,30 +143,30 @@ export class PostsController {
     }
   }
   // @UseGuards(AuthGuard)
-  @UseGuards(BearerAuthGuard)
-  @Put(':id/like-status')
-  @HttpCode(204)
-  async appropriationLike(
-    @Param('id') id: string,
-    @User() userModel: { userId: number },
-    @Body() inputLikeStatus: StatusLikes,
-  ) {
-    const findPosts = await this.postsRepository.getPostsById(id, null);
-    if (!findPosts) throw new NotFoundException();
-    const updateComment = await this.postsService.updateStatusLikeInUser(
-      id,
-      userModel.userId,
-      inputLikeStatus.likeStatus,
-    );
-
-    if (!updateComment) throw new NotFoundException();
-
-    return HttpCode(204);
-  }
+  // @UseGuards(BearerAuthGuard)
+  // @Put(':id/like-status')
+  // @HttpCode(204)
+  // async appropriationLike(
+  //   @Param('id') id: string,
+  //   @User() userModel: { userId: number },
+  //   @Body() inputLikeStatus: StatusLikes,
+  // ) {
+  //   const findPosts = await this.postsRepository.getPostsById(id, null);
+  //   if (!findPosts) throw new NotFoundException();
+  //   const updateComment = await this.postsService.updateStatusLikeInUser(
+  //     id,
+  //     userModel.userId,
+  //     inputLikeStatus.likeStatus,
+  //   );
+  //
+  //   if (!updateComment) throw new NotFoundException();
+  //
+  //   return HttpCode(204);
+  // }
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deletePostByPostId(@Param('id') id: string) {
+  async deletePostByPostId(@Param('id') id: number) {
     const deleted = await this.postsService.deletePostsById(id);
 
     if (!deleted) throw new NotFoundException();

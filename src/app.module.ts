@@ -13,7 +13,7 @@ import { CommentsService } from './Comment/Comments.service';
 
 import { User, UserSchema } from './Users/Type/User.schemas';
 import { PostsController } from './Posts/Posts.controller';
-import { PostsRepository } from './Posts/Posts.repository';
+import { PostsRepository } from './Posts/PostsSQLRepository';
 import { PostsService } from './Posts/Posts.service';
 import { Blog, BlogSchema } from './Blogs/Type/Blogs.schemas';
 import {
@@ -45,6 +45,9 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { UserSQLRepository } from './Users/User.SqlRepositories';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SecurityDevicesSQLRepository } from './Device/postgres/SecurityDeviceSQLRepository';
+import { BlogsSQLController } from './Blogs/postgres/Blogs.postgress.controller';
+import { BlogsSQLRepository } from './Blogs/postgres/Blogs.postgress.repository';
+import { PostsPostgresRepository } from './Posts/postgres/Posts.postgres.repository';
 export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,
@@ -105,6 +108,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     PostsController,
     AllDataClearController,
     DeviceController,
+    BlogsSQLController,
   ],
   providers: [
     BlogsRepository,
@@ -121,6 +125,8 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     CustomBlogIdValidation,
     UserSQLRepository,
     SecurityDevicesSQLRepository,
+    BlogsSQLRepository,
+    PostsPostgresRepository,
   ],
 })
 export class AppModule {}

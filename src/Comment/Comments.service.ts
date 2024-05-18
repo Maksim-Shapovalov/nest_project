@@ -1,10 +1,10 @@
 import { CommentsRepository } from './Comments.repository';
 import { AvailableStatusEnum, CommentsClass } from './Type/Comment.type';
-import { WithId } from 'mongodb';
-import { NewestPostLike, UserMongoDbType } from '../Users/Type/User.type';
-import { PostsRepository } from '../Posts/Posts.repository';
+
+import { NewestPostLike } from '../Users/Type/User.type';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
+import { PostsRepository } from '../Posts/PostsSQLRepository';
 
 @injectable()
 export class CommentsService {

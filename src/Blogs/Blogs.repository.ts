@@ -43,7 +43,7 @@ export class BlogsRepository {
       items: items,
     };
   }
-  async getBlogsById(id: string): Promise<BlogsOutputModel | null> {
+  async getBlogsById(id: string | number): Promise<BlogsOutputModel | null> {
     if (!ObjectId.isValid(id)) return null;
     const findCursor = await this.blogModel.findOne({ _id: new ObjectId(id) });
     if (!findCursor) return null;

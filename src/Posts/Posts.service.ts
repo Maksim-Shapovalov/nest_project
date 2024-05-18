@@ -1,22 +1,24 @@
 import { BodyPostToRequest1, PostClass } from './Type/Posts.type';
-import { PostsRepository } from './Posts.repository';
 import { BlogsRepository } from '../Blogs/Blogs.repository';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
-import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
+import { BlogsSQLRepository } from '../Blogs/postgres/Blogs.postgress.repository';
+import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
 @injectable()
 export class PostsService {
   constructor(
-    protected postsRepository: PostsRepository,
+    protected postsSQLRepository: PostsPostgresRepository,
+    // protected postsRepository: PostsSQLRepository,
     protected blogsRepository: BlogsRepository,
+    protected blogsSQLRepository: BlogsSQLRepository,
   ) {}
 
   async createNewPosts(
     bodyPost: BodyPostToRequest1,
-    userId: string | null,
-    blogId?: string,
+    userId: number | null,
+    blogId?: number,
   ) {
-    const findBlogName = await this.blogsRepository.getBlogsById(
+    const findBlogName = await this.blogsSQLRepository.getBlogsById(
       blogId ?? bodyPost.blogId,
     );
     if (!findBlogName) {
@@ -32,24 +34,24 @@ export class PostsService {
       new Date().toISOString(),
     );
 
-    return this.postsRepository.savePost(newPosts, userId);
+    return this.postsSQLRepository.savePost(newPosts);
   }
-  async updateStatusLikeInUser(
-    postId: string,
-    userID: number,
-    status: AvailableStatusEnum,
-  ) {
-    return this.postsRepository.updateStatusLikeUser(postId, userID, status);
-  }
+  // async updateStatusLikeInUser(
+  //   postId: string,
+  //   userID: number,
+  //   status: AvailableStatusEnum,
+  // ) {
+  //   return this.postsSQLRepository.updateStatusLikeUser(postId, userID, status);
+  // }
 
   async updatePostsById(
-    id: string,
+    id: number,
     title: string,
     shortDescription: string,
     content: string,
-    blogId: string,
+    blogId: number,
   ): Promise<boolean> {
-    return await this.postsRepository.updatePostsById(
+    return await this.postsSQLRepository.updatePostsById(
       id,
       title,
       shortDescription,
@@ -58,7 +60,7 @@ export class PostsService {
     );
   }
 
-  async deletePostsById(id: string): Promise<boolean> {
-    return await this.postsRepository.deletePostsById(id);
+  async deletePostsById(id: number): Promise<boolean> {
+    return await this.postsSQLRepository.deletePostsById(id);
   }
 }

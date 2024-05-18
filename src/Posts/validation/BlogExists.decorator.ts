@@ -5,13 +5,14 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { BlogsRepository } from '../../Blogs/Blogs.repository';
+import { BlogsSQLRepository } from '../../Blogs/postgres/Blogs.postgress.repository';
 
 @ValidatorConstraint({ name: 'blogId', async: true })
 @Injectable()
 export class CustomBlogIdValidation implements ValidatorConstraintInterface {
-  constructor(private blogRepository: BlogsRepository) {}
+  constructor(private blogRepository: BlogsSQLRepository) {}
 
-  async validate(blogId: string): Promise<boolean> {
+  async validate(blogId: number): Promise<boolean> {
     const blog = await this.blogRepository.getBlogsById(blogId);
     console.log(blog);
     if (!blog) {

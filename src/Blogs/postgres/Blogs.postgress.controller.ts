@@ -1,9 +1,4 @@
 import { injectable } from 'inversify';
-import { PostsService } from '../Posts/Posts.service';
-import { BlogsService } from './Blogs.service';
-import { BlogsRepository } from './Blogs.repository';
-import { PostsRepository } from '../Posts/PostsSQLRepository';
-import { queryFilter, searchNameInBlog } from '../qurey-repo/query-filter';
 import 'reflect-metadata';
 import {
   Body,
@@ -19,19 +14,26 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { BodyPostToRequest } from '../Posts/Type/Posts.type';
-import { BlogRequest } from './Type/Blogs.type';
-import { QueryType } from '../Other/Query.Type';
-import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
-import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
+import { BlogsSQLRepository } from './Blogs.postgress.repository';
+import { PostsService } from '../../Posts/Posts.service';
+import { BlogsService } from '../Blogs.service';
+import { BlogsRepository } from '../Blogs.repository';
+import { QueryType } from '../../Other/Query.Type';
+import { queryFilter, searchNameInBlog } from '../../qurey-repo/query-filter';
+import { SoftAuthGuard } from '../../auth/guard/softAuthGuard';
+import { BasicAuthGuard } from '../../auth/guard/basic-authGuard';
+import { BodyPostToRequest } from '../../Posts/Type/Posts.type';
+import { BlogRequest } from '../Type/Blogs.type';
+import { PostsRepository } from '../../Posts/PostsSQLRepository';
 
 @injectable()
-@Controller('blogs')
-export class BlogsController {
+@Controller('sa/blogs')
+export class BlogsSQLController {
   constructor(
     protected postsService: PostsService,
     protected blogsService: BlogsService,
     protected blogsRepository: BlogsRepository,
+    protected blogsSQLRepository: BlogsSQLRepository,
     protected postsRepository: PostsRepository,
   ) {}
   @Get()
@@ -40,8 +42,8 @@ export class BlogsController {
     return this.blogsRepository.getAllBlogs(filter);
   }
   @Get(':id')
-  async getBlogById(@Param('id') id: string) {
-    const blog = await this.blogsRepository.getBlogsById(id);
+  async getBlogById(@Param('id') id: number) {
+    const blog = await this.blogsSQLRepository.getBlogsById(id);
     if (blog) {
       return blog;
     } else {
@@ -77,7 +79,7 @@ export class BlogsController {
     @Req() request,
   ) {
     const user = request.user;
-    const findBlog = await this.blogsRepository.getBlogsById(id);
+    const findBlog = await this.blogsSQLRepository.getBlogsById(id);
     if (!findBlog) throw new NotFoundException();
     const postBody = {
       title: blogsInputModel.title,

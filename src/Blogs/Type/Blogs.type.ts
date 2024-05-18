@@ -20,6 +20,12 @@ export type BlogsOutputModel = {
   createdAt: string;
   isMembership: boolean;
 };
+export type bodyForUpdateBlogs = {
+  id: string;
+  name: string;
+  description: string;
+  websiteUrl: string;
+};
 
 export class BlogRequest {
   @Length(1, 15)
@@ -43,3 +49,11 @@ export type BlogsType = WithId<{
   createdAt: string;
   isMembership: boolean;
 }>;
+export type BlogsTypeSQL = {
+  id: number;
+  name: string;
+  description: string;
+  websiteUrl: string;
+  createdAt: string;
+  isMembership: boolean;
+};

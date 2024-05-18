@@ -6,7 +6,7 @@ import {
 } from './Type/Comment.type';
 import { PaginationQueryType } from '../qurey-repo/query-filter';
 
-import { PostsRepository } from '../Posts/Posts.repository';
+import { PostsRepository } from '../Posts/PostsSQLRepository';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
 import { InjectModel } from '@nestjs/mongoose';
