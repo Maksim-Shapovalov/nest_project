@@ -145,6 +145,7 @@ export class BlogsSQLController {
     @Param('blogId') blogId: number,
     @Param('postId') postId: number,
   ) {
+    if (!blogId || !postId) throw new NotFoundException();
     const deleted = await this.blogsService.deletePostInBlogById(
       blogId,
       postId,

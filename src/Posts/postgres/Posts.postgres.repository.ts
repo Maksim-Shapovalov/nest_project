@@ -241,7 +241,7 @@ export const postsLikeSQLMapper = (post: PostsOutputSQLType) => {
       dislikesCount: 0,
       likesCount: 0,
       myStatus: 'None',
-      newestLikes: 'None',
+      newestLikes: [],
     },
   };
 };
