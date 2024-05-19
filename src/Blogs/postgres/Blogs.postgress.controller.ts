@@ -56,10 +56,11 @@ export class BlogsSQLController {
     }
   }
   //
-  @UseGuards(SoftAuthGuard)
+  // @UseGuards(SoftAuthGuard)
   @Get(':id/posts')
   async getPostsByBlogId(@Param('id') id: number, @Query() query: QueryType) {
     const filter = queryFilter(query);
+    console.log();
     const result = await this.postsSQLRepository.getPostInBlogs(id, filter);
     if (!result) {
       throw new NotFoundException();

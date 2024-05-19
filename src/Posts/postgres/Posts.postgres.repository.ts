@@ -1,13 +1,9 @@
 import { injectable } from 'inversify';
 import 'reflect-metadata';
-
-import { NotFoundException } from '@nestjs/common';
-
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { PaginationQueryType } from '../../qurey-repo/query-filter';
 import { BlogsSQLRepository } from '../../Blogs/postgres/Blogs.postgress.repository';
-import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
 import {
   BodyUpdatingPost,
   PostClass,
@@ -59,21 +55,18 @@ export class PostsPostgresRepository {
   }
 
   async getPostInBlogs(blogId: number, filter: PaginationQueryType) {
-    const findBlog = await this.blogsSQLRepository.getBlogsById(blogId);
-    if (!findBlog) {
-      return null;
-    }
-
-    const filterQuery = { blogId: findBlog[0].id };
+    const totalCountPosts = await this.dataSource.query(
+      `SELECT COUNT(*) FROM "Posts" WHERE "blogId" = ${blogId}`,
+    );
 
     const pageSizeInQuery: number = filter.pageSize;
-    const totalCount = parseInt(findBlog[0].count);
+    const totalCount = parseInt(totalCountPosts[0].count);
 
     const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
     const result = await this.dataSource.query(
-      `SELECT * FROM "Posts" WHERE "blogId" = ${filterQuery} 
+      `SELECT * FROM "Posts" WHERE "blogId" = ${blogId} 
       ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT 
       ${pageSizeInQuery} OFFSET ${pageBlog}`,
     );

@@ -25,6 +25,7 @@ import { QueryType } from '../Other/Query.Type';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { BlogsSQLRepository } from './postgres/Blogs.postgress.repository';
+import { PostsPostgresRepository } from '../Posts/postgres/Posts.postgres.repository';
 
 @injectable()
 @Controller('blogs')
@@ -35,6 +36,7 @@ export class BlogsController {
     protected blogsRepository: BlogsRepository,
     protected blogsSQLRepository: BlogsSQLRepository,
     protected postsRepository: PostsRepository,
+    protected postsSQLRepository: PostsPostgresRepository,
   ) {}
   @Get()
   async getAllBlogs(@Query() query: QueryType) {
@@ -51,20 +53,10 @@ export class BlogsController {
     }
   }
   //
-  @UseGuards(SoftAuthGuard)
   @Get(':id/posts')
-  async getPostsByBlogId(
-    @Param('id') id: string,
-    @Query() query: QueryType,
-    @Req() request,
-  ) {
-    const user = request.user;
+  async getPostsByBlogId(@Param('id') id: number, @Query() query: QueryType) {
     const filter = queryFilter(query);
-    const result = await this.postsRepository.getPostInBlogs(
-      id,
-      filter,
-      user ? user.userId : null,
-    );
+    const result = await this.postsSQLRepository.getPostInBlogs(id, filter);
     if (!result) {
       throw new NotFoundException();
     }
