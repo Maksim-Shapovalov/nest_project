@@ -178,60 +178,70 @@ export class PostsPostgresRepository {
     if (findPost[1] > 0) return true;
   }
 
-  // async postsLikeMapper(post: any, userId: number | null) {
-  //   const likeCount = await this.postLikeModel.countDocuments({
-  //     likesStatus: AvailableStatusEnum.like,
-  //     postId: post._id.toString(),
-  //   });
-  //   const dislikeCount = await this.postLikeModel.countDocuments({
-  //     likesStatus: AvailableStatusEnum.dislike,
-  //     postId: post._id.toString(),
-  //   });
+  //   async postsLikeMapper(post: any, userId: number | null) {
+  //     const likeCount = await this.dataSource.query(
+  //       `SELECT COUNT(*) FROM "Posts" WHERE LOWER("id") = post.id AND LOWER("email") LIKE LOWER('%${searchEmailTerm}%')`,
+  //     );
   //
-  //   const myStatus = await this.postLikeModel
-  //     .findOne({
-  //       userId: userId,
+  //     await this.postLikeModel.countDocuments({
+  //       likesStatus: AvailableStatusEnum.like,
   //       postId: post._id.toString(),
-  //     })
-  //     .exec();
-  //   const findThreeLastUser = await this.postLikeModel
-  //     .find({
-  //       likesStatus: { $all: ['Like'] },
+  //     });
+  //     const dislikeCount = await this.postLikeModel.countDocuments({
+  //       likesStatus: AvailableStatusEnum.dislike,
   //       postId: post._id.toString(),
-  //     })
-  //     .sort({ createdAt: -1 })
-  //     .limit(3)
-  //     .exec();
+  //     });
   //
-  //   return {
-  //     id: post._id.toHexString(),
-  //     title: post.title,
-  //     shortDescription: post.shortDescription,
-  //     content: post.content,
-  //     blogId: post.blogId,
-  //     blogName: post.blogName,
-  //     createdAt: post.createdAt,
-  //     extendedLikesInfo: {
-  //       likesCount: +likeCount, //+likeCount
-  //       dislikesCount: +dislikeCount, //+dislikeCount
-  //       myStatus: myStatus ? myStatus.likesStatus : 'None', //myStatus ? myStatus.likesStatus : 'None'
-  //       newestLikes: findThreeLastUser.map((r) => ({
-  //         addedAt: r.createdAt,
-  //         userId: r.userId,
-  //         login: r.login,
-  //       })), //findThreeLastUser.map(UserDbType.UserInReqMapper)
-  //     },
-  //   };
-  // }
+  //     const myStatus = await this.postLikeModel
+  //       .findOne({
+  //         userId: userId,
+  //         postId: post._id.toString(),
+  //       })
+  //       .exec();
+  //     const findThreeLastUser = await this.postLikeModel
+  //       .find({
+  //         likesStatus: { $all: ['Like'] },
+  //         postId: post._id.toString(),
+  //       })
+  //       .sort({ createdAt: -1 })
+  //       .limit(3)
+  //       .exec();
+  //
+  //     return {
+  //       id: post._id.toHexString(),
+  //       title: post.title,
+  //       shortDescription: post.shortDescription,
+  //       content: post.content,
+  //       blogId: post.blogId,
+  //       blogName: post.blogName,
+  //       createdAt: post.createdAt,
+  //       extendedLikesInfo: {
+  //         likesCount: +likeCount, //+likeCount
+  //         dislikesCount: +dislikeCount, //+dislikeCount
+  //         myStatus: myStatus ? myStatus.likesStatus : 'None', //myStatus ? myStatus.likesStatus : 'None'
+  //         newestLikes: findThreeLastUser.map((r) => ({
+  //           addedAt: r.createdAt,
+  //           userId: r.userId,
+  //           login: r.login,
+  //         })), //findThreeLastUser.map(UserDbType.UserInReqMapper)
+  //       },
+  //     };
+  //   }
 }
 export const postsLikeSQLMapper = (post: PostsOutputSQLType) => {
   return {
     id: post.id.toString(),
     shortDescription: post.shortDescription,
-    blogId: post.blogId,
+    blogId: post.blogId.toString(),
     blogName: post.blogName,
     title: post.title,
     content: post.content,
     createdAt: post.createdAt,
+    extendedLikesInfo: {
+      dislikesCount: 0,
+      likesCount: 0,
+      myStatus: 'None',
+      newestLikes: 'None',
+    },
   };
 };

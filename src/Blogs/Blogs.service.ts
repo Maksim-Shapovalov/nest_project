@@ -38,6 +38,9 @@ export class BlogsService {
   async deleteBlogsById(id: number): Promise<boolean> {
     return await this.blogsSQLRepository.deleteBlogsById(id);
   }
+  async deletePostInBlogById(blogId: number, postId: number): Promise<boolean> {
+    return await this.blogsSQLRepository.deletePostInBlogById(blogId, postId);
+  }
 }
 // const blogMapper = (blog: WithId<BlogsType>): BlogsOutputModel => {
 //   return {

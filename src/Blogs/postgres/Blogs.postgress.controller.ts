@@ -27,6 +27,7 @@ import { BlogRequest } from '../Type/Blogs.type';
 import { PostsRepository } from '../../Posts/PostsSQLRepository';
 
 @injectable()
+@UseGuards(BasicAuthGuard)
 @Controller('sa/blogs')
 export class BlogsSQLController {
   constructor(
@@ -41,7 +42,6 @@ export class BlogsSQLController {
     const filter = searchNameInBlog(query);
     return this.blogsRepository.getAllBlogs(filter);
   }
-  @UseGuards(BasicAuthGuard)
   @Get(':id')
   async getBlogById(@Param('id') id: number) {
     const blog = await this.blogsSQLRepository.getBlogsById(id);
@@ -129,11 +129,26 @@ export class BlogsSQLController {
       return HttpCode(204);
     }
   }
-  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteBlogById(@Param('id') id: number) {
     const deleted = await this.blogsService.deleteBlogsById(id);
+
+    if (!deleted) {
+      throw new NotFoundException();
+    }
+    return HttpCode(204);
+  }
+  @Delete(':blogId/posts/:postId')
+  @HttpCode(204)
+  async deletePostInBlogById(
+    @Param('blogId') blogId: number,
+    @Param('postId') postId: number,
+  ) {
+    const deleted = await this.blogsService.deletePostInBlogById(
+      blogId,
+      postId,
+    );
 
     if (!deleted) {
       throw new NotFoundException();

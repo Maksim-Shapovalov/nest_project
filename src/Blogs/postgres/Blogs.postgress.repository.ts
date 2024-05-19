@@ -23,8 +23,7 @@ export class BlogsSQLRepository {
 
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountBlogs = await this.dataSource.query(
-      `SELECT COUNT(*) FROM "Blogs" WHERE LOWER("name")
- LIKE LOWER('%${filterQuery}%')`,
+      `SELECT COUNT(*) FROM "Blogs" WHERE LOWER("name") LIKE LOWER('%${filterQuery}%')`,
     );
 
     const totalCount = parseInt(totalCountBlogs[0].count);
@@ -40,7 +39,7 @@ export class BlogsSQLRepository {
       pagesCount: pageCountBlogs,
       page: filter.pageNumber,
       pageSize: pageSizeInQuery,
-      totalCount: totalCountBlogs,
+      totalCount: totalCount,
       items: items,
     };
   }
@@ -89,11 +88,21 @@ export class BlogsSQLRepository {
   }
   async deleteBlogsById(id: number): Promise<boolean> {
     const findBlogInDB = await this.dataSource.query(
-      `SELECT * FROM "Blogs" WHERE id = ${id}`,
+      `SELECT * FROM "Blogs" WHERE "id" = ${id}`,
     );
     if (!findBlogInDB[0]) return false;
     const findBlog = await this.dataSource.query(
       `DELETE FROM public."Blogs" WHERE "id" = ${id} ;`,
+    );
+    if (findBlog[1] > 0) return true;
+  }
+  async deletePostInBlogById(blogId: number, postId: number): Promise<boolean> {
+    const findBlogInDB = await this.dataSource.query(
+      `SELECT * FROM "Posts" WHERE "id" = ${postId} AND "blogId" = ${blogId}`,
+    );
+    if (!findBlogInDB[0]) return false;
+    const findBlog = await this.dataSource.query(
+      `DELETE FROM public."Posts" WHERE "id" = ${postId} AND "blogId" = ${blogId} ;`,
     );
     if (findBlog[1] > 0) return true;
   }

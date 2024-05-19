@@ -32,14 +32,6 @@ export class UserSQLRepository {
   ): Promise<PaginationType<UserToShow> | null> {
     const searchLoginTerm = filter.searchLoginTerm;
     const searchEmailTerm = filter.searchEmailTerm;
-    // const logOrEm = searchLoginTerm
-    //   ? `WHERE LOWER(login) like LOWER('%${searchLoginTerm}%')`
-    //   : searchEmailTerm
-    //     ? `WHERE LOWER(email) like LOWER('%${searchEmailTerm}%')`
-    //     : '';
-    // WHERE "login" ILIKE $1
-    // OR "email" ILIKE $2
-    //${logOrEm}
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountUsersQuery = await this.dataSource.query(
       `SELECT COUNT(*) FROM "Users" WHERE LOWER("login") LIKE LOWER('%${searchLoginTerm}%') OR LOWER("email") LIKE LOWER('%${searchEmailTerm}%')`,
