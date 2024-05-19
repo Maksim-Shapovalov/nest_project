@@ -152,7 +152,7 @@ export class PostsPostgresRepository {
 
     await this.dataSource.query(`
     UPDATE "Posts"
-    SET "title" = '${postBody.title}', "shortDescription" = '${postBody.shortDescription}', "content" = '${postBody.shortDescription}', "blogId" = ${postBody.blogId}
+    SET "title" = '${postBody.title}', "shortDescription" = '${postBody.shortDescription}', "content" = '${postBody.content}', "blogId" = ${postBody.blogId}
     WHERE "id" = '${postBody.postId}'
     RETURNING * `);
     return true;

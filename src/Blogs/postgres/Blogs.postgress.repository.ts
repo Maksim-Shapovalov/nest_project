@@ -99,11 +99,11 @@ export class BlogsSQLRepository {
   }
   async deletePostInBlogById(blogId: number, postId: number): Promise<boolean> {
     const findBlogInDB = await this.dataSource.query(
-      `SELECT * FROM "Posts" WHERE "id" = ${postId} AND "blogId" = ${blogId}`,
+      `SELECT * FROM "Posts" WHERE id = ${postId} AND "blogId" = ${blogId}`,
     );
     if (!findBlogInDB[0]) return false;
     const findBlog = await this.dataSource.query(
-      `DELETE FROM public."Posts" WHERE "id" = ${postId} AND "blogId" = ${blogId} ;`,
+      `DELETE FROM public."Posts" WHERE id = ${postId} AND "blogId" = ${blogId} ;`,
     );
     if (findBlog[1] > 0) return true;
   }
