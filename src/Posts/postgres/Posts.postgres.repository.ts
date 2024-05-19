@@ -144,7 +144,7 @@ export class PostsPostgresRepository {
 
   async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {
     const findPostQuery = await this.dataSource.query(
-      `SELECT * FROM "Posts" WHERE "id" = ${postBody.postId}`,
+      `SELECT * FROM "Posts" WHERE "id" = ${postBody.postId} AND "blogId" = ${postBody.blogId}`,
     );
     if (findPostQuery.length === 0) {
       return null;
