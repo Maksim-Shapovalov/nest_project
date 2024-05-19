@@ -1,4 +1,8 @@
-import { BodyPostToRequest1, PostClass } from './Type/Posts.type';
+import {
+  BodyPostToRequest1,
+  BodyUpdatingPost,
+  PostClass,
+} from './Type/Posts.type';
 import { BlogsRepository } from '../Blogs/Blogs.repository';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
@@ -44,20 +48,8 @@ export class PostsService {
   //   return this.postsSQLRepository.updateStatusLikeUser(postId, userID, status);
   // }
 
-  async updatePostsById(
-    id: number,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: number,
-  ): Promise<boolean> {
-    return await this.postsSQLRepository.updatePostsById(
-      id,
-      title,
-      shortDescription,
-      content,
-      blogId,
-    );
+  async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {
+    return await this.postsSQLRepository.updatePostsById(postBody);
   }
 
   async deletePostsById(id: number): Promise<boolean> {

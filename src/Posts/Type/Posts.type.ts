@@ -86,13 +86,10 @@ export class StatusLikes {
 }
 
 export class BodyPostToRequest {
-  @Trim()
   @Length(1, 30)
   title: string;
-  @Trim()
   @Length(1, 100)
   shortDescription: string;
-  @Trim()
   @Length(1, 1000)
   content: string;
 }
@@ -134,3 +131,15 @@ export type PostsType = WithId<{
   };
   createdAt: string;
 }>;
+
+export class BodyUpdatingPost {
+  postId: number;
+  @Length(1, 30)
+  title: string;
+  @Length(1, 100)
+  shortDescription: string;
+  @Length(1, 1000)
+  content: string;
+  @Validate(CustomBlogIdValidation)
+  blogId: number;
+}

@@ -43,6 +43,7 @@ export class BlogsSQLRepository {
       items: items,
     };
   }
+
   async getBlogsById(id: number): Promise<BlogsOutputModel | null> {
     const findCursor = await this.dataSource.query(
       `SELECT * FROM "Blogs" WHERE "id" = ${id}`,

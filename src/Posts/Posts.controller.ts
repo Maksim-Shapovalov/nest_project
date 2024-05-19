@@ -21,14 +21,13 @@ import {
 } from '@nestjs/common';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { QueryType } from '../Other/Query.Type';
-import { BodyPostToPut, BodyPostToRequest1 } from './Type/Posts.type';
+import { BodyPostToRequest1, BodyUpdatingPost } from './Type/Posts.type';
 import { BearerGuard } from '../auth/guard/authGuard';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { Trim } from '../Other/trim-validator';
 import { IsNotEmpty, Length } from 'class-validator';
 import { ObjectId } from 'mongodb';
-import { PostsRepository } from './PostsSQLRepository';
 import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
 
 export class ContentClass {
@@ -116,26 +115,23 @@ export class PostsController {
       content: postInputModel.content,
       blogId: postInputModel.blogId,
     };
-    console.log(postInputModel);
-    console.log(Body);
-    console.log();
-    console.log(postBody, '------');
     return this.postsService.createNewPosts(postBody, null);
   }
   @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updatePostByPostId(
-    @Param('id') userId: number,
+    @Param('id') postId: number,
     @Body() postInputModel: BodyPostToRequest1,
   ) {
-    const result = await this.postsService.updatePostsById(
-      userId,
-      postInputModel.title,
-      postInputModel.shortDescription,
-      postInputModel.content,
-      postInputModel.blogId,
-    );
+    const bodyPost: BodyUpdatingPost = {
+      postId: postId,
+      title: postInputModel.title,
+      shortDescription: postInputModel.shortDescription,
+      content: postInputModel.content,
+      blogId: postInputModel.blogId,
+    };
+    const result = await this.postsService.updatePostsById(bodyPost);
     if (!result) {
       throw new NotFoundException();
     } else {

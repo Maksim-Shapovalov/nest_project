@@ -22,9 +22,13 @@ import { QueryType } from '../../Other/Query.Type';
 import { queryFilter, searchNameInBlog } from '../../qurey-repo/query-filter';
 import { SoftAuthGuard } from '../../auth/guard/softAuthGuard';
 import { BasicAuthGuard } from '../../auth/guard/basic-authGuard';
-import { BodyPostToRequest } from '../../Posts/Type/Posts.type';
+import {
+  BodyPostToRequest,
+  BodyPostToRequest1,
+} from '../../Posts/Type/Posts.type';
 import { BlogRequest } from '../Type/Blogs.type';
 import { PostsRepository } from '../../Posts/PostsSQLRepository';
+import { PostsPostgresRepository } from '../../Posts/postgres/Posts.postgres.repository';
 
 @injectable()
 @UseGuards(BasicAuthGuard)
@@ -35,7 +39,7 @@ export class BlogsSQLController {
     protected blogsService: BlogsService,
     protected blogsRepository: BlogsRepository,
     protected blogsSQLRepository: BlogsSQLRepository,
-    protected postsRepository: PostsRepository,
+    protected postsSQLRepository: PostsPostgresRepository,
   ) {}
   @Get()
   async getAllBlogs(@Query() query: QueryType) {
@@ -54,18 +58,9 @@ export class BlogsSQLController {
   //
   @UseGuards(SoftAuthGuard)
   @Get(':id/posts')
-  async getPostsByBlogId(
-    @Param('id') id: string,
-    @Query() query: QueryType,
-    @Req() request,
-  ) {
-    const user = request.user;
+  async getPostsByBlogId(@Param('id') id: number, @Query() query: QueryType) {
     const filter = queryFilter(query);
-    const result = await this.postsRepository.getPostInBlogs(
-      id,
-      filter,
-      user ? user.userId : null,
-    );
+    const result = await this.postsSQLRepository.getPostInBlogs(id, filter);
     if (!result) {
       throw new NotFoundException();
     }
@@ -108,7 +103,6 @@ export class BlogsSQLController {
     };
     return this.blogsService.createNewBlogs(blog);
   }
-  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updateBlogByBlogId(
@@ -123,6 +117,29 @@ export class BlogsSQLController {
       websiteUrl: blogUpdateModel.websiteUrl,
     };
     const result = await this.blogsService.updateBlogById(blogs);
+    if (!result) {
+      throw new NotFoundException();
+    } else {
+      return HttpCode(204);
+    }
+  }
+  @Put(':blogId/posts/:postId')
+  @HttpCode(204)
+  async updatePostInBlogByBlogIdAndPostId(
+    @Param('blogId') blogId: number,
+    @Param('postId') postId: number,
+    @Body()
+    postUpdateModel: BodyPostToRequest,
+  ) {
+    if (!blogId || !postId) throw new NotFoundException();
+    const post = {
+      postId: postId,
+      blogId: blogId,
+      title: postUpdateModel.title,
+      shortDescription: postUpdateModel.shortDescription,
+      content: postUpdateModel.content,
+    };
+    const result = await this.postsService.updatePostsById(post);
     if (!result) {
       throw new NotFoundException();
     } else {

@@ -8,7 +8,11 @@ import { DataSource } from 'typeorm';
 import { PaginationQueryType } from '../../qurey-repo/query-filter';
 import { BlogsSQLRepository } from '../../Blogs/postgres/Blogs.postgress.repository';
 import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
-import { PostClass, PostsOutputSQLType } from '../Type/Posts.type';
+import {
+  BodyUpdatingPost,
+  PostClass,
+  PostsOutputSQLType,
+} from '../Type/Posts.type';
 
 @injectable()
 export class PostsPostgresRepository {
@@ -145,15 +149,9 @@ export class PostsPostgresRepository {
     return postsLikeSQLMapper(result[0]);
   }
 
-  async updatePostsById(
-    id: number,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: number,
-  ): Promise<boolean> {
+  async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {
     const findPostQuery = await this.dataSource.query(
-      `SELECT * FROM "Posts" WHERE "id" = ${id}`,
+      `SELECT * FROM "Posts" WHERE "id" = ${postBody.postId}`,
     );
     if (findPostQuery.length === 0) {
       return null;
@@ -161,8 +159,8 @@ export class PostsPostgresRepository {
 
     await this.dataSource.query(`
     UPDATE "Posts"
-    SET "title" = '${title}', "shortDescription" = '${shortDescription}', "content" = '${content}', "blogId" = ${blogId}
-    WHERE "id" = '${id}'
+    SET "title" = '${postBody.title}', "shortDescription" = '${postBody.shortDescription}', "content" = '${postBody.shortDescription}', "blogId" = ${postBody.blogId}
+    WHERE "id" = '${postBody.postId}'
     RETURNING * `);
     return true;
   }
