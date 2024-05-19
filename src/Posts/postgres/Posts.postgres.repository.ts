@@ -44,11 +44,13 @@ export class PostsPostgresRepository {
   }
 
   async getPostsById(id: number) {
+    console.log(id);
     const findPosts = await this.dataSource.query(
       `SELECT * FROM "Posts" WHERE id = ${id}`,
     );
+    console.log(findPosts, 'findPosts');
 
-    if (!findPosts) {
+    if (!findPosts[0]) {
       return null;
     }
     return postsLikeSQLMapper(findPosts[0]);
