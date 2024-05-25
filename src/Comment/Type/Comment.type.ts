@@ -5,16 +5,27 @@ export class CommentsClass {
   constructor(
     public content: string,
     public commentatorInfo: {
-      userId: string;
+      userId: number;
       userLogin: string;
     },
-    public postId: string,
+    public postId: number,
     public createdAt: string,
     // public statuses: LikesTypeDb[]
   ) {}
 }
 
-export type CommentsTypeDb = WithId<{
+// export type CommentsTypeDb = WithId<{
+//   content: string;
+//   commentatorInfo: {
+//     userId: string;
+//     userLogin: string;
+//   };
+//   postId: string;
+//   createdAt: string;
+//   // statuses: LikesTypeDb[]
+// }>;
+export type CommentsTypeDb = {
+  id: number;
   content: string;
   commentatorInfo: {
     userId: string;
@@ -23,7 +34,7 @@ export type CommentsTypeDb = WithId<{
   postId: string;
   createdAt: string;
   // statuses: LikesTypeDb[]
-}>;
+};
 export type CommentsTypeOutputDb = {
   id: string;
   content: string;

@@ -2,7 +2,7 @@ import { injectable } from 'inversify';
 import { PostsService } from '../Posts/Posts.service';
 import { BlogsService } from './Blogs.service';
 import { BlogsRepository } from './Blogs.repository';
-import { PostsRepository } from '../Posts/PostsSQLRepository';
+import { PostsRepository } from '../Posts/PostsRepository';
 import { queryFilter, searchNameInBlog } from '../qurey-repo/query-filter';
 import 'reflect-metadata';
 import {
@@ -56,7 +56,11 @@ export class BlogsController {
   @Get(':id/posts')
   async getPostsByBlogId(@Param('id') id: number, @Query() query: QueryType) {
     const filter = queryFilter(query);
-    const result = await this.postsSQLRepository.getPostInBlogs(id, filter);
+    const result = await this.postsSQLRepository.getPostInBlogs(
+      id,
+      filter,
+      null,
+    );
     if (!result) {
       throw new NotFoundException();
     }

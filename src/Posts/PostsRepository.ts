@@ -52,13 +52,13 @@ export class PostsRepository {
     };
   }
 
-  async getPostsById(id: string, userId: string | null) {
+  async getPostsById(id: number, userId: number | null) {
     const findPosts = await this.postModel.findOne({ _id: new ObjectId(id) });
 
     if (!findPosts) {
       return null;
     }
-    return this.postsLikeMapper(findPosts, userId);
+    return this.postsLikeMapper(findPosts, userId.toString());
   }
 
   async getPostInBlogs(

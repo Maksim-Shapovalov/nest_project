@@ -8,6 +8,7 @@ import { injectable } from 'inversify';
 import 'reflect-metadata';
 import { BlogsSQLRepository } from '../Blogs/postgres/Blogs.postgress.repository';
 import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
+import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 @injectable()
 export class PostsService {
   constructor(
@@ -38,15 +39,15 @@ export class PostsService {
       new Date().toISOString(),
     );
 
-    return this.postsSQLRepository.savePost(newPosts);
+    return this.postsSQLRepository.savePost(newPosts, userId);
   }
-  // async updateStatusLikeInUser(
-  //   postId: string,
-  //   userID: number,
-  //   status: AvailableStatusEnum,
-  // ) {
-  //   return this.postsSQLRepository.updateStatusLikeUser(postId, userID, status);
-  // }
+  async updateStatusLikeInUser(
+    postId: number,
+    userID: number,
+    status: AvailableStatusEnum,
+  ) {
+    return this.postsSQLRepository.updateStatusLikeUser(postId, userID, status);
+  }
 
   async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {
     return await this.postsSQLRepository.updatePostsById(postBody);

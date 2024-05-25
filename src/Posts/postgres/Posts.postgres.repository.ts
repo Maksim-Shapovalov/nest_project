@@ -3,20 +3,21 @@ import 'reflect-metadata';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { PaginationQueryType } from '../../qurey-repo/query-filter';
-import { BlogsSQLRepository } from '../../Blogs/postgres/Blogs.postgress.repository';
 import {
   BodyUpdatingPost,
   PostClass,
   PostsOutputSQLType,
 } from '../Type/Posts.type';
+import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
+import { UserSQLRepository } from '../../Users/User.SqlRepositories';
 
 @injectable()
 export class PostsPostgresRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    protected blogsSQLRepository: BlogsSQLRepository,
+    protected userSQLRepository: UserSQLRepository,
   ) {}
-  async getAllPosts(filter: PaginationQueryType) {
+  async getAllPosts(filter: PaginationQueryType, userId: number | null) {
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountPosts = await this.dataSource.query(
       `SELECT COUNT(*) FROM "Posts"`,
@@ -32,7 +33,7 @@ export class PostsPostgresRepository {
       ${pageSizeInQuery} OFFSET ${pageBlog}`,
     );
     // const items = result.map((p) => postsLikeMapper(p,userId))
-    const itemsPromises = result.map((p) => postsLikeSQLMapper(p));
+    const itemsPromises = result.map((p) => this.postsLikeMapper(p, userId));
     const items = await Promise.all(itemsPromises);
     return {
       pagesCount: pageCountBlogs,
@@ -43,20 +44,22 @@ export class PostsPostgresRepository {
     };
   }
 
-  async getPostsById(id: number) {
-    console.log(id);
+  async getPostsById(id: number, userId: number) {
     const findPosts = await this.dataSource.query(
       `SELECT * FROM "Posts" WHERE id = ${id}`,
     );
-    console.log(findPosts, 'findPosts');
 
     if (!findPosts[0]) {
       return null;
     }
-    return postsLikeSQLMapper(findPosts[0]);
+    return this.postsLikeMapper(findPosts[0], userId);
   }
 
-  async getPostInBlogs(blogId: number, filter: PaginationQueryType) {
+  async getPostInBlogs(
+    blogId: number,
+    filter: PaginationQueryType,
+    userId: number,
+  ) {
     const totalCountPosts = await this.dataSource.query(
       `SELECT COUNT(*) FROM "Posts" WHERE "blogId" = ${blogId}`,
     );
@@ -74,7 +77,7 @@ export class PostsPostgresRepository {
     );
     // const items = res.map((p) => postsLikeMapper(p,null))
     const itemsPromises = result.map((p) => {
-      return postsLikeSQLMapper(p);
+      return this.postsLikeMapper(p, userId);
     });
     const items = await Promise.all(itemsPromises);
 
@@ -86,54 +89,39 @@ export class PostsPostgresRepository {
       items: items,
     };
   }
-  // async updateStatusLikeUser(
-  //   postId: string,
-  //   userId: number,
-  //   status: AvailableStatusEnum,
-  // ) {
-  //   const likeWithUserId = await this.postLikeModel
-  //     .findOne({
-  //       userId: userId,
-  //       postId: postId,
-  //     })
-  //     .exec();
-  //   const findUser = await this.userRepository.getUserById(userId);
-  //   const comment = await this.postModel
-  //     .findOne({
-  //       _id: new ObjectId(postId),
-  //     })
-  //     .exec();
-  //
-  //   if (!comment) {
-  //     return false;
-  //   }
-  //
-  //   if (likeWithUserId) {
-  //     const updateStatus = await this.postLikeModel.updateOne(
-  //       { postId: postId, userId: userId },
-  //       {
-  //         $set: {
-  //           likesStatus: status,
-  //         },
-  //       },
-  //     );
-  //     if (!updateStatus) throw new NotFoundException();
-  //
-  //     return updateStatus.matchedCount === 1;
-  //   }
-  //
-  //   await this.postLikeModel.create({
-  //     postId,
-  //     userId: userId,
-  //     likesStatus: status,
-  //     createdAt: new Date().toISOString(),
-  //     login: findUser.login,
-  //   });
-  //
-  //   return true;
-  // }
+  async updateStatusLikeUser(
+    postId: number,
+    userId: number,
+    status: AvailableStatusEnum,
+  ) {
+    const randomId = Math.floor(Math.random() * 1000000);
+    const likeWithUserId = await this.dataSource.query(
+      `SELECT * FROM "Posts-like" WHERE "postId" = ${postId} AND "userID" = ${userId}`,
+    );
+    const findUser = await this.userSQLRepository.getUserById(userId);
+    const comment = await this.getPostsById(postId, userId);
 
-  async savePost(post: PostClass) {
+    if (!comment) {
+      return false;
+    }
+
+    if (likeWithUserId[0]) {
+      const updateStatus = await this.dataSource.query(
+        `UPDATE * FROM "Posts-like" SET "likesStatus"= ${status}
+	      WHERE "postId" = ${postId} AND "userID" = ${userId};`,
+      );
+      if (!updateStatus) return null;
+
+      return updateStatus.matchedCount === 1;
+    } else {
+      await this.dataSource.query(`INSERT INTO public."Posts-like"(
+        id, "postId", "userId", login, "createdAt", "likesStatus")
+        VALUES (${randomId},${postId}, ${userId}, '${findUser.login}', '${new Date().toISOString()}', '${status}');`);
+      return true;
+    }
+  }
+
+  async savePost(post: PostClass, userId: number) {
     const randomId = Math.floor(Math.random() * 1000000);
     // await this.postsLikeMapper(post, null);
     const newPost = `INSERT INTO public."Posts"(
@@ -141,7 +129,7 @@ export class PostsPostgresRepository {
     VALUES (${randomId}, '${post.content}', '${post.createdAt}', '${post.title}', '${post.shortDescription}', '${post.blogId}', '${post.blogName}')
     RETURNING *`;
     const result = await this.dataSource.query(newPost);
-    return postsLikeSQLMapper(result[0]);
+    return this.postsLikeMapper(result[0], userId);
   }
 
   async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {
@@ -171,55 +159,41 @@ export class PostsPostgresRepository {
     if (findPost[1] > 0) return true;
   }
 
-  //   async postsLikeMapper(post: any, userId: number | null) {
-  //     const likeCount = await this.dataSource.query(
-  //       `SELECT COUNT(*) FROM "Posts" WHERE LOWER("id") = post.id AND LOWER("email") LIKE LOWER('%${searchEmailTerm}%')`,
-  //     );
-  //
-  //     await this.postLikeModel.countDocuments({
-  //       likesStatus: AvailableStatusEnum.like,
-  //       postId: post._id.toString(),
-  //     });
-  //     const dislikeCount = await this.postLikeModel.countDocuments({
-  //       likesStatus: AvailableStatusEnum.dislike,
-  //       postId: post._id.toString(),
-  //     });
-  //
-  //     const myStatus = await this.postLikeModel
-  //       .findOne({
-  //         userId: userId,
-  //         postId: post._id.toString(),
-  //       })
-  //       .exec();
-  //     const findThreeLastUser = await this.postLikeModel
-  //       .find({
-  //         likesStatus: { $all: ['Like'] },
-  //         postId: post._id.toString(),
-  //       })
-  //       .sort({ createdAt: -1 })
-  //       .limit(3)
-  //       .exec();
-  //
-  //     return {
-  //       id: post._id.toHexString(),
-  //       title: post.title,
-  //       shortDescription: post.shortDescription,
-  //       content: post.content,
-  //       blogId: post.blogId,
-  //       blogName: post.blogName,
-  //       createdAt: post.createdAt,
-  //       extendedLikesInfo: {
-  //         likesCount: +likeCount, //+likeCount
-  //         dislikesCount: +dislikeCount, //+dislikeCount
-  //         myStatus: myStatus ? myStatus.likesStatus : 'None', //myStatus ? myStatus.likesStatus : 'None'
-  //         newestLikes: findThreeLastUser.map((r) => ({
-  //           addedAt: r.createdAt,
-  //           userId: r.userId,
-  //           login: r.login,
-  //         })), //findThreeLastUser.map(UserDbType.UserInReqMapper)
-  //       },
-  //     };
-  //   }
+  async postsLikeMapper(post: any, userId: number | null) {
+    const likeCount = await this.dataSource.query(
+      `SELECT COUNT(*) FROM "Posts-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "postId" = ${post.id} AND "userId" = ${userId}`,
+    );
+    const dislikeCount = await this.dataSource.query(
+      `SELECT * FROM "Posts-like" WHERE  "likesStatus" = '${AvailableStatusEnum.dislike}' AND "postId" = ${post.id} AND "userId" = ${userId}`,
+    );
+
+    const myStatus = await this.dataSource.query(
+      `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "userId" = ${userId}`,
+    );
+    const findThreeLastUser = await this.dataSource.query(
+      `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "likesStatus" = '${AvailableStatusEnum.like}' ORDER BY "createdAt" DESC LIMIT 3 `,
+    );
+
+    return {
+      id: post._id.toHexString(),
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blogName,
+      createdAt: post.createdAt,
+      extendedLikesInfo: {
+        likesCount: +likeCount[0], //+likeCount
+        dislikesCount: +dislikeCount[0], //+dislikeCount
+        myStatus: myStatus ? myStatus.likesStatus : 'None', //myStatus ? myStatus.likesStatus : 'None'
+        newestLikes: findThreeLastUser.map((r) => ({
+          addedAt: r.createdAt,
+          userId: r.userId,
+          login: r.login,
+        })), //findThreeLastUser.map(UserDbType.UserInReqMapper)
+      },
+    };
+  }
 }
 export const postsLikeSQLMapper = (post: PostsOutputSQLType) => {
   return {

@@ -20,14 +20,9 @@ import { BlogsService } from '../Blogs.service';
 import { BlogsRepository } from '../Blogs.repository';
 import { QueryType } from '../../Other/Query.Type';
 import { queryFilter, searchNameInBlog } from '../../qurey-repo/query-filter';
-import { SoftAuthGuard } from '../../auth/guard/softAuthGuard';
 import { BasicAuthGuard } from '../../auth/guard/basic-authGuard';
-import {
-  BodyPostToRequest,
-  BodyPostToRequest1,
-} from '../../Posts/Type/Posts.type';
+import { BodyPostToRequest } from '../../Posts/Type/Posts.type';
 import { BlogRequest } from '../Type/Blogs.type';
-import { PostsRepository } from '../../Posts/PostsSQLRepository';
 import { PostsPostgresRepository } from '../../Posts/postgres/Posts.postgres.repository';
 
 @injectable()
@@ -60,8 +55,11 @@ export class BlogsSQLController {
   @Get(':id/posts')
   async getPostsByBlogId(@Param('id') id: number, @Query() query: QueryType) {
     const filter = queryFilter(query);
-    console.log();
-    const result = await this.postsSQLRepository.getPostInBlogs(id, filter);
+    const result = await this.postsSQLRepository.getPostInBlogs(
+      id,
+      filter,
+      null,
+    );
     if (!result) {
       throw new NotFoundException();
     }

@@ -1,9 +1,6 @@
 import 'reflect-metadata';
 import { injectable } from 'inversify';
 import { CommentsService } from './Comments.service';
-
-import { CommentsRepository } from './Comments.repository';
-
 import {
   Body,
   Controller,
@@ -25,20 +22,21 @@ import { StatusLikes } from '../Posts/Type/Posts.type';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 import { ContentClass } from '../Posts/Posts.controller';
+import { CommentsSQLRepository } from './postgress/Comments.postgress.repository';
 
 @injectable()
 @Controller('comments')
 export class CommentsController {
   constructor(
     protected serviceComments: CommentsService,
-    protected commentsRepository: CommentsRepository,
+    protected commentsSQLRepository: CommentsSQLRepository,
   ) {}
   @UseGuards(SoftAuthGuard)
   @Get(':id')
-  async getCommentsById(@Param('id') id: string, @Req() request) {
+  async getCommentsById(@Param('id') id: number, @Req() request) {
     const user = request.user as NewestPostLike;
     if (!id) throw new NotFoundException();
-    const findComments = await this.commentsRepository.getCommentById(
+    const findComments = await this.commentsSQLRepository.getCommentById(
       id,
       user ? user.userId : null,
     );
@@ -50,20 +48,20 @@ export class CommentsController {
   @Put(':id')
   @HttpCode(204)
   async updateCommentByCommentId(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() content: ContentClass,
     @Req() request,
   ) {
     if (!id || !ObjectId.isValid(id)) throw new NotFoundException();
     const user = request.user as NewestPostLike;
     if (!user) throw new NotFoundException();
-    const comment = await this.commentsRepository.getCommentById(
+    const comment = await this.commentsSQLRepository.getCommentById(
       id,
       user.userId,
     );
     if (!comment) throw new NotFoundException();
 
-    if (comment.commentatorInfo.userId !== user.userId)
+    if (comment.commentatorInfo.userId !== user.userId.toString())
       throw new ForbiddenException();
 
     const updateComment = await this.serviceComments.updateComment(
@@ -78,11 +76,11 @@ export class CommentsController {
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() inputLikeStatus: StatusLikes,
-    @User() userModel: { userId: string },
+    @User() userModel: { userId: number },
   ) {
-    const findComments = await this.commentsRepository.getCommentById(
+    const findComments = await this.commentsSQLRepository.getCommentById(
       id,
       userModel.userId,
     );
@@ -100,16 +98,16 @@ export class CommentsController {
   @UseGuards(BearerGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteCommentByCommentId(@Param('id') id: string, @Req() request) {
+  async deleteCommentByCommentId(@Param('id') id: number, @Req() request) {
     const user = request.user as NewestPostLike;
     if (!id) throw new NotFoundException();
-    const comment = await this.commentsRepository.getCommentById(
+    const comment = await this.commentsSQLRepository.getCommentById(
       id,
       user.userId,
     );
     if (!comment) throw new NotFoundException();
 
-    if (comment.commentatorInfo.userId !== user.userId)
+    if (comment.commentatorInfo.userId !== user.userId.toString())
       throw new ForbiddenException();
     const deletedComment = await this.serviceComments.deletedComment(id);
 

@@ -1,23 +1,26 @@
-import { CommentsRepository } from './Comments.repository';
 import { AvailableStatusEnum, CommentsClass } from './Type/Comment.type';
 
 import { NewestPostLike } from '../Users/Type/User.type';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
-import { PostsRepository } from '../Posts/PostsSQLRepository';
+import { PostsPostgresRepository } from '../Posts/postgres/Posts.postgres.repository';
+import { CommentsSQLRepository } from './postgress/Comments.postgress.repository';
 
 @injectable()
 export class CommentsService {
   constructor(
-    protected commentsRepository: CommentsRepository,
-    protected postsRepository: PostsRepository,
+    protected commentsRepository: CommentsSQLRepository,
+    protected postsSQLRepository: PostsPostgresRepository,
   ) {}
   async createdNewComments(
-    postId: string,
+    postId: number,
     content: string,
     userId: NewestPostLike,
   ) {
-    const post = await this.postsRepository.getPostsById(postId, userId.userId);
+    const post = await this.postsSQLRepository.getPostsById(
+      postId,
+      userId.userId,
+    );
 
     if (!post) {
       return null;
@@ -36,15 +39,15 @@ export class CommentsService {
     return this.commentsRepository.saveComments(newComment, userId.userId);
   }
 
-  async updateComment(commentId: string, content: string) {
+  async updateComment(commentId: number, content: string) {
     return await this.commentsRepository.updateCommentsByCommentId(
       commentId,
       content,
     );
   }
   async updateStatusLikeInUser(
-    commentId: string,
-    userId: string,
+    commentId: number,
+    userId: number,
     status: AvailableStatusEnum,
   ) {
     return this.commentsRepository.updateStatusLikeUser(
@@ -54,7 +57,7 @@ export class CommentsService {
     );
   }
 
-  async deletedComment(commentId: string) {
+  async deletedComment(commentId: number) {
     return await this.commentsRepository.deleteCommentsByCommentId(commentId);
   }
 }

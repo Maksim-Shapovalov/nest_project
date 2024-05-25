@@ -14,7 +14,7 @@ export class UserDbType {
 
   static UserInReqMapper(user: any): NewestPostLike {
     return {
-      userId: user.id.toString(),
+      userId: user.id,
       addedAt: user.createdAt,
       login: user.login,
     };
@@ -22,7 +22,7 @@ export class UserDbType {
 }
 
 export type NewestPostLike = {
-  userId: string;
+  userId: number;
   addedAt: string;
   login: string;
 };

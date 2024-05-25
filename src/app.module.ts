@@ -8,12 +8,11 @@ import { BlogsController } from './Blogs/Blogs.controller';
 import { BlogsRepository } from './Blogs/Blogs.repository';
 import { BlogsService } from './Blogs/Blogs.service';
 import { CommentsController } from './Comment/Comment.controller';
-import { CommentsRepository } from './Comment/Comments.repository';
 import { CommentsService } from './Comment/Comments.service';
 
 import { User, UserSchema } from './Users/Type/User.schemas';
 import { PostsController } from './Posts/Posts.controller';
-import { PostsRepository } from './Posts/PostsSQLRepository';
+import { PostsRepository } from './Posts/PostsRepository';
 import { PostsService } from './Posts/Posts.service';
 import { Blog, BlogSchema } from './Blogs/Type/Blogs.schemas';
 import {
@@ -48,6 +47,7 @@ import { SecurityDevicesSQLRepository } from './Device/postgres/SecurityDeviceSQ
 import { BlogsSQLController } from './Blogs/postgres/Blogs.postgress.controller';
 import { BlogsSQLRepository } from './Blogs/postgres/Blogs.postgress.repository';
 import { PostsPostgresRepository } from './Posts/postgres/Posts.postgres.repository';
+import { CommentsSQLRepository } from './Comment/postgress/Comments.postgress.repository';
 export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,
@@ -113,7 +113,6 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
   providers: [
     BlogsRepository,
     BlogsService,
-    CommentsRepository,
     CommentsService,
     PostsRepository,
     PostsService,
@@ -127,6 +126,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     SecurityDevicesSQLRepository,
     BlogsSQLRepository,
     PostsPostgresRepository,
+    CommentsSQLRepository,
   ],
 })
 export class AppModule {}
