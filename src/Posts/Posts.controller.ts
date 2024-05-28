@@ -31,8 +31,8 @@ import { IsNotEmpty, Length } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
-import { PostsRepository } from './PostsRepository';
 import { CommentSqlRepository } from '../Comment/postgress/Comments.postgress.repository';
+import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
 
 export class ContentClass {
   @Trim()
@@ -45,7 +45,8 @@ export class ContentClass {
 export class PostsController {
   constructor(
     protected serviceComments: CommentsService,
-    protected postsRepository: PostsRepository,
+    // protected postsRepository: PostsRepository,
+    protected postsSQLRepository: PostsPostgresRepository,
     protected postsService: PostsService,
     protected commentsRepository: CommentSqlRepository,
   ) {}
@@ -54,14 +55,15 @@ export class PostsController {
   async getAllPostsInDB(@Query() query: QueryType, @Req() request) {
     const user = request.user;
     const filter = queryFilter(query);
-    return this.postsRepository.getAllPosts(filter, user.userId);
+    return this.postsSQLRepository.getAllPosts(filter, user.userId);
   }
   @UseGuards(SoftAuthGuard)
   @Get(':id')
   @HttpCode(200)
   async getPostByPostId(@Param('id') id: number, @Req() request) {
     const user = request.user;
-    const post = await this.postsRepository.getPostsById(id, user.userId);
+    console.log(user);
+    const post = await this.postsSQLRepository.getPostsById(id, user);
     if (!post) throw new NotFoundException();
     return post;
   }
@@ -147,7 +149,7 @@ export class PostsController {
     @User() userModel: { userId: number },
     @Body() inputLikeStatus: StatusLikes,
   ) {
-    const findPosts = await this.postsRepository.getPostsById(
+    const findPosts = await this.postsSQLRepository.getPostsById(
       id,
       userModel.userId,
     );

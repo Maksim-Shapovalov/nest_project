@@ -43,7 +43,7 @@ export class PostsPostgresRepository {
     };
   }
 
-  async getPostsById(id: number, userId: number) {
+  async getPostsById(id: number, userId: any | null) {
     const findPosts = await this.dataSource.query(
       `SELECT * FROM "Posts" WHERE id = ${id}`,
     );
@@ -51,7 +51,7 @@ export class PostsPostgresRepository {
     if (!findPosts[0]) {
       return null;
     }
-    return this.postsLikeMapper(findPosts[0], userId);
+    return this.postsLikeMapper(findPosts[0], +userId.userId || null);
   }
 
   async getPostInBlogs(
