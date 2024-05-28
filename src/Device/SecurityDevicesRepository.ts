@@ -1,12 +1,11 @@
 import { DevicesUserDB, OutpatModelDevicesUser } from './Type/Device.user';
 import { WithId } from 'mongodb';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import { InjectModel } from '@nestjs/mongoose';
 import { Device, DeviceDocuments } from './Type/DataId.schemas';
 import { Model } from 'mongoose';
 import { RefreshToken, RefreshTokenDocuments } from '../Token/Token.schema';
-@injectable()
+import { Injectable } from '@nestjs/common';
+@Injectable()
 export class SecurityDevicesRepository {
   constructor(
     @InjectModel(Device.name) protected deviceModel: Model<DeviceDocuments>,

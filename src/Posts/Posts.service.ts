@@ -3,18 +3,14 @@ import {
   BodyUpdatingPost,
   PostClass,
 } from './Type/Posts.type';
-import { BlogsRepository } from '../Blogs/Blogs.repository';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import { BlogsSQLRepository } from '../Blogs/postgres/Blogs.postgress.repository';
-import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
 import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
-@injectable()
+import { Injectable } from '@nestjs/common';
+import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
+@Injectable()
 export class PostsService {
   constructor(
     protected postsSQLRepository: PostsPostgresRepository,
-    // protected postsRepository: PostsSQLRepository,
-    protected blogsRepository: BlogsRepository,
     protected blogsSQLRepository: BlogsSQLRepository,
   ) {}
 

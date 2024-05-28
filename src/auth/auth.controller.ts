@@ -5,6 +5,7 @@ import {
   Get,
   Headers,
   HttpCode,
+  Injectable,
   NotFoundException,
   Post,
   Req,
@@ -25,7 +26,7 @@ import {
   UserMongoDbType,
 } from '../Users/Type/User.type';
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
-import { injectable } from 'inversify';
+
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { ObjectId } from 'mongodb';
 import { RefreshTokenRepo } from '../Token/refreshToken-repo';
@@ -33,7 +34,6 @@ import { CustomRequest, TokenRefreshGuard } from '../Token/token-guard';
 import { RefreshToken } from '../Token/Token.schema';
 import { UserSQLRepository } from '../Users/User.SqlRepositories';
 @UseGuards(ThrottlerGuard)
-@injectable()
 @Controller('auth')
 export class AuthController {
   constructor(

@@ -1,12 +1,11 @@
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { DevicesUserDB, OutpatModelDevicesUser } from '../Type/Device.user';
 import { setting } from '../../setting';
 import { JwtService } from '@nestjs/jwt';
 import { deviceMapper } from '../SecurityDevicesRepository';
-@injectable()
+import { Injectable } from '@nestjs/common';
+@Injectable()
 export class SecurityDevicesSQLRepository {
   constructor(
     private jwtService: JwtService,

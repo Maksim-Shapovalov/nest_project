@@ -3,8 +3,6 @@ import {
   UserPaginationQueryType,
 } from '../qurey-repo/query-filter';
 
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import {
@@ -14,6 +12,7 @@ import {
   UserToShow,
 } from './Type/User.type';
 import add from 'date-fns/add';
+import { Injectable } from '@nestjs/common';
 
 type possibleUser = {
   email: string;
@@ -24,7 +23,7 @@ export type newDataUser2 = {
   newSalt: string;
   recoveryCode: string;
 };
-@injectable()
+@Injectable()
 export class UserSQLRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async getAllUsers(

@@ -5,7 +5,7 @@
 // import { DeviceClass } from '../Device/Type/Device.user';
 // import { SecurityDevicesRepository } from '../Device/SecurityDevicesRepository';
 // import { UserToPostsOutputModel } from '../Users/Type/User.type';
-// import { injectable } from 'inversify';
+// import { Injectable } from 'inversify';
 // import { setting } from '../setting';
 //
 // export type PayloadType = {
@@ -18,7 +18,7 @@
 //   iat: number;
 //   exp: number;
 // } | null;
-// @injectable()
+// @Injectable()
 // export class JwtServiceToken {
 //   constructor(
 //     protected refreshTokenRepo: RefreshTokenRepo,

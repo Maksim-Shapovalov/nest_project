@@ -12,11 +12,10 @@ import {
 } from './Type/User.type';
 import { ObjectId, WithId } from 'mongodb';
 import add from 'date-fns/add';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocuments } from './Type/User.schemas';
 import { Model } from 'mongoose';
+import { Injectable } from '@nestjs/common';
 
 type possibleUser = {
   email: string;
@@ -27,7 +26,7 @@ export type newDataUser2 = {
   newSalt: string;
   recoveryCode: string;
 };
-@injectable()
+@Injectable()
 export class UserRepository {
   constructor(
     @InjectModel(User.name) protected userModel: Model<UserDocuments>,

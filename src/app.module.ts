@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { UserController } from './Users/User.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import * as process from 'process';
+
 import { BlogsController } from './Blogs/Blogs.controller';
 import { BlogsRepository } from './Blogs/Blogs.repository';
 import { BlogsService } from './Blogs/Blogs.service';
@@ -27,6 +28,7 @@ import {
   PostLikeSchema,
   PostsSchema,
 } from './Posts/Type/Posts.schemas';
+
 import { AllDataClearController } from './DataClear/all-data-clear.controller';
 import { AllDataClearRepo } from './DataClear/AllDataClearRepo';
 import { ConfigModule } from '@nestjs/config';
@@ -47,7 +49,8 @@ import { SecurityDevicesSQLRepository } from './Device/postgres/SecurityDeviceSQ
 import { BlogsSQLController } from './Blogs/postgres/Blogs.postgress.controller';
 import { BlogsSQLRepository } from './Blogs/postgres/Blogs.postgress.repository';
 import { PostsPostgresRepository } from './Posts/postgres/Posts.postgres.repository';
-import { CommentsSQLRepository } from './Comment/postgress/Comments.postgress.repository';
+import { CommentSqlRepository } from './Comment/postgress/Comments.postgress.repository';
+
 export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,
@@ -101,16 +104,18 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     ]),
   ],
   controllers: [
+    PostsController,
+
     AppController,
     UserController,
     BlogsController,
     CommentsController,
-    PostsController,
     AllDataClearController,
     DeviceController,
     BlogsSQLController,
   ],
   providers: [
+    CommentSqlRepository,
     BlogsRepository,
     BlogsService,
     CommentsService,
@@ -126,7 +131,6 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     SecurityDevicesSQLRepository,
     BlogsSQLRepository,
     PostsPostgresRepository,
-    CommentsSQLRepository,
   ],
 })
 export class AppModule {}

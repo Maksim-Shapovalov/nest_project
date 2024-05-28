@@ -2,8 +2,6 @@ import { PostClass } from './Type/Posts.type';
 import { ObjectId } from 'mongodb';
 import { PaginationQueryType } from '../qurey-repo/query-filter';
 import { BlogsRepository } from '../Blogs/Blogs.repository';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -14,12 +12,12 @@ import {
   PostsDocument,
 } from './Type/Posts.schemas';
 
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { UserRepository } from '../Users/User.repository';
 import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 
-@injectable()
+@Injectable()
 export class PostsRepository {
   constructor(
     protected blogsRepository: BlogsRepository,

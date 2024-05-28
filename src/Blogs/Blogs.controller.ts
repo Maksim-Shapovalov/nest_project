@@ -1,10 +1,8 @@
-import { injectable } from 'inversify';
 import { PostsService } from '../Posts/Posts.service';
 import { BlogsService } from './Blogs.service';
 import { BlogsRepository } from './Blogs.repository';
 import { PostsRepository } from '../Posts/PostsRepository';
 import { queryFilter, searchNameInBlog } from '../qurey-repo/query-filter';
-import 'reflect-metadata';
 import {
   Body,
   Controller,
@@ -23,20 +21,18 @@ import { BodyPostToRequest } from '../Posts/Type/Posts.type';
 import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
-import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { BlogsSQLRepository } from './postgres/Blogs.postgress.repository';
-import { PostsPostgresRepository } from '../Posts/postgres/Posts.postgres.repository';
 
-@injectable()
 @Controller('blogs')
 export class BlogsController {
+  private postsSQLRepository: any;
   constructor(
     protected postsService: PostsService,
     protected blogsService: BlogsService,
     protected blogsRepository: BlogsRepository,
     protected blogsSQLRepository: BlogsSQLRepository,
     protected postsRepository: PostsRepository,
-    protected postsSQLRepository: PostsPostgresRepository,
+    //protected postsSQLRepository: PostsPostgresRepository,
   ) {}
   @Get()
   async getAllBlogs(@Query() query: QueryType) {

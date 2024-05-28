@@ -1,5 +1,3 @@
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import { InjectModel } from '@nestjs/mongoose';
 import { RefreshToken, RefreshTokenDocuments } from './Token.schema';
 import { Model } from 'mongoose';
@@ -9,8 +7,9 @@ import { setting } from '../setting';
 import { JwtService } from '@nestjs/jwt';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 
-@injectable()
+@Injectable()
 export class RefreshTokenRepo {
   constructor(
     private jwtService: JwtService,

@@ -1,11 +1,10 @@
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import {
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
+  Injectable,
   NotFoundException,
   Param,
   Post,
@@ -25,7 +24,6 @@ import { BodyPostToRequest } from '../../Posts/Type/Posts.type';
 import { BlogRequest } from '../Type/Blogs.type';
 import { PostsPostgresRepository } from '../../Posts/postgres/Posts.postgres.repository';
 
-@injectable()
 @UseGuards(BasicAuthGuard)
 @Controller('sa/blogs')
 export class BlogsSQLController {

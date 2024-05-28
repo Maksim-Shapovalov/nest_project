@@ -1,9 +1,7 @@
-import { injectable } from 'inversify';
-import { Controller, Delete, HttpCode } from '@nestjs/common';
+import { Controller, Delete, HttpCode, Injectable } from '@nestjs/common';
 
 import { AllDataClearRepo } from './AllDataClearRepo';
 
-@injectable()
 @Controller('testing/all-data')
 export class AllDataClearController {
   constructor(protected allDataClearRepo: AllDataClearRepo) {}

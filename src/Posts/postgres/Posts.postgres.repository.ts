@@ -1,5 +1,3 @@
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { PaginationQueryType } from '../../qurey-repo/query-filter';
@@ -10,8 +8,9 @@ import {
 } from '../Type/Posts.type';
 import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
 import { UserSQLRepository } from '../../Users/User.SqlRepositories';
+import { Injectable } from '@nestjs/common';
 
-@injectable()
+@Injectable()
 export class PostsPostgresRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,

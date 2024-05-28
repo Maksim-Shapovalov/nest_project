@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
-@injectable()
+import { Injectable } from '@nestjs/common';
+@Injectable()
 export class EmailAdapter {
   async sendEmail(createUser: any, message: string) {
     try {

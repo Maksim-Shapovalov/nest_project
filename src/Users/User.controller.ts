@@ -1,4 +1,3 @@
-import { injectable } from 'inversify';
 import { UserRepository } from './User.repository';
 import { UserService } from './User.service';
 import { searchLogAndEmailInUsers } from '../qurey-repo/query-filter';
@@ -20,7 +19,6 @@ import { UserBasicRequestBody } from './Type/User.type';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { UserSQLRepository } from './User.SqlRepositories';
 
-@injectable()
 @Controller('sa/users')
 export class UserController {
   constructor(

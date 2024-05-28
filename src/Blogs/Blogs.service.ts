@@ -2,24 +2,18 @@ import {
   BlogClass,
   BlogRequest,
   BlogsOutputModel,
-  BlogsType,
   bodyForUpdateBlogs,
 } from './Type/Blogs.type';
-import { WithId } from 'mongodb';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
+
 import {
   blogMapperSQL,
   BlogsSQLRepository,
 } from './postgres/Blogs.postgress.repository';
-import { BlogsRepository } from './Blogs.repository';
+import { Injectable } from '@nestjs/common';
 
-@injectable()
+@Injectable()
 export class BlogsService {
-  constructor(
-    protected blogsRepository: BlogsRepository,
-    protected blogsSQLRepository: BlogsSQLRepository,
-  ) {}
+  constructor(protected blogsSQLRepository: BlogsSQLRepository) {}
   async createNewBlogs(blog: BlogRequest): Promise<BlogsOutputModel> {
     const newBlogs = new BlogClass(
       blog.name,

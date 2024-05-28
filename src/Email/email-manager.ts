@@ -1,7 +1,6 @@
 import { EmailAdapter } from './email-adapter';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
-@injectable()
+import { Injectable } from '@nestjs/common';
+@Injectable()
 export class EmailManager {
   constructor(protected emailAdapter: EmailAdapter) {}
   async sendEmailRecoveryMessage(createUser: any) {

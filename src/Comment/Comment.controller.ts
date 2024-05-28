@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-import { injectable } from 'inversify';
 import { CommentsService } from './Comments.service';
 import {
   Body,
@@ -22,19 +20,28 @@ import { StatusLikes } from '../Posts/Type/Posts.type';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 import { ContentClass } from '../Posts/Posts.controller';
-import { CommentsSQLRepository } from './postgress/Comments.postgress.repository';
+import { CommentSqlRepository } from './postgress/Comments.postgress.repository';
+import { PostsPostgresRepository } from '../Posts/postgres/Posts.postgres.repository';
 
-@injectable()
 @Controller('comments')
 export class CommentsController {
   constructor(
     protected serviceComments: CommentsService,
-    protected commentsSQLRepository: CommentsSQLRepository,
+    protected commentsSQLRepository: CommentSqlRepository,
+    protected postsSQLRepository: PostsPostgresRepository,
   ) {}
   @UseGuards(SoftAuthGuard)
   @Get(':id')
   async getCommentsById(@Param('id') id: number, @Req() request) {
     const user = request.user as NewestPostLike;
+    const findPost = await this.postsSQLRepository.getPostsById(
+      id,
+      user.userId,
+    );
+
+    if (!findPost[0]) {
+      return null;
+    }
     if (!id) throw new NotFoundException();
     const findComments = await this.commentsSQLRepository.getCommentById(
       id,

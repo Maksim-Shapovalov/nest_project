@@ -1,8 +1,7 @@
 import { BlackListModel } from '../Other/blackList-schemas';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
+import { Injectable } from '@nestjs/common';
 
-@injectable()
+@Injectable()
 export class DeletedTokenRepoRepository {
   constructor() {}
   async deletedTokens(token: any) {

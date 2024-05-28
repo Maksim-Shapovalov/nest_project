@@ -1,16 +1,10 @@
-import { SecurityDevicesRepository } from './SecurityDevicesRepository';
-import { ObjectId } from 'mongodb';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import { OutpatModelDevicesUser } from './Type/Device.user';
 import { SecurityDevicesSQLRepository } from './postgres/SecurityDeviceSQLRepository';
+import { Injectable } from '@nestjs/common';
 
-@injectable()
+@Injectable()
 export class SecurityDeviceService {
-  constructor(
-    protected securityDevicesRepo: SecurityDevicesRepository,
-    protected securitySQLDevicesRepo: SecurityDevicesSQLRepository,
-  ) {}
+  constructor(protected securitySQLDevicesRepo: SecurityDevicesSQLRepository) {}
   async getAllDevices(
     userId: number,
   ): Promise<OutpatModelDevicesUser[] | null> {

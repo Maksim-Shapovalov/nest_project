@@ -1,6 +1,5 @@
-import { injectable } from 'inversify';
 import { InjectModel } from '@nestjs/mongoose';
-import 'reflect-metadata';
+
 import {
   Post,
   PostLike,
@@ -20,8 +19,9 @@ import { Device, DeviceDocuments } from '../Device/Type/DataId.schemas';
 import { RefreshToken, RefreshTokenDocuments } from '../Token/Token.schema';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 
-@injectable()
+@Injectable()
 export class AllDataClearRepo {
   constructor(
     @InjectModel(Post.name) protected postModel: Model<PostsDocument>,

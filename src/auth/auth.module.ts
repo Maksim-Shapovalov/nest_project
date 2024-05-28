@@ -21,8 +21,7 @@ import { RefreshToken, TokenRefreshSchema } from '../Token/Token.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserSQLRepository } from '../Users/User.SqlRepositories';
 import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceSQLRepository';
-import process from 'process';
-const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
+// const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 @Module({
   controllers: [AuthController],
   exports: [

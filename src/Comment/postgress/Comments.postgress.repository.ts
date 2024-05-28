@@ -1,39 +1,32 @@
-import { injectable } from 'inversify';
 import { PaginationQueryType } from '../../qurey-repo/query-filter';
+import { InjectDataSource } from '@nestjs/typeorm';
+
 import {
   AvailableStatusEnum,
   CommentsClass,
   CommentsTypeDb,
 } from '../Type/Comment.type';
-import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { PostsPostgresRepository } from '../../Posts/postgres/Posts.postgres.repository';
 
-@injectable()
-export class CommentsSQLRepository {
-  constructor(
-    @InjectDataSource() protected dataSource: DataSource,
-    protected postsPostgresRepository: PostsPostgresRepository,
-  ) {}
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class CommentSqlRepository {
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
+
   async getCommentsInPost(
     postId: number,
     filter: PaginationQueryType,
     userId: number,
   ) {
-    const findPost = await this.postsPostgresRepository.getPostsById(
-      postId,
-      userId,
+    const findComments = await this.dataSource.query(
+      `SELECT COUNT(*) FROM "Comments" WHERE "postId" = ${postId}`,
     );
-
-    if (!findPost[0]) {
-      return null;
-    }
-
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountBlogs = await this.dataSource.query(
       `SELECT COUNT(*) FROM "Comments" WHERE "postId" = ${postId}`,
     );
-    const totalCount = parseInt(findPost[0].count);
+    const totalCount = parseInt(findComments[0].count);
     const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
     const pageComment: number = (filter.pageNumber - 1) * pageSizeInQuery;
 

@@ -1,5 +1,3 @@
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
@@ -12,8 +10,9 @@ import {
   BlogsTypeSQL,
   bodyForUpdateBlogs,
 } from '../Type/Blogs.type';
+import { Injectable } from '@nestjs/common';
 
-@injectable()
+@Injectable()
 export class BlogsSQLRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async getAllBlogs(

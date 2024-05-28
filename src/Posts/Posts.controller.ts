@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-import { injectable } from 'inversify';
 import { PostsService } from './Posts.service';
 import { CommentsService } from '../Comment/Comments.service';
 import { queryFilter } from '../qurey-repo/query-filter';
@@ -31,10 +29,10 @@ import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { Trim } from '../Other/trim-validator';
 import { IsNotEmpty, Length } from 'class-validator';
 import { ObjectId } from 'mongodb';
-import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
-import { AuthGuard } from '@nestjs/passport';
+
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
-import { CommentsSQLRepository } from '../Comment/postgress/Comments.postgress.repository';
+import { PostsRepository } from './PostsRepository';
+import { CommentSqlRepository } from '../Comment/postgress/Comments.postgress.repository';
 
 export class ContentClass {
   @Trim()
@@ -42,15 +40,14 @@ export class ContentClass {
   @Length(20, 300)
   content: string;
 }
-@injectable()
+
 @Controller('posts')
 export class PostsController {
   constructor(
-    protected postsService: PostsService,
-    // protected postsRepository: PostsRepository,
-    protected postsRepository: PostsPostgresRepository,
     protected serviceComments: CommentsService,
-    protected commentsRepository: CommentsSQLRepository,
+    protected postsRepository: PostsRepository,
+    protected postsService: PostsService,
+    protected commentsRepository: CommentSqlRepository,
   ) {}
   @UseGuards(SoftAuthGuard)
   @Get()
@@ -142,7 +139,6 @@ export class PostsController {
       return HttpCode(204);
     }
   }
-  @UseGuards(AuthGuard)
   @UseGuards(BearerAuthGuard)
   @Put(':id/like-status')
   @HttpCode(204)

@@ -1,7 +1,6 @@
-import { injectable } from 'inversify';
 import { SecurityDeviceService } from './SecurityDevice.service';
 import { SecurityDevicesRepository } from './SecurityDevicesRepository';
-import 'reflect-metadata';
+
 import {
   Body,
   Controller,
@@ -9,6 +8,7 @@ import {
   ForbiddenException,
   Get,
   HttpCode,
+  Injectable,
   NotFoundException,
   Param,
   Req,
@@ -18,12 +18,10 @@ import { OutpatModelDevicesUser } from './Type/Device.user';
 import { CustomRequest, TokenRefreshGuard } from '../Token/token-guard';
 import { SecurityDevicesSQLRepository } from './postgres/SecurityDeviceSQLRepository';
 
-@injectable()
 @Controller('security/devices')
 export class DeviceController {
   constructor(
     protected securityDeviceService: SecurityDeviceService,
-    protected securityDevicesRepo: SecurityDevicesRepository,
     protected securitySQLDevicesRepo: SecurityDevicesSQLRepository,
   ) {}
   @UseGuards(TokenRefreshGuard)

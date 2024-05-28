@@ -49,11 +49,11 @@ export class CommentsLike {
 export const CommentsLikeSchema = SchemaFactory.createForClass(CommentsLike);
 
 // const likesSchema = new mongoose.Schema<LikesTypeDb>({
-//     userId: {type: String, required: true},
-//     likeStatus:  {
-//         type: String,
-//         enum: Object.values(AvailableStatusEnum),
-//         required:true
-//     },
-//     commentId: {type: String, required: true},
-// })
+//   userId: { type: String, required: true },
+//   likeStatus: {
+//     type: String,
+//     enum: Object.values(AvailableStatusEnum),
+//     required: true,
+//   },
+//   commentId: { type: String, required: true },
+// });

@@ -4,13 +4,13 @@ import {
   BlogsPaginationQueryType,
   PaginationType,
 } from '../qurey-repo/query-filter';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
+
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Blog, UserDocument } from './Type/Blogs.schemas';
+import { Injectable } from '@nestjs/common';
 
-@injectable()
+@Injectable()
 export class BlogsRepository {
   constructor(
     @InjectModel(Blog.name) protected blogModel: Model<UserDocument>,

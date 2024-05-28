@@ -7,12 +7,10 @@ import {
 import { UserRepository } from './User.repository';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
 import { addHours } from 'date-fns';
-import { UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserSQLRepository, userToPostMapper } from './User.SqlRepositories';
-@injectable()
+@Injectable()
 export class UserService {
   constructor(
     protected userRepository: UserRepository,

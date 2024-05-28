@@ -1,10 +1,10 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
-import { UserService } from './User.service';
-import { UserRepository } from './User.repository';
-import { UserDocuments, UserSchema } from './Type/User.schemas';
-import { UserToShow } from './Type/User.type';
-import { HTTP_STATUS } from '../app.module';
+import { UserService } from '../User.service';
+import { UserRepository } from '../User.repository';
+import { UserDocuments, UserSchema } from '../Type/User.schemas';
+import { UserToShow } from '../Type/User.type';
+import { HTTP_STATUS } from '../../app.module';
 
 describe('integration tests for UserService', () => {
   let mongoServer: MongoMemoryServer;

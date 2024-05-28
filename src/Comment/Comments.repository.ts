@@ -7,7 +7,7 @@
 // import { PaginationQueryType } from '../qurey-repo/query-filter';
 //
 // import { PostsRepository } from '../Posts/PostsRepository';
-// import { injectable } from 'inversify';
+// import { Injectable } from 'inversify';
 // import 'reflect-metadata';
 // import { InjectModel } from '@nestjs/mongoose';
 // import { Model } from 'mongoose';
@@ -19,7 +19,7 @@
 // } from './Type/Comments.schemas';
 // import { NewestPostLike } from '../Users/Type/User.type';
 //
-// @injectable()
+// @Injectable()
 // export class CommentsRepository {
 //   constructor(
 //     protected postsRepository: PostsRepository,
@@ -27,50 +27,51 @@
 //     @InjectModel(CommentsLike.name)
 //     protected commentsLikeModel: Model<CommentsLikeDocument>,
 //   ) {}
-//   async getCommentsInPost(
-//     postId: number,
-//     filter: PaginationQueryType,
-//     user: NewestPostLike,
-//   ) {
-//     const findPost = await this.postsRepository.getPostsById(
-//       postId,
-//       user.userId,
-//     );
-//
-//     if (!findPost) {
-//       return null;
-//     }
-//
-//     const filterQuery = { postId: findPost.id };
-//
-//     const pageSizeInQuery: number = filter.pageSize;
-//     const totalCountBlogs = await this.commentModel.countDocuments(filterQuery);
-//
-//     const pageCountBlogs: number = Math.ceil(totalCountBlogs / pageSizeInQuery);
-//     const pageComment: number = (filter.pageNumber - 1) * pageSizeInQuery;
-//
-//     const res = await this.commentModel
-//       .find(filterQuery)
-//       .sort({ [filter.sortBy]: filter.sortDirection })
-//       .skip(pageComment)
-//       .limit(pageSizeInQuery)
-//       .lean();
-//
-//     const itemsPromises = res.map((c) => this.commentsMapper(c, user.userId));
-//     const items = await Promise.all(itemsPromises);
-//
-//     return {
-//       pagesCount: pageCountBlogs,
-//       page: filter.pageNumber,
-//       pageSize: pageSizeInQuery,
-//       totalCount: totalCountBlogs,
-//       items: items,
-//     };
-//   }
+//   // async getCommentsInPost(
+//   //   postId: number,
+//   //   filter: PaginationQueryType,
+//   //   user: NewestPostLike,
+//   // ) {
+//   //   const findPost = await this.postsRepository.getPostsById(
+//   //     postId,
+//   //     user.userId,
+//   //   );
+//   //
+//   //   if (!findPost) {
+//   //     return null;
+//   //   }
+//   //
+//   //   const filterQuery = { postId: findPost.id };
+//   //
+//   //   const pageSizeInQuery: number = filter.pageSize;
+//   //   const totalCountBlogs = await this.commentModel.countDocuments(filterQuery);
+//   //
+//   //   const pageCountBlogs: number = Math.ceil(totalCountBlogs / pageSizeInQuery);
+//   //   const pageComment: number = (filter.pageNumber - 1) * pageSizeInQuery;
+//   //
+//   //   const res = await this.commentModel
+//   //     .find(filterQuery)
+//   //     .sort({ [filter.sortBy]: filter.sortDirection })
+//   //     .skip(pageComment)
+//   //     .limit(pageSizeInQuery)
+//   //     .lean();
+//   //
+//   //   const itemsPromises = res.map((c) => this.commentsMapper(c, user.userId));
+//   //   const items = await Promise.all(itemsPromises);
+//   //
+//   //   return {
+//   //     pagesCount: pageCountBlogs,
+//   //     page: filter.pageNumber,
+//   //     pageSize: pageSizeInQuery,
+//   //     totalCount: totalCountBlogs,
+//   //     items: items,
+//   //   };
+//   // }
 //
 //   async saveComments(comments: CommentsClass, userId: string) {
 //     const saveComments = await this.commentModel.create(comments);
-//     return this.commentsMapper(saveComments, userId);
+//     // return this.commentsMapper(saveComments, userId);
+//     return { saveComments, userId };
 //   }
 //
 //   async getCommentById(commentId: string, userId: string | null) {
@@ -81,7 +82,8 @@
 //     if (!findComments) {
 //       return null;
 //     }
-//     return this.commentsMapper(findComments, userId);
+//     return { findComments, userId };
+//     // return this.commentsMapper(findComments, userId);
 //   }
 //
 //   async updateCommentsByCommentId(
