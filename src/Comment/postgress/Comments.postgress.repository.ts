@@ -49,13 +49,27 @@ export class CommentSqlRepository {
   }
 
   async saveComments(comments: CommentsClass, userId: number) {
+    console.log(6, comments);
     const randomId = Math.floor(Math.random() * 1000000);
+    console.log(7, randomId);
     const newComments = await this.dataSource
       .query(`INSERT INTO public."Comments"(
      id, content, "userId", "userLogin", "postId", "createdAt")
      VALUES (${randomId}, '${comments.content}', '${comments.commentatorInfo.userId}', '${comments.commentatorInfo.userLogin}', '${comments.postId}', '${comments.createdAt}')
-     RETURN *`);
-    return this.commentsMapper(newComments, userId);
+     RETURNING *`);
+    console.log(newComments, userId);
+    const comment = {
+      id: newComments[0].id,
+      content: newComments[0].content,
+      commentatorInfo: {
+        userId: newComments[0].userId,
+        userLogin: newComments[0].userLogin,
+      },
+      postId: newComments[0].postId,
+      createdAt: newComments[0].createdAt,
+    };
+    console.log(comment);
+    return this.commentsMapper(comment, userId);
   }
 
   async getCommentById(commentId: number, userId: number | null) {
@@ -65,7 +79,7 @@ export class CommentSqlRepository {
     if (!findComments) {
       return null;
     }
-    return this.commentsMapper(findComments, userId);
+    return this.commentsMapper(findComments[0], userId);
   }
 
   async updateCommentsByCommentId(
@@ -127,16 +141,26 @@ export class CommentSqlRepository {
   }
   async commentsMapper(comment: CommentsTypeDb, userId: number | null) {
     const likeCount = await this.dataSource.query(
-      `SELECT * FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}' AND "commentId" = ${comment.id}`,
+      `SELECT COUNT(*) AS likesCount 
+        FROM "Comments-like" 
+        WHERE "likesStatus" = '${AvailableStatusEnum.like}' 
+        AND "commentId" = ${comment.id}`,
     );
 
     const dislikeCount = await this.dataSource.query(
-      `SELECT * FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.dislike}' AND "commentId" = ${comment.id}`,
+      `SELECT COUNT(*) AS likesCount 
+        FROM "Comments-like" 
+        WHERE "likesStatus" = '${AvailableStatusEnum.dislike}' 
+        AND "commentId" = ${comment.id}`,
     );
 
     const myStatus = await this.dataSource.query(
       `SELECT * FROM "Comments-like" WHERE "userId" = ${userId} AND "commentId" = ${comment.id}`,
     );
+    let myStatusValue = 'None';
+    if (myStatus.length > 0) {
+      myStatusValue = myStatus[0].likesStatus;
+    }
 
     return {
       id: comment.id.toString(),
@@ -147,9 +171,11 @@ export class CommentSqlRepository {
       },
       createdAt: comment.createdAt,
       likesInfo: {
-        likesCount: +likeCount[0].likesStatus,
-        dislikesCount: +dislikeCount[0].likesStatus,
-        myStatus: myStatus[0].likesStatus ? myStatus[0].likesStatus : 'None',
+        likesCount: +likeCount[0].likesStatus ? +likeCount[0].likesStatus : 0,
+        dislikesCount: +dislikeCount[0].likesStatus
+          ? +dislikeCount[0].likesStatus
+          : 0,
+        myStatus: myStatusValue,
       },
     };
   }

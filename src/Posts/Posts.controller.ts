@@ -62,7 +62,6 @@ export class PostsController {
   @HttpCode(200)
   async getPostByPostId(@Param('id') id: number, @Req() request) {
     const user = request.user;
-    console.log(user);
     const post = await this.postsSQLRepository.getPostsById(id, user);
     if (!post) throw new NotFoundException();
     return post;
@@ -98,12 +97,15 @@ export class PostsController {
     @Param('id') id: number,
     @Req() request,
   ) {
+    console.log(1);
     const user = request.user as NewestPostLike;
+    console.log(2, user);
     const result = await this.serviceComments.createdNewComments(
       id,
       contentInput.content,
       user,
     );
+    console.log(3);
 
     if (!result) throw new NotFoundException();
 

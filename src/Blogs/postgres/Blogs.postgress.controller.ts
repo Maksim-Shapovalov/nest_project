@@ -72,9 +72,7 @@ export class BlogsSQLController {
     @Req() request,
   ) {
     const user = request.user;
-    console.log(user);
     const findBlog = await this.blogsSQLRepository.getBlogsById(id);
-    console.log(findBlog);
     if (!findBlog) throw new NotFoundException();
     const postBody = {
       title: blogsInputModel.title,
@@ -82,13 +80,11 @@ export class BlogsSQLController {
       content: blogsInputModel.content,
       blogId: id,
     };
-    console.log(postBody);
     const newPost = await this.postsService.createNewPosts(
       postBody,
       id,
       user ? user.userId : null,
     );
-    console.log(newPost);
     if (!newPost) {
       throw new NotFoundException();
     }
