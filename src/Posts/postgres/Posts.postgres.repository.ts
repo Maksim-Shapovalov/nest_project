@@ -174,7 +174,7 @@ export class PostsPostgresRepository {
     );
 
     return {
-      id: post._id.toHexString(),
+      id: post.id.toString(),
       title: post.title,
       shortDescription: post.shortDescription,
       content: post.content,
