@@ -49,15 +49,12 @@ export class CommentSqlRepository {
   }
 
   async saveComments(comments: CommentsClass, userId: number) {
-    console.log(6, comments);
     const randomId = Math.floor(Math.random() * 1000000);
-    console.log(7, randomId);
     const newComments = await this.dataSource
       .query(`INSERT INTO public."Comments"(
      id, content, "userId", "userLogin", "postId", "createdAt")
      VALUES (${randomId}, '${comments.content}', '${comments.commentatorInfo.userId}', '${comments.commentatorInfo.userLogin}', '${comments.postId}', '${comments.createdAt}')
      RETURNING *`);
-    console.log(newComments, userId);
     const comment = {
       id: newComments[0].id,
       content: newComments[0].content,
@@ -68,7 +65,6 @@ export class CommentSqlRepository {
       postId: newComments[0].postId,
       createdAt: newComments[0].createdAt,
     };
-    console.log(comment);
     return this.commentsMapper(comment, userId);
   }
 

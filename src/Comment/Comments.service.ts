@@ -19,7 +19,6 @@ export class CommentsService {
       postId,
       userId.userId,
     );
-    console.log(post, 4);
 
     if (!post) {
       return null;
@@ -34,7 +33,6 @@ export class CommentsService {
       postId,
       new Date().toISOString(),
     );
-    console.log(newComment, 5);
 
     return this.commentsRepository.saveComments(newComment, userId.userId);
   }

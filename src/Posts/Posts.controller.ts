@@ -97,15 +97,12 @@ export class PostsController {
     @Param('id') id: number,
     @Req() request,
   ) {
-    console.log(1);
     const user = request.user as NewestPostLike;
-    console.log(2, user);
     const result = await this.serviceComments.createdNewComments(
       id,
       contentInput.content,
       user,
     );
-    console.log(3);
 
     if (!result) throw new NotFoundException();
 
