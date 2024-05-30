@@ -45,14 +45,15 @@ export class PostsPostgresRepository {
   }
 
   async getPostsById(id: number, user: NewestPostLike | null) {
+    console.log(user);
     const findPosts = await this.dataSource.query(
       `SELECT * FROM "Posts" WHERE id = ${id}`,
     );
 
-    if (!findPosts[0]) {
+    if (findPosts.length === 0) {
       return null;
     }
-    return this.postsLikeMapper(findPosts[0], user.userId || null);
+    return this.postsLikeMapper(findPosts[0], user ? user.userId : null);
   }
 
   async getPostInBlogs(

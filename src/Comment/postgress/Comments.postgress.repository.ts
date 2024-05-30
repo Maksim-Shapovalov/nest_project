@@ -8,7 +8,8 @@ import {
 } from '../Type/Comment.type';
 import { DataSource } from 'typeorm';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { NewestPostLike } from '../../Users/Type/User.type';
 
 @Injectable()
 export class CommentSqlRepository {
@@ -68,14 +69,17 @@ export class CommentSqlRepository {
     return this.commentsMapper(comment, userId);
   }
 
-  async getCommentById(commentId: number, userId: number | null) {
+  async getCommentById(commentId: number, userId: NewestPostLike | null) {
+    console.log(userId, 'userId');
     const findComments = await this.dataSource.query(
       `SELECT * FROM "Comments" WHERE id = ${commentId}`,
     );
-    if (!findComments) {
+    console.log(userId, 'userId');
+    console.log(findComments, 'findComments');
+    if (!findComments[0]) {
       return null;
     }
-    return this.commentsMapper(findComments[0], userId);
+    return this.commentsMapper(findComments[0], userId ? userId.userId : null);
   }
 
   async updateCommentsByCommentId(
@@ -135,7 +139,7 @@ export class CommentSqlRepository {
      WHERE id = ${commentId};`);
     return true;
   }
-  async commentsMapper(comment: CommentsTypeDb, userId: number | null) {
+  async commentsMapper(comment: any, userId: number | null) {
     const likeCount = await this.dataSource.query(
       `SELECT COUNT(*) AS likesCount 
         FROM "Comments-like" 
@@ -162,8 +166,12 @@ export class CommentSqlRepository {
       id: comment.id.toString(),
       content: comment.content,
       commentatorInfo: {
-        userId: comment.commentatorInfo.userId.toString(),
-        userLogin: comment.commentatorInfo.userLogin,
+        userId: comment.commentatorInfo
+          ? comment.commentatorInfo.userId.toString()
+          : comment.userId.toString(),
+        userLogin: comment.commentatorInfo
+          ? comment.commentatorInfo.userLogin
+          : comment.userLogin,
       },
       createdAt: comment.createdAt,
       likesInfo: {

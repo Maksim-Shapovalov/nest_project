@@ -34,16 +34,12 @@ export class CommentsController {
   @Get(':id')
   async getCommentsById(@Param('id') id: number, @Req() request) {
     const user = request.user as NewestPostLike;
-    const findPost = await this.postsSQLRepository.getPostsById(id, user);
-
-    if (!findPost || !findPost[0]) {
-      return null;
-    }
     if (!id) throw new NotFoundException();
     const findComments = await this.commentsSQLRepository.getCommentById(
       id,
-      user ? user.userId : null,
+      user || null,
     );
+    console.log(findComments, 'findComments');
 
     if (!findComments) throw new NotFoundException();
     return findComments;
@@ -59,10 +55,7 @@ export class CommentsController {
     if (!id || !ObjectId.isValid(id)) throw new NotFoundException();
     const user = request.user as NewestPostLike;
     if (!user) throw new NotFoundException();
-    const comment = await this.commentsSQLRepository.getCommentById(
-      id,
-      user.userId,
-    );
+    const comment = await this.commentsSQLRepository.getCommentById(id, user);
     if (!comment) throw new NotFoundException();
 
     if (comment.commentatorInfo.userId !== user.userId.toString())
@@ -82,11 +75,11 @@ export class CommentsController {
   async appropriationLike(
     @Param('id') id: number,
     @Body() inputLikeStatus: StatusLikes,
-    @User() userModel: { userId: number },
+    @User() userModel: NewestPostLike,
   ) {
     const findComments = await this.commentsSQLRepository.getCommentById(
       id,
-      userModel.userId,
+      userModel,
     );
     if (!findComments) throw new NotFoundException();
     const updateComment = await this.serviceComments.updateStatusLikeInUser(
@@ -107,7 +100,7 @@ export class CommentsController {
     if (!id) throw new NotFoundException();
     const comment = await this.commentsSQLRepository.getCommentById(
       id,
-      user.userId,
+      user || null,
     );
     if (!comment) throw new NotFoundException();
 

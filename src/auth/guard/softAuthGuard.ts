@@ -13,7 +13,6 @@ export class SoftAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
-    console.log(token, token);
 
     if (token) {
       try {
@@ -32,8 +31,8 @@ export class SoftAuthGuard implements CanActivate {
       } catch (error) {
         return true;
       }
-    }
-    if (token === undefined) {
+    } else {
+      request.user = null;
       return true;
     }
   }
