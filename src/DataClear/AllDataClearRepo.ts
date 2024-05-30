@@ -49,7 +49,13 @@ export class AllDataClearRepo {
       this.deviceModel.deleteMany({}),
       this.tokenRefreshModel.deleteMany({}),
       this.dataSource.query(
-        `DELETE FROM public."device"; DELETE FROM public."Users"; DELETE FROM public."Posts"; DELETE FROM public."Blogs"`,
+        `DELETE FROM public."device"; 
+        DELETE FROM public."Comments-like"; 
+        DELETE FROM public."Comments"; 
+        DELETE FROM public."Posts-like"; 
+         DELETE FROM public."Posts"; 
+         DELETE FROM public."Blogs";
+          DELETE FROM public."Users";`,
       ),
     ]);
     return true;
