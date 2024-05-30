@@ -162,7 +162,7 @@ export class CommentSqlRepository {
       id: comment.id.toString(),
       content: comment.content,
       commentatorInfo: {
-        userId: comment.commentatorInfo.userId,
+        userId: comment.commentatorInfo.userId.toString(),
         userLogin: comment.commentatorInfo.userLogin,
       },
       createdAt: comment.createdAt,

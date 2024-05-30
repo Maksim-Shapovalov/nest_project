@@ -7,6 +7,7 @@ import { BlogsSQLRepository } from '../Blogs/postgres/Blogs.postgress.repository
 import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 import { Injectable } from '@nestjs/common';
 import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
+import { NewestPostLike } from '../Users/Type/User.type';
 @Injectable()
 export class PostsService {
   constructor(
@@ -39,7 +40,7 @@ export class PostsService {
   }
   async updateStatusLikeInUser(
     postId: number,
-    userID: number,
+    userID: NewestPostLike,
     status: AvailableStatusEnum,
   ) {
     return this.postsSQLRepository.updateStatusLikeUser(postId, userID, status);

@@ -15,10 +15,7 @@ export class CommentsService {
     content: string,
     userId: NewestPostLike,
   ) {
-    const post = await this.postsSQLRepository.getPostsById(
-      postId,
-      userId.userId,
-    );
+    const post = await this.postsSQLRepository.getPostsById(postId, userId);
 
     if (!post) {
       return null;

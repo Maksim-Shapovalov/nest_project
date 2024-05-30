@@ -9,6 +9,7 @@ import {
 import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
 import { UserSQLRepository } from '../../Users/User.SqlRepositories';
 import { Injectable } from '@nestjs/common';
+import { NewestPostLike } from '../../Users/Type/User.type';
 
 @Injectable()
 export class PostsPostgresRepository {
@@ -43,7 +44,7 @@ export class PostsPostgresRepository {
     };
   }
 
-  async getPostsById(id: number, userId: any | null) {
+  async getPostsById(id: number, user: NewestPostLike | null) {
     const findPosts = await this.dataSource.query(
       `SELECT * FROM "Posts" WHERE id = ${id}`,
     );
@@ -51,7 +52,7 @@ export class PostsPostgresRepository {
     if (!findPosts[0]) {
       return null;
     }
-    return this.postsLikeMapper(findPosts[0], +userId.userId || null);
+    return this.postsLikeMapper(findPosts[0], user.userId || null);
   }
 
   async getPostInBlogs(
@@ -90,15 +91,15 @@ export class PostsPostgresRepository {
   }
   async updateStatusLikeUser(
     postId: number,
-    userId: number,
+    user: NewestPostLike,
     status: AvailableStatusEnum,
   ) {
     const randomId = Math.floor(Math.random() * 1000000);
     const likeWithUserId = await this.dataSource.query(
-      `SELECT * FROM "Posts-like" WHERE "postId" = ${postId} AND "userID" = ${userId}`,
+      `SELECT * FROM "Posts-like" WHERE "postId" = ${postId} AND "userID" = ${user.userId}`,
     );
-    const findUser = await this.userSQLRepository.getUserById(userId);
-    const comment = await this.getPostsById(postId, userId);
+    const findUser = await this.userSQLRepository.getUserById(user.userId);
+    const comment = await this.getPostsById(postId, user);
 
     if (!comment) {
       return false;
@@ -107,7 +108,7 @@ export class PostsPostgresRepository {
     if (likeWithUserId[0]) {
       const updateStatus = await this.dataSource.query(
         `UPDATE * FROM "Posts-like" SET "likesStatus"= ${status}
-	      WHERE "postId" = ${postId} AND "userID" = ${userId};`,
+	      WHERE "postId" = ${postId} AND "userID" = ${user.userId};`,
       );
       if (!updateStatus) return null;
 
@@ -115,7 +116,7 @@ export class PostsPostgresRepository {
     } else {
       await this.dataSource.query(`INSERT INTO public."Posts-like"(
         id, "postId", "userId", login, "createdAt", "likesStatus")
-        VALUES (${randomId},${postId}, ${userId}, '${findUser.login}', '${new Date().toISOString()}', '${status}');`);
+        VALUES (${randomId},${postId}, ${user.userId}, '${findUser.login}', '${new Date().toISOString()}', '${status}');`);
       return true;
     }
   }

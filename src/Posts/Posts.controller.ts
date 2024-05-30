@@ -145,17 +145,14 @@ export class PostsController {
   @HttpCode(204)
   async appropriationLike(
     @Param('id') id: number,
-    @User() userModel: { userId: number },
+    @User() userModel: NewestPostLike,
     @Body() inputLikeStatus: StatusLikes,
   ) {
-    const findPosts = await this.postsSQLRepository.getPostsById(
-      id,
-      userModel.userId,
-    );
+    const findPosts = await this.postsSQLRepository.getPostsById(id, userModel);
     if (!findPosts) throw new NotFoundException();
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
-      userModel.userId,
+      userModel,
       inputLikeStatus.likeStatus,
     );
 

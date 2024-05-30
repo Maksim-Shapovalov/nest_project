@@ -13,6 +13,7 @@ export class SoftAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
+    console.log(token, token);
 
     if (token) {
       try {
@@ -20,17 +21,20 @@ export class SoftAuthGuard implements CanActivate {
           token.replace('Bearer ', ''),
           { secret: setting.JWT_SECRET },
         );
+        console.log(decodedToken);
         const userId = decodedToken.userId;
 
         const user = await this.userSQLRepository.getUserById(userId);
-        if (user) {
+        console.log(user);
+        if (user[0]) {
           request.user = UserDbType.UserInReqMapper(user[0]);
         }
       } catch (error) {
         return true;
       }
     }
-
-    return true;
+    if (token === undefined) {
+      return true;
+    }
   }
 }
