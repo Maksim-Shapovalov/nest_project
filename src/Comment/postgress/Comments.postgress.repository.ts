@@ -94,8 +94,8 @@ export class CommentSqlRepository {
     }
 
     await this.dataSource.query(`UPDATE public."Comments"
-    SET "content"= '${content}',
-      WHERE id = ${commentId};
+    SET "content"= '${content}'
+      WHERE id = ${commentId}
       RETURNING *`);
     return true;
   }
