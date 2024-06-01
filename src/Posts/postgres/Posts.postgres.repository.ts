@@ -97,7 +97,7 @@ export class PostsPostgresRepository {
   ) {
     const randomId = Math.floor(Math.random() * 1000000);
     const likeWithUserId = await this.dataSource.query(
-      `SELECT * FROM "Posts-like" WHERE "postId" = ${postId} AND "userID" = ${user.userId}`,
+      `SELECT * FROM "Posts-like" WHERE "postId" = ${postId} AND "userId" = ${user.userId}`,
     );
     const findUser = await this.userSQLRepository.getUserById(user.userId);
     const comment = await this.getPostsById(postId, user);
@@ -109,7 +109,7 @@ export class PostsPostgresRepository {
     if (likeWithUserId[0]) {
       const updateStatus = await this.dataSource.query(
         `UPDATE * FROM "Posts-like" SET "likesStatus"= ${status}
-	      WHERE "postId" = ${postId} AND "userID" = ${user.userId};`,
+	      WHERE "postId" = ${postId} AND "userId" = ${user.userId};`,
       );
       if (!updateStatus) return null;
 

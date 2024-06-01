@@ -18,7 +18,7 @@ export class CommentSqlRepository {
   async getCommentsInPost(
     postId: number,
     filter: PaginationQueryType,
-    userId: number,
+    userId: NewestPostLike | null,
   ) {
     const findComments = await this.dataSource.query(
       `SELECT COUNT(*) FROM "Comments" WHERE "postId" = ${postId}`,
@@ -37,7 +37,9 @@ export class CommentSqlRepository {
       ${pageSizeInQuery} OFFSET ${pageComment}`,
     );
 
-    const itemsPromises = result.map((c) => this.commentsMapper(c, userId));
+    const itemsPromises = result.map((c) =>
+      this.commentsMapper(c, userId ? userId.userId : null),
+    );
     const items = await Promise.all(itemsPromises);
 
     return {

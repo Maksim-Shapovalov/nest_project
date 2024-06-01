@@ -80,7 +80,6 @@ export type LastThreeLikeUserInPost = [
   },
 ];
 export class StatusLikes {
-  @Trim()
   @IsEnum(AvailableStatusEnum)
   likeStatus: AvailableStatusEnum;
 }
