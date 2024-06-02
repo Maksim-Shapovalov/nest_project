@@ -43,6 +43,8 @@ export class PostsService {
     user: NewestPostLike,
     status: AvailableStatusEnum,
   ) {
+    const findPosts = await this.postsSQLRepository.getPostsById(postId, user);
+    if (!findPosts) return null;
     return this.postsSQLRepository.updateStatusLikeUser(postId, user, status);
   }
 

@@ -28,7 +28,6 @@ import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { Trim } from '../Other/trim-validator';
 import { IsNotEmpty, Length } from 'class-validator';
-import { ObjectId } from 'mongodb';
 
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 import { CommentSqlRepository } from '../Comment/postgress/Comments.postgress.repository';
@@ -82,7 +81,6 @@ export class PostsController {
       filter,
       user || null,
     );
-    console.log(result);
     if (!result) {
       throw new NotFoundException();
     }
@@ -140,6 +138,7 @@ export class PostsController {
     }
   }
   @UseGuards(BearerAuthGuard)
+  // @UseGuards(SoftAuthGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
@@ -147,8 +146,6 @@ export class PostsController {
     @User() userModel: NewestPostLike,
     @Body() inputLikeStatus: StatusLikes,
   ) {
-    const findPosts = await this.postsSQLRepository.getPostsById(id, userModel);
-    if (!findPosts) throw new NotFoundException();
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
       userModel,
