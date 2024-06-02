@@ -58,15 +58,20 @@ export class PostsController {
     const filter = queryFilter(query);
     return this.postsSQLRepository.getAllPosts(filter, user.userId);
   }
-  @UseGuards(SoftAuthGuard)
+  // @UseGuards(SoftAuthGuard)
+  //@Req() request
+  @UseGuards(BearerAuthGuard)
   @Get(':id')
   @HttpCode(200)
-  async getPostByPostId(@Param('id') id: number, @Req() request) {
-    const user = request.user;
-    const post = await this.postsSQLRepository.getPostsById(id, user);
+  async getPostByPostId(
+    @Param('id') id: number,
+    @User() userModel: NewestPostLike,
+  ) {
+    const post = await this.postsSQLRepository.getPostsById(id, userModel);
     if (!post) throw new NotFoundException();
     return post;
   }
+
   @UseGuards(SoftAuthGuard)
   @Get(':id/comments')
   @HttpCode(200)
