@@ -139,24 +139,25 @@ export class PostsController {
       return HttpCode(204);
     }
   }
-  @UseGuards(BearerAuthGuard)
-  // @UseGuards(SoftAuthGuard)
+  // @UseGuards(BearerAuthGuard)
+  @UseGuards(SoftAuthGuard)
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
     @Param('id') id: number,
-    @User() userModel: NewestPostLike,
-    // @Req() request,
+    // @User() userModel: NewestPostLike,
+    @Req() request,
     @Body() inputLikeStatus: StatusLikes,
   ) {
-    if (!userModel) {
+    const user = request.user as NewestPostLike;
+    if (!user) {
       return 'None';
     }
-    // const user = request.user as NewestPostLike;
+
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
       inputLikeStatus.likeStatus,
-      userModel || null,
+      user || null,
     );
 
     if (!updateComment) throw new NotFoundException();
