@@ -74,12 +74,9 @@ export class CommentSqlRepository {
   }
 
   async getCommentById(commentId: number, userId: NewestPostLike | null) {
-    console.log(userId, 'userId');
     const findComments = await this.dataSource.query(
       `SELECT * FROM "Comments" WHERE id = ${commentId}`,
     );
-    console.log(userId, 'userId');
-    console.log(findComments, 'findComments');
     if (!findComments[0]) {
       return null;
     }

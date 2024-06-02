@@ -40,12 +40,19 @@ export class PostsService {
   }
   async updateStatusLikeInUser(
     postId: number,
-    user: NewestPostLike,
     status: AvailableStatusEnum,
+    user: NewestPostLike | null,
   ) {
-    const findPosts = await this.postsSQLRepository.getPostsById(postId, user);
+    const findPosts = await this.postsSQLRepository.getPostsById(
+      postId,
+      user || null,
+    );
     if (!findPosts) return null;
-    return this.postsSQLRepository.updateStatusLikeUser(postId, user, status);
+    return this.postsSQLRepository.updateStatusLikeUser(
+      postId,
+      user || null,
+      status,
+    );
   }
 
   async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {
