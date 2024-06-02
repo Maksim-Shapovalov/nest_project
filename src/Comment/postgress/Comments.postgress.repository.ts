@@ -24,9 +24,9 @@ export class CommentSqlRepository {
       `SELECT COUNT(*) FROM "Comments" WHERE "postId" = ${postId}`,
     );
     const pageSizeInQuery: number = filter.pageSize;
-    const totalCountBlogs = await this.dataSource.query(
-      `SELECT COUNT(*) FROM "Comments" WHERE "postId" = ${postId}`,
-    );
+    // const totalCountBlogs = await this.dataSource.query(
+    //   `SELECT COUNT(*) FROM "Comments" WHERE "postId" = ${postId}`,
+    // );
     const totalCount = parseInt(findComments[0].count);
     const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
     const pageComment: number = (filter.pageNumber - 1) * pageSizeInQuery;
