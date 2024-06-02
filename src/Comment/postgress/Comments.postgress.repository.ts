@@ -32,7 +32,7 @@ export class CommentSqlRepository {
     const pageComment: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
     const result = await this.dataSource.query(
-      `SELECT * FROM "Comments" 
+      `SELECT * FROM "Comments" WHERE "postId" = ${postId}
       ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT 
       ${pageSizeInQuery} OFFSET ${pageComment}`,
     );
