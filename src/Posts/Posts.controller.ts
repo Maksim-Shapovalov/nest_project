@@ -60,7 +60,7 @@ export class PostsController {
   }
   // @UseGuards(SoftAuthGuard)
   //@Req() request
-  @UseGuards(BearerAuthGuard)
+  @UseGuards(SoftAuthGuard)
   @Get(':id')
   @HttpCode(200)
   async getPostByPostId(
