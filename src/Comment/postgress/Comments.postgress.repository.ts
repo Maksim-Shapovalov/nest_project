@@ -46,7 +46,7 @@ export class CommentSqlRepository {
       pagesCount: pageCountBlogs,
       page: filter.pageNumber,
       pageSize: pageSizeInQuery,
-      totalCount: totalCountBlogs,
+      totalCount: totalCount,
       items: items,
     };
   }
