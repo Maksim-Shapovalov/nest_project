@@ -32,6 +32,7 @@ import { IsNotEmpty, Length } from 'class-validator';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 import { CommentSqlRepository } from '../Comment/postgress/Comments.postgress.repository';
 import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
+import { UserSQLRepository } from '../Users/User.SqlRepositories';
 
 export class ContentClass {
   @Trim()
@@ -48,6 +49,7 @@ export class PostsController {
     protected postsSQLRepository: PostsPostgresRepository,
     protected postsService: PostsService,
     protected commentsRepository: CommentSqlRepository,
+    protected userSQLRepository: UserSQLRepository,
   ) {}
   @UseGuards(SoftAuthGuard)
   @Get()
@@ -143,15 +145,18 @@ export class PostsController {
   @HttpCode(204)
   async appropriationLike(
     @Param('id') id: number,
-    // @User() userModel: NewestPostLike,
-    @Req() request,
+    @User() userModel: NewestPostLike,
+    // @Req() request,
     @Body() inputLikeStatus: StatusLikes,
   ) {
-    const user = request.user as NewestPostLike;
+    if (!userModel) {
+      return 'None';
+    }
+    // const user = request.user as NewestPostLike;
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
       inputLikeStatus.likeStatus,
-      user || null,
+      userModel || null,
     );
 
     if (!updateComment) throw new NotFoundException();

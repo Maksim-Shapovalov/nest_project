@@ -1,14 +1,11 @@
 import { SecurityDeviceService } from './SecurityDevice.service';
-import { SecurityDevicesRepository } from './SecurityDevicesRepository';
 
 import {
-  Body,
   Controller,
   Delete,
   ForbiddenException,
   Get,
   HttpCode,
-  Injectable,
   NotFoundException,
   Param,
   Req,

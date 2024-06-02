@@ -20,11 +20,9 @@ export class SoftAuthGuard implements CanActivate {
           token.replace('Bearer ', ''),
           { secret: setting.JWT_SECRET },
         );
-        console.log(decodedToken);
         const userId = decodedToken.userId;
 
         const user = await this.userSQLRepository.getUserById(userId);
-        console.log(user);
         if (user[0]) {
           request.user = UserDbType.UserInReqMapper(user[0]);
         }

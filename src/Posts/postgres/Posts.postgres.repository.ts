@@ -98,6 +98,8 @@ export class PostsPostgresRepository {
       `SELECT * FROM "Posts-like" WHERE "postId" = ${postId} AND "userId" = ${user ? user.userId : null}`,
     );
     const findUser = await this.userSQLRepository.getUserById(user.userId);
+    if (!findUser[0]) {
+    }
     const comment = await this.getPostsById(postId, user);
 
     if (!comment) {
