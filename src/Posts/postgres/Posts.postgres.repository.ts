@@ -191,7 +191,8 @@ export class PostsPostgresRepository {
       blogName: post.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: likesCount?.[0]?.likesCount ?? 0, //+likeCount
+        likesCount: +likesCount[0].likesStatus ? +likesCount[0].likesStatus : 0,
+        //likesCount?.[0]?.likesCount ?? 0, //+likeCount
         dislikesCount: dislikesCount?.[0]?.dislikesCount ?? 0, //+dislikeCount
         myStatus: myStatus?.[0]?.likesStatus ?? 'None', //myStatus ? myStatus.likesStatus : 'None'
         newestLikes: findThreeLastUser.map((r) => ({
