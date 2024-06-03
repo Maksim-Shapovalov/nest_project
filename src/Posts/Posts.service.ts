@@ -48,11 +48,13 @@ export class PostsService {
       user || null,
     );
     if (!findPosts) return null;
-    return this.postsSQLRepository.updateStatusLikeUser(
+    const post = await this.postsSQLRepository.updateStatusLikeUser(
       postId,
       user || null,
       status,
     );
+    console.log(post);
+    return post;
   }
 
   async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {

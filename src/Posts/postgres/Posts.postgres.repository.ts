@@ -101,19 +101,18 @@ export class PostsPostgresRepository {
     if (!findUser[0]) {
     }
     const comment = await this.getPostsById(postId, user);
-
     if (!comment) {
       return false;
     }
-
     if (likeWithUserId[0]) {
       const updateStatus = await this.dataSource.query(
-        `UPDATE * FROM "Posts-like" SET "likesStatus"= '${status}'
-	      WHERE "postId" = ${postId} AND "userId" = ${user ? user.userId : null};`,
+        `UPDATE public."Posts-like" SET "likesStatus"= '${status}'
+	      WHERE "postId" = ${postId} AND "userId" = ${user ? user.userId : null}
+	      RETURNING *`,
       );
       if (!updateStatus) return null;
 
-      return updateStatus.matchedCount === 1;
+      return updateStatus[0];
     } else {
       const randomId = Math.floor(Math.random() * 1000000);
       await this.dataSource.query(`INSERT INTO public."Posts-like"(
@@ -167,8 +166,13 @@ export class PostsPostgresRepository {
     let myStatus;
     if (userId) {
       likesCount = await this.dataSource.query(
-        `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Posts-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "postId" = ${post.id} AND "userId" = ${userId}`,
+        `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Posts-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "postId" = ${post.id}`,
       );
+      //"userId" = ${userId ? userId : null}
+      console.log(likesCount);
+      console.log(likesCount);
+      console.log(likesCount[0], 'console.log(likesCount);');
+      console.log(likesCount, 'console.log(likesCount);');
       dislikesCount = await this.dataSource.query(
         `SELECT COALESCE(COUNT(*), 0)::int as dislikesCount FROM "Posts-like" WHERE  "likesStatus" = '${AvailableStatusEnum.dislike}' AND "postId" = ${post.id} AND "userId" = ${userId}`,
       );
@@ -191,7 +195,7 @@ export class PostsPostgresRepository {
       blogName: post.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: +likesCount[0].likesStatus ? +likesCount[0].likesStatus : 0,
+        likesCount: likesCount?.[0]?.likescount ?? 0, //+likeCount
         //likesCount?.[0]?.likesCount ?? 0, //+likeCount
         dislikesCount: dislikesCount?.[0]?.dislikesCount ?? 0, //+dislikeCount
         myStatus: myStatus?.[0]?.likesStatus ?? 'None', //myStatus ? myStatus.likesStatus : 'None'
