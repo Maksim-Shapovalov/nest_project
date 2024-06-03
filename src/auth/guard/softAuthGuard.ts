@@ -16,15 +16,18 @@ export class SoftAuthGuard implements CanActivate {
 
     if (token) {
       try {
+        console.log(1);
         const decodedToken = this.jwtService.verify(
           token.replace('Bearer ', ''),
           { secret: setting.JWT_SECRET },
         );
         const userId = decodedToken.userId;
-
+        console.log(2);
         const user = await this.userSQLRepository.getUserById(userId);
-        if (user[0]) {
-          request.user = UserDbType.UserInReqMapper(user[0]);
+        console.log(3, user);
+        if (user) {
+          request.user = UserDbType.UserInReqMapper(user);
+          return true;
         }
       } catch (error) {
         return true;

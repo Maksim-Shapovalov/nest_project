@@ -56,7 +56,7 @@ export class PostsController {
   async getAllPostsInDB(@Query() query: QueryType, @Req() request) {
     const user = request.user;
     const filter = queryFilter(query);
-    return this.postsSQLRepository.getAllPosts(filter, user.userId);
+    return this.postsSQLRepository.getAllPosts(filter, user?.userId);
   }
   // @UseGuards(SoftAuthGuard)
   //@Req() request
