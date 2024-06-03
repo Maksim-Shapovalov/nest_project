@@ -196,7 +196,7 @@ export class PostsPostgresRepository {
         myStatus: myStatus?.[0]?.likesStatus ?? 'None', //myStatus ? myStatus.likesStatus : 'None'
         newestLikes: findThreeLastUser.map((r) => ({
           addedAt: r.createdAt,
-          userId: r.userId,
+          userId: r.userId.toString(),
           login: r.login,
         })), //findThreeLastUser.map(UserDbType.UserInReqMapper)
       },
