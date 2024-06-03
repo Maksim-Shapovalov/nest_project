@@ -169,12 +169,8 @@ export class PostsPostgresRepository {
         `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Posts-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "postId" = ${post.id}`,
       );
       //"userId" = ${userId ? userId : null}
-      console.log(likesCount);
-      console.log(likesCount);
-      console.log(likesCount[0], 'console.log(likesCount);');
-      console.log(likesCount, 'console.log(likesCount);');
       dislikesCount = await this.dataSource.query(
-        `SELECT COALESCE(COUNT(*), 0)::int as dislikesCount FROM "Posts-like" WHERE  "likesStatus" = '${AvailableStatusEnum.dislike}' AND "postId" = ${post.id} AND "userId" = ${userId}`,
+        `SELECT COALESCE(COUNT(*), 0)::int as dislikesCount FROM "Posts-like" WHERE  "likesStatus" = '${AvailableStatusEnum.dislike}' AND "postId" = ${post.id}`,
       );
 
       myStatus = await this.dataSource.query(
@@ -183,7 +179,7 @@ export class PostsPostgresRepository {
     }
 
     const findThreeLastUser = await this.dataSource.query(
-      `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "likesStatus" = '${AvailableStatusEnum.like}' ORDER BY "createdAt" DESC LIMIT 3 `,
+      `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "likesStatus" = '${AvailableStatusEnum.like}' ORDER BY "createdAt" ASC LIMIT 3 `,
     );
 
     return {
