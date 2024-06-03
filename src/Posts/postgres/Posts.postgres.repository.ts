@@ -162,16 +162,22 @@ export class PostsPostgresRepository {
   }
 
   async postsLikeMapper(post: any, userId: number | null) {
-    const likeCount = await this.dataSource.query(
-      `SELECT COUNT(*) FROM "Posts-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "postId" = ${post.id} AND "userId" = ${userId}`,
-    );
-    const dislikeCount = await this.dataSource.query(
-      `SELECT * FROM "Posts-like" WHERE  "likesStatus" = '${AvailableStatusEnum.dislike}' AND "postId" = ${post.id} AND "userId" = ${userId}`,
-    );
+    let likesCount;
+    let dislikesCount;
+    let myStatus;
+    if (userId) {
+      likesCount = await this.dataSource.query(
+        `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Posts-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "postId" = ${post.id} AND "userId" = ${userId}`,
+      );
+      dislikesCount = await this.dataSource.query(
+        `SELECT COALESCE(COUNT(*), 0)::int as dislikesCount FROM "Posts-like" WHERE  "likesStatus" = '${AvailableStatusEnum.dislike}' AND "postId" = ${post.id} AND "userId" = ${userId}`,
+      );
 
-    const myStatus = await this.dataSource.query(
-      `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "userId" = ${userId}`,
-    );
+      myStatus = await this.dataSource.query(
+        `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "userId" = ${userId}`,
+      );
+    }
+
     const findThreeLastUser = await this.dataSource.query(
       `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "likesStatus" = '${AvailableStatusEnum.like}' ORDER BY "createdAt" DESC LIMIT 3 `,
     );
@@ -185,9 +191,9 @@ export class PostsPostgresRepository {
       blogName: post.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: +likeCount[0], //+likeCount
-        dislikesCount: +dislikeCount[0], //+dislikeCount
-        myStatus: myStatus ? myStatus.likesStatus : 'None', //myStatus ? myStatus.likesStatus : 'None'
+        likesCount: likesCount?.[0]?.likesCount ?? 0, //+likeCount
+        dislikesCount: dislikesCount?.[0]?.dislikesCount ?? 0, //+dislikeCount
+        myStatus: myStatus?.[0]?.likesStatus ?? 'None', //myStatus ? myStatus.likesStatus : 'None'
         newestLikes: findThreeLastUser.map((r) => ({
           addedAt: r.createdAt,
           userId: r.userId,
