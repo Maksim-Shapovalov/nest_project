@@ -22,17 +22,19 @@ import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { BlogsSQLRepository } from './postgres/Blogs.postgress.repository';
+import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
+import { User } from '../auth/guard/authGuard';
+import { NewestPostLike } from '../Users/Type/User.type';
+import { PostsPostgresRepository } from '../Posts/postgres/Posts.postgres.repository';
 
 @Controller('blogs')
 export class BlogsController {
-  private postsSQLRepository: any;
   constructor(
     protected postsService: PostsService,
     protected blogsService: BlogsService,
     protected blogsRepository: BlogsRepository,
     protected blogsSQLRepository: BlogsSQLRepository,
-    protected postsRepository: PostsRepository,
-    //protected postsSQLRepository: PostsPostgresRepository,
+    protected postsSQLRepository: PostsPostgresRepository,
   ) {}
   @Get()
   async getAllBlogs(@Query() query: QueryType) {
@@ -49,13 +51,18 @@ export class BlogsController {
     }
   }
   //
+  @UseGuards(SoftAuthGuard)
   @Get(':id/posts')
-  async getPostsByBlogId(@Param('id') id: number, @Query() query: QueryType) {
+  async getPostsByBlogId(
+    @Param('id') id: number,
+    @Query() query: QueryType,
+    @User() userModel: NewestPostLike,
+  ) {
     const filter = queryFilter(query);
     const result = await this.postsSQLRepository.getPostInBlogs(
       id,
       filter,
-      null,
+      userModel,
     );
     if (!result) {
       throw new NotFoundException();

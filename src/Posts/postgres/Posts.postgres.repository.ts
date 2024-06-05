@@ -58,7 +58,7 @@ export class PostsPostgresRepository {
   async getPostInBlogs(
     blogId: number,
     filter: PaginationQueryType,
-    userId: number,
+    userId: NewestPostLike | null,
   ) {
     const totalCountPosts = await this.dataSource.query(
       `SELECT COUNT(*) FROM "Posts" WHERE "blogId" = ${blogId}`,
@@ -77,7 +77,7 @@ export class PostsPostgresRepository {
     );
     // const items = res.map((p) => postsLikeMapper(p,null))
     const itemsPromises = result.map((p) => {
-      return this.postsLikeMapper(p, userId);
+      return this.postsLikeMapper(p, userId ? userId.userId : null);
     });
     const items = await Promise.all(itemsPromises);
 
