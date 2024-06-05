@@ -168,10 +168,12 @@ export class PostsPostgresRepository {
       likesCount = await this.dataSource.query(
         `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Posts-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "postId" = ${post.id}`,
       );
+      console.log(likesCount);
       //"userId" = ${userId ? userId : null}
       dislikesCount = await this.dataSource.query(
         `SELECT COALESCE(COUNT(*), 0)::int as dislikesCount FROM "Posts-like" WHERE  "likesStatus" = '${AvailableStatusEnum.dislike}' AND "postId" = ${post.id}`,
       );
+      console.log(dislikesCount);
 
       myStatus = await this.dataSource.query(
         `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "userId" = ${userId}`,
@@ -179,7 +181,7 @@ export class PostsPostgresRepository {
     }
 
     const findThreeLastUser = await this.dataSource.query(
-      `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "likesStatus" = '${AvailableStatusEnum.like}' ORDER BY "createdAt" ASC LIMIT 3 `,
+      `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "likesStatus" = '${AvailableStatusEnum.like}' ORDER BY "createdAt" DESC LIMIT 3 `,
     );
 
     return {
@@ -193,7 +195,8 @@ export class PostsPostgresRepository {
       extendedLikesInfo: {
         likesCount: likesCount?.[0]?.likescount ?? 0, //+likeCount
         //likesCount?.[0]?.likesCount ?? 0, //+likeCount
-        dislikesCount: dislikesCount?.[0]?.dislikesCount ?? 0, //+dislikeCount
+        dislikesCount: dislikesCount?.[0]?.dislikescount ?? 0, //+dislikeCount
+        // dislikesCount: dislikesCount?.[0]?.dislikesCount ?? 0, //+dislikeCount
         myStatus: myStatus?.[0]?.likesStatus ?? 'None', //myStatus ? myStatus.likesStatus : 'None'
         newestLikes: findThreeLastUser.map((r) => ({
           addedAt: r.createdAt,
