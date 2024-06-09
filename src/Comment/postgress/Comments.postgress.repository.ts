@@ -80,13 +80,6 @@ export class CommentSqlRepository {
     if (!findComments[0]) {
       return null;
     }
-    console.log(findComments);
-    console.log(
-      this.commentsMapper(findComments[0], userId ? userId.userId : null),
-    );
-    console.log(
-      'this.commentsMapper(findComments[0], userId ? userId.userId : null',
-    );
     return this.commentsMapper(findComments[0], userId ? userId.userId : null);
   }
 
@@ -157,6 +150,7 @@ export class CommentSqlRepository {
     const likeCount = await this.dataSource.query(
       `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "commentId" = ${comment.id}`,
     );
+    console.log(likeCount);
     const dislikeCount = await this.dataSource.query(
       `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.dislike}'AND "commentId" = ${comment.id}`,
     );
@@ -179,8 +173,8 @@ export class CommentSqlRepository {
       },
       createdAt: comment.createdAt,
       likesInfo: {
-        likesCount: likeCount?.[0]?.likeCount ?? 0,
-        dislikesCount: dislikeCount?.[0]?.dislikeCount ?? 0,
+        likesCount: likeCount?.[0]?.likescount ?? 0,
+        dislikesCount: dislikeCount?.[0]?.dislikescount ?? 0,
         myStatus: myStatus?.[0]?.likesStatus ?? 'None',
       },
     };

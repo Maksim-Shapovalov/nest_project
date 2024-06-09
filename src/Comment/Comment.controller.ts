@@ -39,7 +39,6 @@ export class CommentsController {
       id,
       user || null,
     );
-    console.log(findComments, 'findComments');
 
     if (!findComments) throw new NotFoundException();
     return findComments;
