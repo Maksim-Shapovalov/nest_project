@@ -151,17 +151,16 @@ export class CommentSqlRepository {
     return true;
   }
   async commentsMapper(comment: any, userId: number | null) {
-    let likeCount;
-    let dislikeCount;
+    // let likeCount;
+    // let dislikeCount;
     let myStatus;
+    const likeCount = await this.dataSource.query(
+      `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "commentId" = ${comment.id}`,
+    );
+    const dislikeCount = await this.dataSource.query(
+      `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.dislike}'AND "commentId" = ${comment.id}`,
+    );
     if (userId) {
-      likeCount = await this.dataSource.query(
-        `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "commentId" = ${comment.id}`,
-      );
-      dislikeCount = await this.dataSource.query(
-        `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.dislike}'AND "commentId" = ${comment.id}`,
-      );
-
       myStatus = await this.dataSource.query(
         `SELECT * FROM "Comments-like" WHERE "userId" = ${userId} AND "commentId" = ${comment.id}`,
       );
