@@ -168,12 +168,10 @@ export class PostsPostgresRepository {
       likesCount = await this.dataSource.query(
         `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Posts-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "postId" = ${post.id}`,
       );
-      console.log(likesCount);
       //"userId" = ${userId ? userId : null}
       dislikesCount = await this.dataSource.query(
         `SELECT COALESCE(COUNT(*), 0)::int as dislikesCount FROM "Posts-like" WHERE  "likesStatus" = '${AvailableStatusEnum.dislike}' AND "postId" = ${post.id}`,
       );
-      console.log(dislikesCount);
 
       myStatus = await this.dataSource.query(
         `SELECT * FROM "Posts-like" WHERE "postId" = ${post.id} AND "userId" = ${userId}`,

@@ -143,26 +143,21 @@ export class CommentSqlRepository {
     return true;
   }
   async commentsMapper(comment: any, userId: number | null) {
-    const likeCount = await this.dataSource.query(
-      `SELECT COUNT(*) AS likesCount 
-        FROM "Comments-like" 
-        WHERE "likesStatus" = '${AvailableStatusEnum.like}' 
-        AND "commentId" = ${comment.id}`,
-    );
+    let likeCount;
+    let dislikeCount;
+    let myStatus;
+    if (userId) {
+      likeCount = await this.dataSource.query(
+        `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "commentId" = ${comment.id}`,
+      );
 
-    const dislikeCount = await this.dataSource.query(
-      `SELECT COUNT(*) AS likesCount 
-        FROM "Comments-like" 
-        WHERE "likesStatus" = '${AvailableStatusEnum.dislike}' 
-        AND "commentId" = ${comment.id}`,
-    );
+      dislikeCount = await this.dataSource.query(
+        `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.dislike}'AND "commentId" = ${comment.id}`,
+      );
 
-    const myStatus = await this.dataSource.query(
-      `SELECT * FROM "Comments-like" WHERE "userId" = ${userId} AND "commentId" = ${comment.id}`,
-    );
-    let myStatusValue = 'None';
-    if (myStatus.length > 0) {
-      myStatusValue = myStatus[0].likesStatus;
+      myStatus = await this.dataSource.query(
+        `SELECT * FROM "Comments-like" WHERE "userId" = ${userId} AND "commentId" = ${comment.id}`,
+      );
     }
 
     return {
@@ -178,11 +173,9 @@ export class CommentSqlRepository {
       },
       createdAt: comment.createdAt,
       likesInfo: {
-        likesCount: +likeCount[0].likesStatus ? +likeCount[0].likesStatus : 0,
-        dislikesCount: +dislikeCount[0].likesStatus
-          ? +dislikeCount[0].likesStatus
-          : 0,
-        myStatus: myStatusValue,
+        likesCount: likeCount?.[0]?.likeCount ?? 0,
+        dislikesCount: dislikeCount?.[0]?.dislikeCount ?? 0,
+        myStatus: myStatus?.[0]?.likesStatus ?? 'None',
       },
     };
   }
