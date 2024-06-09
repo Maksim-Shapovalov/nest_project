@@ -80,6 +80,13 @@ export class CommentSqlRepository {
     if (!findComments[0]) {
       return null;
     }
+    console.log(findComments);
+    console.log(
+      this.commentsMapper(findComments[0], userId ? userId.userId : null),
+    );
+    console.log(
+      'this.commentsMapper(findComments[0], userId ? userId.userId : null',
+    );
     return this.commentsMapper(findComments[0], userId ? userId.userId : null);
   }
 
@@ -117,7 +124,7 @@ export class CommentSqlRepository {
       return false;
     }
 
-    if (likeWithUserId) {
+    if (likeWithUserId[0]) {
       const updateStatus = await this.dataSource
         .query(`UPDATE public."Comments-like"
       SET "likesStatus"= '${status}'
@@ -128,10 +135,11 @@ export class CommentSqlRepository {
       return true;
     } else {
       const randomId = Math.floor(Math.random() * 1000000);
+      console.log(3);
 
       await this.dataSource.query(`INSERT INTO public."Comments-like"(
       id, "commentId", "userId", "likesStatus")
-      VALUES (${randomId}, ${commentId}, ${userId}, ${status});`);
+      VALUES (${randomId}, ${commentId}, ${userId}, '${status}');`);
 
       return true;
     }
@@ -150,7 +158,6 @@ export class CommentSqlRepository {
       likeCount = await this.dataSource.query(
         `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "commentId" = ${comment.id}`,
       );
-
       dislikeCount = await this.dataSource.query(
         `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.dislike}'AND "commentId" = ${comment.id}`,
       );
