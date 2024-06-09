@@ -154,6 +154,7 @@ export class CommentSqlRepository {
     const dislikeCount = await this.dataSource.query(
       `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.dislike}'AND "commentId" = ${comment.id}`,
     );
+    console.log(dislikeCount, 'dislike');
     if (userId) {
       myStatus = await this.dataSource.query(
         `SELECT * FROM "Comments-like" WHERE "userId" = ${userId} AND "commentId" = ${comment.id}`,
@@ -174,7 +175,7 @@ export class CommentSqlRepository {
       createdAt: comment.createdAt,
       likesInfo: {
         likesCount: likeCount?.[0]?.likescount ?? 0,
-        dislikesCount: dislikeCount?.[0]?.dislikescount ?? 0,
+        dislikesCount: dislikeCount?.[0]?.likescount ?? 0,
         myStatus: myStatus?.[0]?.likesStatus ?? 'None',
       },
     };
