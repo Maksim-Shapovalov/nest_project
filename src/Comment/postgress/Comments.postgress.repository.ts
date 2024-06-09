@@ -118,10 +118,12 @@ export class CommentSqlRepository {
     }
 
     if (likeWithUserId) {
-      await this.dataSource.query(`UPDATE public."Comments-like"
-      SET "likesStatus"= '${status}',
-      WHERE "commentId" = ${commentId} AND "userId" = ${userId};
+      const updateStatus = await this.dataSource
+        .query(`UPDATE public."Comments-like"
+      SET "likesStatus"= '${status}'
+      WHERE "commentId" = ${commentId} AND "userId" = ${userId}
       RETURNING *`);
+      if (!updateStatus) return null;
 
       return true;
     } else {
