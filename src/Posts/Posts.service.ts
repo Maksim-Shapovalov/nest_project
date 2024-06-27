@@ -3,16 +3,16 @@ import {
   BodyUpdatingPost,
   PostClass,
 } from './Type/Posts.type';
-import { BlogsSQLRepository } from '../Blogs/postgres/Blogs.postgress.repository';
 import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 import { Injectable } from '@nestjs/common';
-import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
 import { NewestPostLike } from '../Users/Type/User.type';
+import { PostsPostgresTypeOrmRepository } from './TypeOrm/Posts.repo.TypeOrm';
+import { BlogsSQLTypeOrmRepository } from '../Blogs/TypeOrm/Blogs.repo.TypeOrm';
 @Injectable()
 export class PostsService {
   constructor(
-    protected postsSQLRepository: PostsPostgresRepository,
-    protected blogsSQLRepository: BlogsSQLRepository,
+    protected postsSQLRepository: PostsPostgresTypeOrmRepository,
+    protected blogsSQLRepository: BlogsSQLTypeOrmRepository,
   ) {}
 
   async createNewPosts(

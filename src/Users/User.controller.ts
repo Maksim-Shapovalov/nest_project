@@ -17,12 +17,12 @@ import {
 import { QueryType } from '../Other/Query.Type';
 import { UserBasicRequestBody } from './Type/User.type';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
-import { UserSQLRepository } from './postgres/User.SqlRepositories';
+import { UserSQLTypeOrmRepository } from './TypeORM/User.repo.TypeORm';
 
 @Controller('sa/users')
 export class UserController {
   constructor(
-    protected userSQLRepository: UserSQLRepository,
+    protected userSQLRepository: UserSQLTypeOrmRepository,
     protected userRepository: UserRepository,
     protected serviceUser: UserService,
   ) {}

@@ -21,6 +21,8 @@ import { RefreshToken, TokenRefreshSchema } from '../Token/Token.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserSQLRepository } from '../Users/postgres/User.SqlRepositories';
 import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceSQLRepository';
+import { UserSQLTypeOrmRepository } from '../Users/TypeORM/User.repo.TypeORm';
+import { SecurityDevicesSQLTypeOrmRepository } from '../Device/TypeOrm/Device.repo.TypeOrm';
 // const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 @Module({
   controllers: [AuthController],
@@ -53,6 +55,7 @@ import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceS
   providers: [
     UserService,
     SecurityDevicesRepository,
+    SecurityDevicesSQLTypeOrmRepository,
     SecurityDeviceService,
     DeletedTokenRepoRepository,
     UserRepository,
@@ -65,6 +68,7 @@ import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceS
     JwtStrategy,
     UserSQLRepository,
     SecurityDevicesSQLRepository,
+    UserSQLTypeOrmRepository,
   ],
 })
 export class AuthModule {}

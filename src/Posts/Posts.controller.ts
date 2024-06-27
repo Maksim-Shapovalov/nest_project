@@ -28,11 +28,9 @@ import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { Trim } from '../Other/trim-validator';
 import { IsNotEmpty, Length } from 'class-validator';
-
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
-import { CommentSqlRepository } from '../Comment/postgress/Comments.postgress.repository';
-import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
-import { UserSQLRepository } from '../Users/postgres/User.SqlRepositories';
+import { CommentSqlTypeOrmRepository } from '../Comment/TypeOrm/Comments.repo.TypeOrm';
+import { PostsPostgresTypeOrmRepository } from './TypeOrm/Posts.repo.TypeOrm';
 
 export class ContentClass {
   @Trim()
@@ -45,11 +43,9 @@ export class ContentClass {
 export class PostsController {
   constructor(
     protected serviceComments: CommentsService,
-    // protected postsRepository: PostsRepository,
-    protected postsSQLRepository: PostsPostgresRepository,
+    protected postsSQLRepository: PostsPostgresTypeOrmRepository,
     protected postsService: PostsService,
-    protected commentsRepository: CommentSqlRepository,
-    protected userSQLRepository: UserSQLRepository,
+    protected commentsRepository: CommentSqlTypeOrmRepository,
   ) {}
   @UseGuards(SoftAuthGuard)
   @Get()

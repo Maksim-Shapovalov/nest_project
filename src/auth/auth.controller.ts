@@ -15,32 +15,27 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
-import { userMapper, UserRepository } from '../Users/User.repository';
-import { DeletedTokenRepoRepository } from '../Token/deletedTokenRepo-repository';
+import { UserRepository } from '../Users/User.repository';
 import { UserService } from '../Users/User.service';
-import { BearerGuard, User } from './guard/authGuard';
+import { BearerGuard } from './guard/authGuard';
 import {
   FindUserByRecoveryCode,
   NewestPostLike,
   UserBasicRequestBody,
-  UserMongoDbType,
 } from '../Users/Type/User.type';
 import { SecurityDeviceService } from '../Device/SecurityDevice.service';
 
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { ObjectId } from 'mongodb';
 import { RefreshTokenRepo } from '../Token/refreshToken-repo';
 import { CustomRequest, TokenRefreshGuard } from '../Token/token-guard';
-import { RefreshToken } from '../Token/Token.schema';
-import { UserSQLRepository } from '../Users/postgres/User.SqlRepositories';
+import { UserSQLTypeOrmRepository } from '../Users/TypeORM/User.repo.TypeORm';
 @UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController {
   constructor(
     protected authService: AuthService,
     protected serviceUser: UserService,
-    protected userRepository: UserRepository,
-    protected userSQLRepository: UserSQLRepository,
+    protected userSQLRepository: UserSQLTypeOrmRepository,
     protected securityDeviceService: SecurityDeviceService,
     protected refreshTokenRepo: RefreshTokenRepo,
   ) {}

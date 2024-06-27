@@ -58,7 +58,11 @@ import {
   CommentLikeEntity,
 } from './Comment/Type/Comment.entity';
 import { DeviceEntity } from './Device/Type/Device.entity';
-import { UserSQLTypeOrmRepository } from './Users/TypeORM/User.service.TypeORm';
+import { UserSQLTypeOrmRepository } from './Users/TypeORM/User.repo.TypeORm';
+import { BlogsSQLTypeOrmRepository } from './Blogs/TypeOrm/Blogs.repo.TypeOrm';
+import { PostsPostgresTypeOrmRepository } from './Posts/TypeOrm/Posts.repo.TypeOrm';
+import { CommentSqlTypeOrmRepository } from './Comment/TypeOrm/Comments.repo.TypeOrm';
+import { SecurityDevicesSQLTypeOrmRepository } from './Device/TypeOrm/Device.repo.TypeOrm';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -134,6 +138,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
   ],
   providers: [
     CommentSqlRepository,
+    CommentSqlTypeOrmRepository,
     BlogsRepository,
     BlogsService,
     CommentsService,
@@ -147,8 +152,11 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
     CustomBlogIdValidation,
     UserSQLRepository,
     SecurityDevicesSQLRepository,
+    SecurityDevicesSQLTypeOrmRepository,
     BlogsSQLRepository,
+    BlogsSQLTypeOrmRepository,
     PostsPostgresRepository,
+    PostsPostgresTypeOrmRepository,
     UserSQLTypeOrmRepository,
   ],
 })

@@ -2,13 +2,13 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { setting } from '../../setting';
 import { UserDbType } from '../../Users/Type/User.type';
-import { UserSQLRepository } from '../../Users/postgres/User.SqlRepositories';
+import { UserSQLTypeOrmRepository } from '../../Users/TypeORM/User.repo.TypeORm';
 
 @Injectable()
 export class SoftAuthGuard implements CanActivate {
   constructor(
     protected jwtService: JwtService,
-    protected userSQLRepository: UserSQLRepository,
+    protected userSQLRepository: UserSQLTypeOrmRepository,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();

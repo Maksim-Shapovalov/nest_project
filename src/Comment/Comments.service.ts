@@ -1,14 +1,14 @@
 import { AvailableStatusEnum, CommentsClass } from './Type/Comment.type';
 import { Injectable } from '@nestjs/common';
 import { NewestPostLike } from '../Users/Type/User.type';
-import { PostsPostgresRepository } from '../Posts/postgres/Posts.postgres.repository';
-import { CommentSqlRepository } from './postgress/Comments.postgress.repository';
+import { CommentSqlTypeOrmRepository } from './TypeOrm/Comments.repo.TypeOrm';
+import { PostsPostgresTypeOrmRepository } from '../Posts/TypeOrm/Posts.repo.TypeOrm';
 
 @Injectable()
 export class CommentsService {
   constructor(
-    protected postsSQLRepository: PostsPostgresRepository,
-    protected commentsRepository: CommentSqlRepository,
+    protected postsSQLRepository: PostsPostgresTypeOrmRepository,
+    protected commentsRepository: CommentSqlTypeOrmRepository,
   ) {}
   async createdNewComments(
     postId: number,

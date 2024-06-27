@@ -20,15 +20,13 @@ import { StatusLikes } from '../Posts/Type/Posts.type';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 import { ContentClass } from '../Posts/Posts.controller';
-import { CommentSqlRepository } from './postgress/Comments.postgress.repository';
-import { PostsPostgresRepository } from '../Posts/postgres/Posts.postgres.repository';
+import { CommentSqlTypeOrmRepository } from './TypeOrm/Comments.repo.TypeOrm';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
     protected serviceComments: CommentsService,
-    protected commentsSQLRepository: CommentSqlRepository,
-    protected postsSQLRepository: PostsPostgresRepository,
+    protected commentsSQLRepository: CommentSqlTypeOrmRepository,
   ) {}
   @UseGuards(SoftAuthGuard)
   @Get(':id')

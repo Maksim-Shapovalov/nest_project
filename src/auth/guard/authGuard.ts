@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { setting } from '../../setting';
 import { UserDbType } from '../../Users/Type/User.type';
 import { UserSQLRepository } from '../../Users/postgres/User.SqlRepositories';
+import { UserSQLTypeOrmRepository } from '../../Users/TypeORM/User.repo.TypeORm';
 
 export const User = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
@@ -22,7 +23,7 @@ export const User = createParamDecorator(
 export class BearerGuard implements CanActivate {
   constructor(
     protected jwtService: JwtService,
-    protected userSQLRepository: UserSQLRepository,
+    protected userSQLRepository: UserSQLTypeOrmRepository,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();

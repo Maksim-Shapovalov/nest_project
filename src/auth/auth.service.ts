@@ -9,20 +9,16 @@ import { v4 as uuidv4 } from 'uuid';
 import { RefreshTokenRepo } from '../Token/refreshToken-repo';
 import { setting } from '../setting';
 import { JwtService } from '@nestjs/jwt';
-import jwt from 'jsonwebtoken';
 import {
   FindUserByRecoveryCode,
   UserOutputModel,
-  UserToPostsOutputModel,
 } from '../Users/Type/User.type';
-import { SecurityDevicesRepository } from '../Device/SecurityDevicesRepository';
 import { randomUUID } from 'crypto';
-import { newDataUser2, UserRepository } from '../Users/User.repository';
+import { newDataUser2 } from '../Users/User.repository';
 import { EmailManager } from '../Email/email-manager';
 import bcrypt from 'bcrypt';
-import { PayloadTypeRefresh } from '../Token/refreshToken-type';
-import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceSQLRepository';
-import { UserSQLRepository } from '../Users/postgres/User.SqlRepositories';
+import { SecurityDevicesSQLTypeOrmRepository } from '../Device/TypeOrm/Device.repo.TypeOrm';
+import { UserSQLTypeOrmRepository } from '../Users/TypeORM/User.repo.TypeORm';
 
 @Injectable()
 export class AuthService {
@@ -30,10 +26,8 @@ export class AuthService {
     private usersService: UserService,
     private refreshTokenRepo: RefreshTokenRepo,
     private jwtService: JwtService,
-    protected deviceRepo: SecurityDevicesRepository,
-    protected deviceSQLRepo: SecurityDevicesSQLRepository,
-    protected userRepository: UserRepository,
-    protected userSQLRepository: UserSQLRepository,
+    protected deviceSQLRepo: SecurityDevicesSQLTypeOrmRepository,
+    protected userSQLRepository: UserSQLTypeOrmRepository,
     protected emailManager: EmailManager,
   ) {}
 

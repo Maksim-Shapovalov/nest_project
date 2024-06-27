@@ -5,15 +5,13 @@ import {
   bodyForUpdateBlogs,
 } from './Type/Blogs.type';
 
-import {
-  blogMapperSQL,
-  BlogsSQLRepository,
-} from './postgres/Blogs.postgress.repository';
+import { blogMapperSQL } from './postgres/Blogs.postgress.repository';
 import { Injectable } from '@nestjs/common';
+import { BlogsSQLTypeOrmRepository } from './TypeOrm/Blogs.repo.TypeOrm';
 
 @Injectable()
 export class BlogsService {
-  constructor(protected blogsSQLRepository: BlogsSQLRepository) {}
+  constructor(protected blogsSQLRepository: BlogsSQLTypeOrmRepository) {}
   async createNewBlogs(blog: BlogRequest): Promise<BlogsOutputModel> {
     const newBlogs = new BlogClass(
       blog.name,

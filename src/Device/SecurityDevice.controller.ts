@@ -13,13 +13,13 @@ import {
 } from '@nestjs/common';
 import { OutpatModelDevicesUser } from './Type/Device.user';
 import { CustomRequest, TokenRefreshGuard } from '../Token/token-guard';
-import { SecurityDevicesSQLRepository } from './postgres/SecurityDeviceSQLRepository';
+import { SecurityDevicesSQLTypeOrmRepository } from './TypeOrm/Device.repo.TypeOrm';
 
 @Controller('security/devices')
 export class DeviceController {
   constructor(
     protected securityDeviceService: SecurityDeviceService,
-    protected securitySQLDevicesRepo: SecurityDevicesSQLRepository,
+    protected securitySQLDevicesRepo: SecurityDevicesSQLTypeOrmRepository,
   ) {}
   @UseGuards(TokenRefreshGuard)
   @Get()

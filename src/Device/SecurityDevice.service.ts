@@ -1,10 +1,12 @@
 import { OutpatModelDevicesUser } from './Type/Device.user';
-import { SecurityDevicesSQLRepository } from './postgres/SecurityDeviceSQLRepository';
 import { Injectable } from '@nestjs/common';
+import { SecurityDevicesSQLTypeOrmRepository } from './TypeOrm/Device.repo.TypeOrm';
 
 @Injectable()
 export class SecurityDeviceService {
-  constructor(protected securitySQLDevicesRepo: SecurityDevicesSQLRepository) {}
+  constructor(
+    protected securitySQLDevicesRepo: SecurityDevicesSQLTypeOrmRepository,
+  ) {}
   async getAllDevices(
     userId: number,
   ): Promise<OutpatModelDevicesUser[] | null> {

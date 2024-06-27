@@ -21,11 +21,11 @@ import { BodyPostToRequest } from '../Posts/Type/Posts.type';
 import { BlogRequest } from './Type/Blogs.type';
 import { QueryType } from '../Other/Query.Type';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
-import { BlogsSQLRepository } from './postgres/Blogs.postgress.repository';
 import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { User } from '../auth/guard/authGuard';
 import { NewestPostLike } from '../Users/Type/User.type';
-import { PostsPostgresRepository } from '../Posts/postgres/Posts.postgres.repository';
+import { BlogsSQLTypeOrmRepository } from './TypeOrm/Blogs.repo.TypeOrm';
+import { PostsPostgresTypeOrmRepository } from '../Posts/TypeOrm/Posts.repo.TypeOrm';
 
 @Controller('blogs')
 export class BlogsController {
@@ -33,8 +33,8 @@ export class BlogsController {
     protected postsService: PostsService,
     protected blogsService: BlogsService,
     protected blogsRepository: BlogsRepository,
-    protected blogsSQLRepository: BlogsSQLRepository,
-    protected postsSQLRepository: PostsPostgresRepository,
+    protected blogsSQLRepository: BlogsSQLTypeOrmRepository,
+    protected postsSQLRepository: PostsPostgresTypeOrmRepository,
   ) {}
   @Get()
   async getAllBlogs(@Query() query: QueryType) {

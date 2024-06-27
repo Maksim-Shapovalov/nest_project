@@ -4,19 +4,15 @@ import {
   UserOutputModel,
   UserToShow,
 } from './Type/User.type';
-import { UserRepository } from './User.repository';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { addHours } from 'date-fns';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { userToPostMapper } from './postgres/User.SqlRepositories';
-import { UserSQLTypeOrmRepository } from './TypeORM/User.service.TypeORm';
+import { UserSQLTypeOrmRepository } from './TypeORM/User.repo.TypeORm';
 @Injectable()
 export class UserService {
-  constructor(
-    protected userRepository: UserRepository,
-    protected userSQLRepository: UserSQLTypeOrmRepository,
-  ) {}
+  constructor(protected userSQLRepository: UserSQLTypeOrmRepository) {}
   async getNewUser(user: UserBasicRequestBody): Promise<UserToShow> {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(user.password, passwordSalt);
