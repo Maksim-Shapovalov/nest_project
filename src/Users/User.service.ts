@@ -9,12 +9,13 @@ import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { addHours } from 'date-fns';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserSQLRepository, userToPostMapper } from './User.SqlRepositories';
+import { userToPostMapper } from './postgres/User.SqlRepositories';
+import { UserSQLTypeOrmRepository } from './TypeORM/User.service.TypeORm';
 @Injectable()
 export class UserService {
   constructor(
     protected userRepository: UserRepository,
-    protected userSQLRepository: UserSQLRepository,
+    protected userSQLRepository: UserSQLTypeOrmRepository,
   ) {}
   async getNewUser(user: UserBasicRequestBody): Promise<UserToShow> {
     const passwordSalt = await bcrypt.genSalt(10);
@@ -44,9 +45,9 @@ export class UserService {
   async _generateHash(password: string, salt: string) {
     return bcrypt.hash(password, salt);
   }
-  async findOneUserByUserName(userName: string) {
-    return this.userRepository.findByLoginOrEmail(userName);
-  }
+  // async findOneUserByUserName(userName: string) {
+  //   return this.userRepository.findByLoginOrEmail(userName);
+  // }
   async checkCredentials(
     loginOrEmail: string,
     password: string,

@@ -3,7 +3,6 @@ import {
   UserPaginationQueryType,
 } from '../qurey-repo/query-filter';
 import {
-  EmailConfirmations,
   FindUserByRecoveryCode,
   UserDbType,
   UserMongoDbType,

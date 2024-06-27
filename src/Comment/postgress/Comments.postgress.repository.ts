@@ -128,7 +128,6 @@ export class CommentSqlRepository {
       return true;
     } else {
       const randomId = Math.floor(Math.random() * 1000000);
-      console.log(3);
 
       await this.dataSource.query(`INSERT INTO public."Comments-like"(
       id, "commentId", "userId", "likesStatus")
@@ -150,11 +149,9 @@ export class CommentSqlRepository {
     const likeCount = await this.dataSource.query(
       `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "commentId" = ${comment.id}`,
     );
-    console.log(likeCount);
     const dislikeCount = await this.dataSource.query(
       `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "Comments-like" WHERE "likesStatus" = '${AvailableStatusEnum.dislike}'AND "commentId" = ${comment.id}`,
     );
-    console.log(dislikeCount, 'dislike');
     if (userId) {
       myStatus = await this.dataSource.query(
         `SELECT * FROM "Comments-like" WHERE "userId" = ${userId} AND "commentId" = ${comment.id}`,

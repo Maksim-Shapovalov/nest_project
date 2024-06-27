@@ -1,7 +1,7 @@
 import {
   PaginationType,
   UserPaginationQueryType,
-} from '../qurey-repo/query-filter';
+} from '../../qurey-repo/query-filter';
 
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -10,7 +10,7 @@ import {
   UserDbType,
   UserOutputModel,
   UserToShow,
-} from './Type/User.type';
+} from '../Type/User.type';
 import add from 'date-fns/add';
 import { Injectable } from '@nestjs/common';
 
@@ -24,7 +24,7 @@ export type newDataUser2 = {
   recoveryCode: string;
 };
 @Injectable()
-export class UserSQLRepository {
+export class UserSQLTypeOrmRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async getAllUsers(
     filter: UserPaginationQueryType,
@@ -33,14 +33,14 @@ export class UserSQLRepository {
     const searchEmailTerm = filter.searchEmailTerm;
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountUsersQuery = await this.dataSource.query(
-      `SELECT COUNT(*) FROM "Users" WHERE LOWER("login") LIKE LOWER('%${searchLoginTerm}%') OR LOWER("email") LIKE LOWER('%${searchEmailTerm}%')`,
+      `SELECT COUNT(*) FROM "user_entity" WHERE LOWER("login") LIKE LOWER('%${searchLoginTerm}%') OR LOWER("email") LIKE LOWER('%${searchEmailTerm}%')`,
     );
     const totalCount = parseInt(totalCountUsersQuery[0].count);
     const pageCountUsers: number = Math.ceil(totalCount / pageSizeInQuery);
     const pageOffset: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
     const result = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE LOWER("login") LIKE LOWER('%${searchLoginTerm}%') OR LOWER("email") LIKE LOWER('%${searchEmailTerm}%') ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT ${pageSizeInQuery} OFFSET ${pageOffset}`,
+      `SELECT * FROM "user_entity" WHERE LOWER("login") LIKE LOWER('%${searchLoginTerm}%') OR LOWER("email") LIKE LOWER('%${searchEmailTerm}%') ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT ${pageSizeInQuery} OFFSET ${pageOffset}`,
     );
 
     const items = result.map((u) => userToPostMapper(u));
@@ -55,7 +55,7 @@ export class UserSQLRepository {
   }
   async getUserById(id: number): Promise<FindUserByRecoveryCode | null> {
     const getUserQuery = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE id = ${id}`,
+      `SELECT * FROM "user_entity" WHERE id = ${id}`,
     );
     if (getUserQuery.length === 0) {
       return null;
@@ -66,7 +66,7 @@ export class UserSQLRepository {
     return user;
   }
   async getUserByIdWithMapper(id: string): Promise<UserOutputModel | null> {
-    const getUserQuery = 'SELECT * FROM "Users" WHERE id = $1';
+    const getUserQuery = 'SELECT * FROM "user_entity" WHERE id = $1';
     const getUserValues = [id];
     const result = await this.dataSource
       .query(getUserQuery, getUserValues)
@@ -83,7 +83,7 @@ export class UserSQLRepository {
   }
   async findUsersByCode(codeUser: string): Promise<FindUserByRecoveryCode> {
     const getUsersQuery = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE "confirmationCode" = '${codeUser}'`,
+      `SELECT * FROM "user_entity" WHERE "confirmationCode" = '${codeUser}'`,
     );
     if (getUsersQuery.length === 0) {
       return null;
@@ -94,7 +94,7 @@ export class UserSQLRepository {
   }
   async getUserByCode(codeUser: string): Promise<boolean> {
     await this.dataSource.query(`
-      UPDATE "Users" SET "isConfirmed" = true WHERE "confirmationCode" = '${codeUser}'`);
+      UPDATE "user_entity" SET "isConfirmed" = true WHERE "confirmationCode" = '${codeUser}'`);
 
     return true;
   }
@@ -103,7 +103,7 @@ export class UserSQLRepository {
     loginOrEmail: string,
   ): Promise<FindUserByRecoveryCode> {
     const findUserQuery = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE "login" = '${loginOrEmail}' OR "email" = '${loginOrEmail}'`,
+      `SELECT * FROM "user_entity" WHERE "login" = '${loginOrEmail}' OR "email" = '${loginOrEmail}'`,
     );
 
     if (findUserQuery.length === 0) {
@@ -120,7 +120,7 @@ export class UserSQLRepository {
     email: string,
   ): Promise<FindUserByRecoveryCode> {
     const findUserQuery = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE login = '${login}' OR email = '${email}'`,
+      `SELECT * FROM "user_entity" WHERE login = '${login}' OR email = '${email}'`,
     );
 
     if (findUserQuery.length === 0) {
@@ -137,7 +137,7 @@ export class UserSQLRepository {
     email: string,
   ): Promise<FindUserByRecoveryCode> {
     const findUserQuery = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE login = '${login}' AND email = '${email}'`,
+      `SELECT * FROM "user_entity" WHERE login = '${login}' AND email = '${email}'`,
     );
 
     if (findUserQuery.length === 0) {
@@ -152,7 +152,7 @@ export class UserSQLRepository {
 
   async findByEmailAndAddRecoveryCode(possibleUser: possibleUser) {
     const updateUserQuery = await this.dataSource.query(
-      `UPDATE "Users" SET recovery_code = ${possibleUser.recoveryCode} WHERE email = ${possibleUser.email}`,
+      `UPDATE "user_entity" SET recovery_code = ${possibleUser.recoveryCode} WHERE email = ${possibleUser.email}`,
     );
 
     if (!updateUserQuery) return false;
@@ -162,7 +162,8 @@ export class UserSQLRepository {
   async findUserByCodeInValidation(
     code: string | null,
   ): Promise<UserOutputModel | null> {
-    const findUserQuery = 'SELECT * FROM "Users" WHERE recovery_code = $1';
+    const findUserQuery =
+      'SELECT * FROM "user_entity" WHERE recovery_code = $1';
     const findUserValues = [code];
     const result = await this.dataSource
       .query(findUserQuery, findUserValues)
@@ -180,7 +181,7 @@ export class UserSQLRepository {
 
   async findUserByRecoveryCode(newDataUser: newDataUser2) {
     const findUserQuery = await this.dataSource.query(
-      `UPDATE "Users" SET "passwordHash" = '${newDataUser.newPassword}', "passwordSalt" = '${newDataUser.newSalt}' WHERE "recoveryCode" = '${newDataUser.recoveryCode}' RETURNING *`,
+      `UPDATE "user_entity" SET "passwordHash" = '${newDataUser.newPassword}', "passwordSalt" = '${newDataUser.newSalt}' WHERE "recoveryCode" = '${newDataUser.recoveryCode}' RETURNING *`,
     );
 
     if (findUserQuery.length === 0) {
@@ -203,13 +204,13 @@ export class UserSQLRepository {
     }).toISOString();
 
     await this.dataSource.query(`
-    UPDATE "Users"
+    UPDATE "user_entity"
     SET "confirmationCode" = '${info.confirmationCode}', "expirationDate" = '${expirationDate}'
     WHERE "email" = '${userEmail}'
     RETURNING * `);
 
     const findUserQuery = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE "email" = '${userEmail}'`,
+      `SELECT * FROM "user_entity" WHERE "email" = '${userEmail}'`,
     );
 
     if (findUserQuery.length === 0) {
@@ -230,11 +231,11 @@ export class UserSQLRepository {
   // }
   async deleteUserById(userId: number): Promise<boolean> {
     const findUserInDB = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE id = ${userId}`,
+      `SELECT * FROM "user_entity" WHERE id = ${userId}`,
     );
     if (!findUserInDB[0]) return false;
     const user = await this.dataSource.query(
-      `DELETE FROM public."Users" WHERE "id" = ${userId} ;`,
+      `DELETE FROM public."user_entity" WHERE "id" = ${userId} ;`,
     );
     if (user[1] > 0) return true;
   }
@@ -242,7 +243,7 @@ export class UserSQLRepository {
   async saveUser(user: UserDbType): Promise<UserToShow> {
     const randomId = Math.floor(Math.random() * 1000000);
     const saveUserQuery = `
-    INSERT INTO public."Users"(
+    INSERT INTO public."user_entity"(
     id, login, email, "passwordHash", "passwordSalt", "createdAt", "confirmationCode",
      "expirationDate", "isConfirmed", "recoveryCode")
     VALUES (${randomId},

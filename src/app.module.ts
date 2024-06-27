@@ -43,13 +43,22 @@ import { EmailManager } from './Email/email-manager';
 import { EmailAdapter } from './Email/email-adapter';
 import { CustomBlogIdValidation } from './Posts/validation/BlogExists.decorator';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { UserSQLRepository } from './Users/User.SqlRepositories';
+import { UserSQLRepository } from './Users/postgres/User.SqlRepositories';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SecurityDevicesSQLRepository } from './Device/postgres/SecurityDeviceSQLRepository';
 import { BlogsSQLController } from './Blogs/postgres/Blogs.postgress.controller';
 import { BlogsSQLRepository } from './Blogs/postgres/Blogs.postgress.repository';
 import { PostsPostgresRepository } from './Posts/postgres/Posts.postgres.repository';
 import { CommentSqlRepository } from './Comment/postgress/Comments.postgress.repository';
+import { UserEntity } from './Users/Type/User.entity';
+import { PostsEntity, PostsLikeEntity } from './Posts/Type/Posts.entity';
+import { BlogsEntity } from './Blogs/Type/Blogs.entity';
+import {
+  CommentEntity,
+  CommentLikeEntity,
+} from './Comment/Type/Comment.entity';
+import { DeviceEntity } from './Device/Type/Device.entity';
+import { UserSQLTypeOrmRepository } from './Users/TypeORM/User.service.TypeORm';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -61,7 +70,7 @@ export const HTTP_STATUS = {
   NOT_FOUND_404: 404,
   TOO_MANY_REQUESTS_429: 429,
 };
-const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
 
 @Module({
   imports: [
@@ -73,11 +82,20 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
       port: 5432,
       username: PGUSER,
       password: PGPASSWORD,
-      database: PGDATABASE,
-      autoLoadEntities: false,
-      synchronize: false,
+      database: PGDATABASE2,
+      autoLoadEntities: true,
+      synchronize: true,
       ssl: true,
     }),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      PostsEntity,
+      BlogsEntity,
+      CommentEntity,
+      DeviceEntity,
+      PostsLikeEntity,
+      CommentLikeEntity,
+    ]),
     ThrottlerModule.forRoot([
       {
         ttl: 10000,
@@ -131,6 +149,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     SecurityDevicesSQLRepository,
     BlogsSQLRepository,
     PostsPostgresRepository,
+    UserSQLTypeOrmRepository,
   ],
 })
 export class AppModule {}

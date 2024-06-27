@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { setting } from '../../setting';
 import { UserDbType } from '../../Users/Type/User.type';
-import { UserSQLRepository } from '../../Users/User.SqlRepositories';
+import { UserSQLRepository } from '../../Users/postgres/User.SqlRepositories';
 
 export const User = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {

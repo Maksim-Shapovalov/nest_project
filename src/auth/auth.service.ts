@@ -22,7 +22,7 @@ import { EmailManager } from '../Email/email-manager';
 import bcrypt from 'bcrypt';
 import { PayloadTypeRefresh } from '../Token/refreshToken-type';
 import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceSQLRepository';
-import { UserSQLRepository } from '../Users/User.SqlRepositories';
+import { UserSQLRepository } from '../Users/postgres/User.SqlRepositories';
 
 @Injectable()
 export class AuthService {

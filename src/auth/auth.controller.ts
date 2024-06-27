@@ -32,7 +32,7 @@ import { ObjectId } from 'mongodb';
 import { RefreshTokenRepo } from '../Token/refreshToken-repo';
 import { CustomRequest, TokenRefreshGuard } from '../Token/token-guard';
 import { RefreshToken } from '../Token/Token.schema';
-import { UserSQLRepository } from '../Users/User.SqlRepositories';
+import { UserSQLRepository } from '../Users/postgres/User.SqlRepositories';
 @UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController {

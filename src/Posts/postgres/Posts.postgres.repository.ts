@@ -7,7 +7,7 @@ import {
   PostsOutputSQLType,
 } from '../Type/Posts.type';
 import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
-import { UserSQLRepository } from '../../Users/User.SqlRepositories';
+import { UserSQLRepository } from '../../Users/postgres/User.SqlRepositories';
 import { Injectable } from '@nestjs/common';
 import { NewestPostLike } from '../../Users/Type/User.type';
 

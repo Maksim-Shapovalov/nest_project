@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { setting } from '../../setting';
 import { UserDbType } from '../../Users/Type/User.type';
-import { UserSQLRepository } from '../../Users/User.SqlRepositories';
+import { UserSQLRepository } from '../../Users/postgres/User.SqlRepositories';
 
 @Injectable()
 export class SoftAuthGuard implements CanActivate {

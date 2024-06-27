@@ -19,7 +19,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtStrategy } from './strategies/bearer.strategies';
 import { RefreshToken, TokenRefreshSchema } from '../Token/Token.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserSQLRepository } from '../Users/User.SqlRepositories';
+import { UserSQLRepository } from '../Users/postgres/User.SqlRepositories';
 import { SecurityDevicesSQLRepository } from '../Device/postgres/SecurityDeviceSQLRepository';
 // const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 @Module({

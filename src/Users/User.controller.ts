@@ -17,7 +17,7 @@ import {
 import { QueryType } from '../Other/Query.Type';
 import { UserBasicRequestBody } from './Type/User.type';
 import { BasicAuthGuard } from '../auth/guard/basic-authGuard';
-import { UserSQLRepository } from './User.SqlRepositories';
+import { UserSQLRepository } from './postgres/User.SqlRepositories';
 
 @Controller('sa/users')
 export class UserController {

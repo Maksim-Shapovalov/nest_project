@@ -32,7 +32,7 @@ import { IsNotEmpty, Length } from 'class-validator';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 import { CommentSqlRepository } from '../Comment/postgress/Comments.postgress.repository';
 import { PostsPostgresRepository } from './postgres/Posts.postgres.repository';
-import { UserSQLRepository } from '../Users/User.SqlRepositories';
+import { UserSQLRepository } from '../Users/postgres/User.SqlRepositories';
 
 export class ContentClass {
   @Trim()
