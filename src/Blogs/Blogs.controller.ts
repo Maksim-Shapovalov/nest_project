@@ -1,7 +1,6 @@
 import { PostsService } from '../Posts/Posts.service';
 import { BlogsService } from './Blogs.service';
 import { BlogsRepository } from './Blogs.repository';
-import { PostsRepository } from '../Posts/PostsRepository';
 import { queryFilter, searchNameInBlog } from '../qurey-repo/query-filter';
 import {
   Body,

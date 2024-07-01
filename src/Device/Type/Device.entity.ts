@@ -5,7 +5,7 @@ import { UserEntity } from '../../Users/Type/User.entity';
 @Entity()
 export class DeviceEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  deviceId: number;
   @Column()
   ip: string;
   @Column()
@@ -13,8 +13,10 @@ export class DeviceEntity {
   @Column()
   lastActiveDate: string;
   @Column()
-  deviceId: string;
+  iat: number;
+  @Column()
+  exp: number;
   @OneToOne(() => UserEntity)
   @JoinColumn()
-  userId: UserEntity;
+  user: UserEntity;
 }

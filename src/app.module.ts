@@ -74,7 +74,7 @@ export const HTTP_STATUS = {
   NOT_FOUND_404: 404,
   TOO_MANY_REQUESTS_429: 429,
 };
-const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
+const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
 
 @Module({
   imports: [

@@ -8,7 +8,7 @@ export class EmailAdapter {
         service: 'gmail',
         auth: {
           user: 'maksim.shapovalov.01@gmail.com',
-          pass: 'wewedrlwgkkmoswq',
+          pass: 'tulk nufe egfk bcut',
         },
       });
       //createUser.email
@@ -32,7 +32,7 @@ export class EmailAdapter {
         service: 'gmail',
         auth: {
           user: 'maksim.shapovalov.01@gmail.com',
-          pass: 'wewedrlwgkkmoswq',
+          pass: 'tulk nufe egfk bcut',
         },
       });
       //createUser.email

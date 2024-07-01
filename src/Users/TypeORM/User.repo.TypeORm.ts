@@ -61,26 +61,22 @@ export class UserSQLTypeOrmRepository {
       return null;
     }
 
-    const user = getUserQuery[0];
-
-    return user;
+    return getUserQuery[0];
   }
-  async getUserByIdWithMapper(id: string): Promise<UserOutputModel | null> {
-    const getUserQuery = 'SELECT * FROM "user_entity" WHERE id = $1';
-    const getUserValues = [id];
-    const result = await this.dataSource
-      .query(getUserQuery, getUserValues)
-      .then((result) => result.rows);
-
-    if (result.length === 0) {
-      return null;
-    }
-
-    const user = result[0];
-    const mappedUser = userMapper(user);
-
-    return mappedUser;
-  }
+  // async getUserByIdWithMapper(id: string): Promise<UserOutputModel | null> {
+  //   const getUserQuery = 'SELECT * FROM "user_entity" WHERE id = $1';
+  //   const getUserValues = [id];
+  //   const result = await this.dataSource
+  //     .query(getUserQuery, getUserValues)
+  //     .then((result) => result.rows);
+  //
+  //   if (result.length === 0) {
+  //     return null;
+  //   }
+  //
+  //   const user = result[0];
+  //   return userMapper(user);
+  // }
   async findUsersByCode(codeUser: string): Promise<FindUserByRecoveryCode> {
     const getUsersQuery = await this.dataSource.query(
       `SELECT * FROM "user_entity" WHERE "confirmationCode" = '${codeUser}'`,
@@ -122,6 +118,8 @@ export class UserSQLTypeOrmRepository {
     const findUserQuery = await this.dataSource.query(
       `SELECT * FROM "user_entity" WHERE login = '${login}' OR email = '${email}'`,
     );
+    console.log(findUserQuery, 'findUserQuery');
+    console.log(findUserQuery.length, 'findUserQuery');
 
     if (findUserQuery.length === 0) {
       return null;

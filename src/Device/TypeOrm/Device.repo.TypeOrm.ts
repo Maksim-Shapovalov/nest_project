@@ -23,11 +23,13 @@ export class SecurityDevicesSQLTypeOrmRepository {
     return device;
   }
   async addDeviceInDB(token: DevicesUserDB, refreshToken: string) {
+    console.log('repo device');
     const parser = await this.jwtService.verify(refreshToken, {
       secret: setting.JWT_REFRESH_SECRET,
     });
-    await this.dataSource.query(`INSERT INTO public.device(
-    "device_entity", ip, title, "lastActiveDate", "userId", iat, exp)
+    console.log('123');
+    await this.dataSource.query(`INSERT INTO public."device_entity"(
+    "deviceId", ip, title, "lastActiveDate", "userId", iat, exp)
     VALUES ('${token.deviceId}', '${token.ip}', '${token.title}',
      '${token.lastActiveDate}', '${token.userId}', '${parser.iat}',
       '${parser.exp}')
