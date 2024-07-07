@@ -27,14 +27,23 @@ export class SecurityDevicesSQLTypeOrmRepository {
     const parser = await this.jwtService.verify(refreshToken, {
       secret: setting.JWT_REFRESH_SECRET,
     });
+    console.log(token);
     console.log('123');
+    console.log(`${token.deviceId},
+     '${token.ip}',
+      '${token.title}',
+      '${token.lastActiveDate}',
+       '${token.userId}',
+        '${parser.iat}',
+      '${parser.exp}`);
     await this.dataSource.query(`INSERT INTO public."device_entity"(
     "deviceId", ip, title, "lastActiveDate", "userId", iat, exp)
-    VALUES ('${token.deviceId}', '${token.ip}', '${token.title}',
-     '${token.lastActiveDate}', '${token.userId}', '${parser.iat}',
-      '${parser.exp}')
+    VALUES (${token.deviceId}, '${token.ip}', '${token.title}',
+     '${token.lastActiveDate}', ${token.userId}, ${parser.iat},
+      ${parser.exp})
     RETURNING *
     `);
+    console.log('321');
     return true;
   }
   async updateDevice(deviceId: number) {
