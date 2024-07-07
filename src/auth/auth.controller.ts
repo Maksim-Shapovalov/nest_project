@@ -125,14 +125,11 @@ export class AuthController {
   @Post('/registration')
   @HttpCode(204)
   async registration(@Body() bodyUser: UserBasicRequestBody) {
-    console.log(1);
     const findUserInDB =
       await this.userSQLRepository.findByLoginOrEmailByOneUser(
         bodyUser.login,
         bodyUser.email,
       );
-    console.log(2);
-    console.log(findUserInDB, 'findUserInDB');
     if (findUserInDB) {
       if (findUserInDB.login === bodyUser.login) {
         throw new BadRequestException({
@@ -146,15 +143,12 @@ export class AuthController {
         });
       }
     }
-    console.log(3);
 
     const newUser = await this.serviceUser.getNewUser(bodyUser);
     const findUser = await this.userSQLRepository.findByLoginOrEmail(
       newUser.login,
     );
-    console.log(4);
     await this.authService.doOperation(findUser);
-    console.log(5);
     return HttpCode(204);
   }
   @Post('/registration-email-resending')

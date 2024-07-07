@@ -42,11 +42,10 @@ export class TokenRefreshGuard implements CanActivate {
         secret: setting.JWT_REFRESH_SECRET,
       });
       const validToken2: PayloadTypeRefresh = await this.dataSource.query(
-        `SELECT * FROM "device" WHERE "userId" = ${parser.userId} AND "deviceId" = ${parser.deviceId}`,
+        `SELECT * FROM "device_entity" WHERE "userId" = ${parser.userId} AND "deviceId" = ${parser.deviceId}`,
       );
       const validToken1 = validToken2[0];
       if (!validToken1) throw new ForbiddenException();
-      console.log(validToken1);
       if (validToken1.iat === parser.iat) {
         request.token = {
           userId: validToken1.userId,
