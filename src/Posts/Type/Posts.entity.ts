@@ -1,4 +1,10 @@
-import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Column } from 'typeorm';
 import { BlogsEntity } from '../../Blogs/Type/Blogs.entity';
 import { UserEntity } from '../../Users/Type/User.entity';
@@ -13,9 +19,9 @@ export class PostsEntity {
   shortDescription: string;
   @Column()
   content: string;
-  @OneToOne(() => BlogsEntity)
+  @ManyToOne(() => BlogsEntity)
   @JoinColumn()
-  blogId: number;
+  blog: number;
   @Column()
   blogName: string;
   @Column()
@@ -25,14 +31,14 @@ export class PostsEntity {
 export class PostsLikeEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @OneToOne(() => PostsEntity)
+  @ManyToOne(() => PostsEntity)
   @JoinColumn()
-  postId: number;
+  post: number;
   @Column()
   likesStatus: string;
   @OneToOne(() => UserEntity)
   @JoinColumn()
-  userId: number;
+  user: number;
   @Column()
   createdAt: string;
   @Column()

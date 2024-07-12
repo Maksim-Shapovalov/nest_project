@@ -45,7 +45,7 @@ export class BlogsSQLRepository {
 
   async getBlogsById(id: number): Promise<BlogsOutputModel | null> {
     const findCursor = await this.dataSource.query(
-      `SELECT * FROM "Blogs" WHERE "id" = ${id}`,
+      `SELECT * FROM "blogs_entity" WHERE "id" = ${id}`,
     );
     if (!findCursor[0]) return null;
     return blogMapperSQL(findCursor[0]);
@@ -53,7 +53,7 @@ export class BlogsSQLRepository {
   async saveBlog(blog: BlogClass): Promise<BlogsTypeSQL> {
     const randomId = Math.floor(Math.random() * 1000000);
     const saveBlogsQuery = `
-    INSERT INTO public."Blogs"(
+    INSERT INTO public."blogs_entity"(
     id, name, description, "websiteUrl", "createdAt", "isMembership")
     VALUES (${randomId}, '${blog.name}', '${blog.description}', 
     '${blog.websiteUrl}', '${blog.createdAt}', '${blog.isMembership}') 
@@ -74,13 +74,13 @@ export class BlogsSQLRepository {
   }
   async updateBlogById(blogs: bodyForUpdateBlogs): Promise<boolean> {
     const findBlogQuery = await this.dataSource.query(
-      `SELECT * FROM "Blogs" WHERE "id" = '${blogs.id}'`,
+      `SELECT * FROM "blogs_entity" WHERE "id" = '${blogs.id}'`,
     );
     if (findBlogQuery.length === 0) {
       return null;
     }
     await this.dataSource.query(`
-    UPDATE "Blogs"
+    UPDATE "blogs_entity"
     SET "name" = '${blogs.name}', "description" = '${blogs.description}', "websiteUrl" = '${blogs.websiteUrl}'
     WHERE "id" = '${blogs.id}'
     RETURNING * `);
@@ -88,21 +88,21 @@ export class BlogsSQLRepository {
   }
   async deleteBlogsById(id: number): Promise<boolean> {
     const findBlogInDB = await this.dataSource.query(
-      `SELECT * FROM "Blogs" WHERE "id" = ${id}`,
+      `SELECT * FROM "blogs_entity" WHERE "id" = ${id}`,
     );
     if (!findBlogInDB[0]) return false;
     const findBlog = await this.dataSource.query(
-      `DELETE FROM public."Blogs" WHERE "id" = ${id} ;`,
+      `DELETE FROM public."blogs_entity" WHERE "id" = ${id} ;`,
     );
     if (findBlog[1] > 0) return true;
   }
   async deletePostInBlogById(blogId: number, postId: number): Promise<boolean> {
     const findBlogInDB = await this.dataSource.query(
-      `SELECT * FROM "Posts" WHERE id = ${postId} AND "blogId" = ${blogId}`,
+      `SELECT * FROM "posts_entity" WHERE id = ${postId} AND "blogId" = ${blogId}`,
     );
     if (!findBlogInDB[0]) return false;
     const findBlog = await this.dataSource.query(
-      `DELETE FROM public."Posts" WHERE id = ${postId} AND "blogId" = ${blogId} ;`,
+      `DELETE FROM public."posts_entity" WHERE id = ${postId} AND "blogId" = ${blogId} ;`,
     );
     if (findBlog[1] > 0) return true;
   }
