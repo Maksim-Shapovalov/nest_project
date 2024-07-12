@@ -71,11 +71,11 @@ export class AuthService {
 
       const accessToken: string = await this.jwtService.signAsync(
         bodyToAccessToken,
-        { secret: setting.JWT_SECRET, expiresIn: '10s' },
+        { secret: setting.JWT_SECRET, expiresIn: '1000s' },
       );
       const refreshToken: string = await this.jwtService.signAsync(
         bodyToRefreshToken,
-        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '20s' },
+        { secret: setting.JWT_REFRESH_SECRET, expiresIn: '2000s' },
       );
       // await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
       await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
