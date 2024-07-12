@@ -39,7 +39,7 @@ export class SecurityDevicesSQLTypeOrmRepository {
   async updateDevice(deviceId: number) {
     const currencyDay = new Date().toISOString();
     const updateDevice = await this.dataSource.query(
-      `UPDATE public.device
+      `UPDATE public.device_entity
     SET "lastActiveDate"= '${currencyDay}'
     WHERE "deviceId" = ${deviceId};`,
     );
