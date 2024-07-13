@@ -12,7 +12,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsSQLRepository } from './Blogs.postgress.repository';
 import { PostsService } from '../../Posts/Posts.service';
 import { BlogsService } from '../Blogs.service';
 import { BlogsRepository } from '../Blogs.repository';
