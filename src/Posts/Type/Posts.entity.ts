@@ -36,7 +36,7 @@ export class PostsLikeEntity {
   post: number;
   @Column()
   likesStatus: string;
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn()
   user: number;
   @Column()
