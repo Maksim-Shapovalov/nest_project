@@ -17,12 +17,12 @@ export class CommentEntity {
   content: string;
   @ManyToOne(() => UserEntity)
   @JoinColumn()
-  userId: UserEntity;
+  user: UserEntity;
   @Column()
   userLogin: string;
   @OneToOne(() => PostsEntity)
   @JoinColumn()
-  postId: PostsEntity;
+  post: PostsEntity;
   @Column()
   createdAt: string;
 }
@@ -32,10 +32,10 @@ export class CommentLikeEntity {
   id: number;
   @OneToOne(() => PostsEntity)
   @JoinColumn()
-  commentId: number;
+  comment: number;
   @Column()
   likesStatus: string;
   @OneToOne(() => UserEntity)
   @JoinColumn()
-  userId: number;
+  user: number;
 }
