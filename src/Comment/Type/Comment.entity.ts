@@ -2,6 +2,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -20,7 +21,7 @@ export class CommentEntity {
   user: UserEntity;
   @Column()
   userLogin: string;
-  @OneToOne(() => PostsEntity)
+  @ManyToOne(() => PostsEntity)
   @JoinColumn()
   post: PostsEntity;
   @Column()
