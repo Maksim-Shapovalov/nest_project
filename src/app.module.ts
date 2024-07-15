@@ -153,7 +153,7 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
     UserSQLRepository,
     SecurityDevicesSQLRepository,
     SecurityDevicesSQLTypeOrmRepository,
-    // BlogsSQLRepository,
+    BlogsSQLRepository,
     BlogsSQLTypeOrmRepository,
     PostsPostgresRepository,
     PostsPostgresTypeOrmRepository,

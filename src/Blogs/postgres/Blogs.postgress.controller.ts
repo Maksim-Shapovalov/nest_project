@@ -22,6 +22,7 @@ import { BodyPostToRequest } from '../../Posts/Type/Posts.type';
 import { BlogRequest } from '../Type/Blogs.type';
 import { PostsPostgresRepository } from '../../Posts/postgres/Posts.postgres.repository';
 import { BlogsSQLTypeOrmRepository } from '../TypeOrm/Blogs.repo.TypeOrm';
+import { BlogsSQLRepository } from './Blogs.postgress.repository';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa/blogs')
@@ -30,7 +31,7 @@ export class BlogsSQLController {
     protected postsService: PostsService,
     protected blogsService: BlogsService,
     protected blogsRepository: BlogsRepository,
-    protected blogsSQLRepository: BlogsSQLTypeOrmRepository,
+    protected blogsSQLRepository: BlogsSQLRepository,
     protected postsSQLRepository: PostsPostgresRepository,
   ) {}
   @Get()

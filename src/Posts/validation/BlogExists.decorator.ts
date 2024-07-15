@@ -5,12 +5,12 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 
-import { BlogsSQLTypeOrmRepository } from '../../Blogs/TypeOrm/Blogs.repo.TypeOrm';
+import { BlogsSQLRepository } from '../../Blogs/postgres/Blogs.postgress.repository';
 
 @ValidatorConstraint({ name: 'blogId', async: true })
 @Injectable()
 export class CustomBlogIdValidation implements ValidatorConstraintInterface {
-  constructor(private blogRepository: BlogsSQLTypeOrmRepository) {}
+  constructor(private blogRepository: BlogsSQLRepository) {}
 
   async validate(blogId: number): Promise<boolean> {
     const blog = await this.blogRepository.getBlogsById(blogId);
