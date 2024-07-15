@@ -1,16 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { BlogsRepository } from '../../Blogs/Blogs.repository';
-import { BlogsSQLRepository } from '../../Blogs/postgres/Blogs.postgress.repository';
+
+import { BlogsSQLTypeOrmRepository } from '../../Blogs/TypeOrm/Blogs.repo.TypeOrm';
 
 @ValidatorConstraint({ name: 'blogId', async: true })
 @Injectable()
 export class CustomBlogIdValidation implements ValidatorConstraintInterface {
-  constructor(private blogRepository: BlogsSQLRepository) {}
+  constructor(private blogRepository: BlogsSQLTypeOrmRepository) {}
 
   async validate(blogId: number): Promise<boolean> {
     const blog = await this.blogRepository.getBlogsById(blogId);
