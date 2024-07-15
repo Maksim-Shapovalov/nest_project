@@ -10,12 +10,13 @@ import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
 import { UserSQLRepository } from '../../Users/postgres/User.SqlRepositories';
 import { Injectable } from '@nestjs/common';
 import { NewestPostLike } from '../../Users/Type/User.type';
+import { UserSQLTypeOrmRepository } from '../../Users/TypeORM/User.repo.TypeORm';
 
 @Injectable()
 export class PostsPostgresTypeOrmRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    protected userSQLRepository: UserSQLRepository,
+    protected userSQLRepository: UserSQLTypeOrmRepository,
   ) {}
   async getAllPosts(filter: PaginationQueryType, userId: number | null) {
     const pageSizeInQuery: number = filter.pageSize;

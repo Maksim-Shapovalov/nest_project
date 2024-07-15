@@ -55,7 +55,7 @@ export class UserSQLRepository {
   }
   async getUserById(id: number): Promise<FindUserByRecoveryCode | null> {
     const getUserQuery = await this.dataSource.query(
-      `SELECT * FROM "Users" WHERE id = ${id}`,
+      `SELECT * FROM "user_entity" WHERE id = ${id}`,
     );
     if (getUserQuery.length === 0) {
       return null;
