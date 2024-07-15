@@ -150,8 +150,6 @@ export class PostsController {
     // @Req() request,
     @Body() inputLikeStatus: StatusLikes,
   ) {
-    console.log(inputLikeStatus);
-    // const user = request.user as NewestPostLike;
     const updateComment = await this.postsService.updateStatusLikeInUser(
       id,
       inputLikeStatus.likeStatus,

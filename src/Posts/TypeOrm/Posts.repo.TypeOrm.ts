@@ -99,7 +99,8 @@ export class PostsPostgresTypeOrmRepository {
       `SELECT * FROM "posts_like_entity" WHERE "postId" = ${postId} AND "userId" = ${user ? user.userId : null}`,
     );
     const findUser = await this.userSQLRepository.getUserById(user.userId);
-    if (!findUser[0]) {
+    if (!findUser) {
+      return false;
     }
     const comment = await this.getPostsById(postId, user);
     if (!comment) {
