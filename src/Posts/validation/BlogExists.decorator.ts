@@ -14,7 +14,6 @@ export class CustomBlogIdValidation implements ValidatorConstraintInterface {
 
   async validate(blogId: number): Promise<boolean> {
     const blog = await this.blogRepository.getBlogsById(blogId);
-    console.log(blog);
     if (!blog) {
       return false;
     }
