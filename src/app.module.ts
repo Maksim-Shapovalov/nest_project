@@ -47,7 +47,6 @@ import { UserSQLRepository } from './Users/postgres/User.SqlRepositories';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SecurityDevicesSQLRepository } from './Device/postgres/SecurityDeviceSQLRepository';
 import { BlogsSQLController } from './Blogs/postgres/Blogs.postgress.controller';
-import { BlogsSQLRepository } from './Blogs/postgres/Blogs.postgress.repository';
 import { PostsPostgresRepository } from './Posts/postgres/Posts.postgres.repository';
 import { CommentSqlRepository } from './Comment/postgress/Comments.postgress.repository';
 import { UserEntity } from './Users/Type/User.entity';
@@ -153,7 +152,6 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
     UserSQLRepository,
     SecurityDevicesSQLRepository,
     SecurityDevicesSQLTypeOrmRepository,
-    BlogsSQLRepository,
     BlogsSQLTypeOrmRepository,
     PostsPostgresRepository,
     PostsPostgresTypeOrmRepository,

@@ -5,9 +5,11 @@ import {
   bodyForUpdateBlogs,
 } from './Type/Blogs.type';
 
-import { blogMapperSQL } from './postgres/Blogs.postgress.repository';
 import { Injectable } from '@nestjs/common';
-import { BlogsSQLTypeOrmRepository } from './TypeOrm/Blogs.repo.TypeOrm';
+import {
+  blogMapperSQL,
+  BlogsSQLTypeOrmRepository,
+} from './TypeOrm/Blogs.repo.TypeOrm';
 
 @Injectable()
 export class BlogsService {
