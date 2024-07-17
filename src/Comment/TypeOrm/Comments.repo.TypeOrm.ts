@@ -117,7 +117,7 @@ export class CommentSqlTypeOrmRepository {
       const updateStatus = await this.dataSource
         .query(`UPDATE public."comment_like_entity"
       SET "likesStatus"= '${status}'
-      WHERE "commentId" = ${commentId} AND "userId" = ${userId}
+      WHERE "commentId" = ${commentId} AND "userId" = ${+userId}
       RETURNING *`);
       if (!updateStatus) return null;
 
@@ -127,7 +127,7 @@ export class CommentSqlTypeOrmRepository {
 
       await this.dataSource.query(`INSERT INTO public."comment_like_entity"(
       id, "commentId", "userId", "likesStatus")
-      VALUES (${randomId}, ${commentId}, ${userId}, '${status}');`);
+      VALUES (${randomId}, ${commentId}, ${+userId}, '${status}');`);
 
       return true;
     }
