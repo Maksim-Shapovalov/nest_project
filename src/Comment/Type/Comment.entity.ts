@@ -36,7 +36,7 @@ export class CommentLikeEntity {
   comment: number;
   @Column()
   likesStatus: string;
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn()
   user: number;
 }
