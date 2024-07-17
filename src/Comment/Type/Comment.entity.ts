@@ -31,7 +31,7 @@ export class CommentEntity {
 export class CommentLikeEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @OneToOne(() => PostsEntity)
+  @ManyToOne(() => PostsEntity)
   @JoinColumn()
   comment: number;
   @Column()
