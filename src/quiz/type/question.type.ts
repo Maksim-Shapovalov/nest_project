@@ -18,18 +18,11 @@ export type questionBody = {
   createdAt: string;
   updatedAt: string;
 };
-export enum trueAnswer {
-  Six = '6',
-  SixWords = 'six',
-  SixInRussian = 'шесть',
-  ALot = 'дофига',
-}
 
 export class requestBodyQuestionToCreate {
   @IsNotEmpty()
   @Length(10, 500)
   body: string;
   @IsNotEmpty()
-  @IsEnum(trueAnswer, { each: true })
-  correctAnswers: trueAnswer;
+  correctAnswers: string;
 }
