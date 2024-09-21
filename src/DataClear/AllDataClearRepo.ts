@@ -13,6 +13,12 @@ export class AllDataClearRepo {
         DELETE FROM public."comment_like_entity"; 
         DELETE FROM public."comment_entity"; 
         DELETE FROM public."posts_like_entity"; 
+         DELETE FROM public."questions_entity"; 
+         DELETE FROM public."quiz_game_entity_not_player_info"; 
+         DELETE FROM public."posts_like_entity"; 
+         DELETE FROM public."posts_like_entity"; 
+         DELETE FROM public."posts_like_entity"; 
+         DELETE FROM public."posts_like_entity"; 
          DELETE FROM public."posts_entity"; 
          DELETE FROM public."blogs_entity";
           DELETE FROM public."user_entity";`,

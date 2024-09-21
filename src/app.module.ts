@@ -113,7 +113,6 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
       QuizGameEntityNotPlayerInfo,
       AnswersEntity,
       QuestionsEntity,
-      QuestionsEntity,
       PlayersEntity,
     ]),
     ThrottlerModule.forRoot([

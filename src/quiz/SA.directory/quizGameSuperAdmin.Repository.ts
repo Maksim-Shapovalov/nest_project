@@ -13,7 +13,7 @@ export class QuizGameSuperAdminRepository {
   async getAllQuestions(filter: PaginationQueryType) {
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountPosts = await this.dataSource.query(
-      `SELECT COUNT(*) FROM "question_entity"`,
+      `SELECT COUNT(*) FROM "questions_entity"`,
     );
 
     const totalCount = parseInt(totalCountPosts[0].count);
@@ -21,7 +21,7 @@ export class QuizGameSuperAdminRepository {
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
     const result = await this.dataSource.query(
-      `SELECT * FROM "question_entity" 
+      `SELECT * FROM "questions_entity" 
       ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT 
       ${pageSizeInQuery} OFFSET ${pageBlog}`,
     );
@@ -36,7 +36,7 @@ export class QuizGameSuperAdminRepository {
   }
   async createQuestion(createNewQuestion: QuestionType) {
     const generateRandomId = Math.floor(Math.random() * 1000000);
-    const newQuestion = `INSERT INTO public."question_entity"(
+    const newQuestion = `INSERT INTO public."questions_entity"(
       id, body, correctAnswers, published, createdAt, updatedAt, )
     VALUES (${generateRandomId.toString()}, '${createNewQuestion.body}', '${createNewQuestion.correctAnswers}',
      '${createNewQuestion.published}', '${createNewQuestion.updatedAt}', '${createNewQuestion.createdAt}')
@@ -46,11 +46,11 @@ export class QuizGameSuperAdminRepository {
   }
   async deleteQuestionById(id: number) {
     const findQuestionInDB = await this.dataSource.query(
-      `SELECT * FROM "question_entity" WHERE id = ${id}`,
+      `SELECT * FROM "questions_entity" WHERE id = ${id}`,
     );
     if (!findQuestionInDB[0]) return false;
     const findPost = await this.dataSource.query(
-      `DELETE FROM public."question_entity" WHERE "id" = ${id} ;`,
+      `DELETE FROM public."questions_entity" WHERE "id" = ${id} ;`,
     );
     if (findPost[1] > 0) return true;
   }
@@ -59,11 +59,11 @@ export class QuizGameSuperAdminRepository {
     id: number,
   ) {
     const findQuestionInDB = await this.dataSource.query(
-      `SELECT * FROM "question_entity" WHERE id = ${id}`,
+      `SELECT * FROM "questions_entity" WHERE id = ${id}`,
     );
     if (!findQuestionInDB[0]) return false;
     await this.dataSource.query(
-      `UPDATE "question_entity" SET "body" = ${body.body}, "correctAnswers" = ${body.correctAnswers}
+      `UPDATE "questions_entity" SET "body" = ${body.body}, "correctAnswers" = ${body.correctAnswers}
             WHERE "id" = ${id}
             RETURNING *`,
     );
@@ -71,11 +71,11 @@ export class QuizGameSuperAdminRepository {
   }
   async updateQuestionPublishedRepo(published: boolean, id: number) {
     const findQuestionInDB = await this.dataSource.query(
-      `SELECT * FROM "question_entity" WHERE id = ${id}`,
+      `SELECT * FROM "questions_entity" WHERE id = ${id}`,
     );
     if (!findQuestionInDB[0]) return false;
     await this.dataSource.query(
-      `UPDATE "question_entity" SET "published" = ${published}
+      `UPDATE "questions_entity" SET "published" = ${published}
             WHERE "id" = ${id}
             RETURNING *`,
     );
