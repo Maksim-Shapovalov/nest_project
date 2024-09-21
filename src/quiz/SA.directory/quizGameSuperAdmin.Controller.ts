@@ -22,7 +22,7 @@ import { OutputTypePair } from '../type/QuizGame.type';
 @Controller('sa/quiz')
 export class QuizGameControllerSuperAdmin {
   constructor(protected quizGameSuperAdminService: QuizGameSuperAdminService) {}
-  @UseGuards()
+  @UseGuards(BasicAuthGuard)
   @Get('questions')
   @HttpCode(200)
   async getUnfinishedCurrentGame(@Query() query: QueryType) {

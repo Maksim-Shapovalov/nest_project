@@ -6,16 +6,19 @@ import {
   QuestionType,
   requestBodyQuestionToCreate,
 } from '../type/question.type';
+import { QuizGameService } from '../QuizGame.service';
 
 @Injectable()
 export class QuizGameSuperAdminRepository {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() protected dataSource: DataSource,
+    protected quizGameService: QuizGameService,
+  ) {}
   async getAllQuestions(filter: PaginationQueryType) {
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountPosts = await this.dataSource.query(
       `SELECT COUNT(*) FROM "questions_entity"`,
     );
-
     const totalCount = parseInt(totalCountPosts[0].count);
     const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
@@ -25,7 +28,10 @@ export class QuizGameSuperAdminRepository {
       ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT 
       ${pageSizeInQuery} OFFSET ${pageBlog}`,
     );
-    const items = await Promise.all(result[0]);
+    // const items = await Promise.all(result[0]);
+    const items = await Promise.all(
+      result.map((p) => this.quizGameService.quizGameMapperOnOutputTypePair(p)),
+    );
     return {
       pagesCount: pageCountBlogs,
       page: filter.pageNumber,
