@@ -26,11 +26,9 @@ export enum trueAnswer {
 }
 
 export class requestBodyQuestionToCreate {
-  @Trim()
   @IsNotEmpty()
   @Length(10, 500)
   body: string;
-  @Trim()
   @IsNotEmpty()
   @IsEnum(trueAnswer, { each: true })
   correctAnswers: trueAnswer;

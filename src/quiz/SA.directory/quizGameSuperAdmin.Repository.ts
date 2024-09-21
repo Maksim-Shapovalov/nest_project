@@ -42,12 +42,15 @@ export class QuizGameSuperAdminRepository {
   }
   async createQuestion(createNewQuestion: QuestionType) {
     const generateRandomId = Math.floor(Math.random() * 1000000);
+    console.log(createNewQuestion);
     const newQuestion = `INSERT INTO public."questions_entity"(
-      id, body, correctAnswers, published, createdAt, updatedAt, )
-    VALUES (${generateRandomId.toString()}, '${createNewQuestion.body}', '${createNewQuestion.correctAnswers}',
+      id, body, "correctAnswers", published, "createdAt", "updatedAt" )
+    VALUES (${generateRandomId.toString()}, '${createNewQuestion.body}', ARRAY['${createNewQuestion.correctAnswers}'],
      '${createNewQuestion.published}', '${createNewQuestion.updatedAt}', '${createNewQuestion.createdAt}')
     RETURNING *`;
+    console.log(newQuestion);
     const result = await this.dataSource.query(newQuestion);
+    console.log(result);
     return result[0];
   }
   async deleteQuestionById(id: number) {

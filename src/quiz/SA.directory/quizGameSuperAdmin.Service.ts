@@ -26,7 +26,6 @@ export class QuizGameSuperAdminService {
 
     const takeAllQuestions =
       await this.quizGameSuperAdminRepository.createQuestion(createNewQuestion);
-    console.log(takeAllQuestions);
     return takeAllQuestions;
   }
   async deleteQuestionById(id: number) {

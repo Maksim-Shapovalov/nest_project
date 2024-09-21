@@ -33,7 +33,7 @@ export class QuizGameControllerSuperAdmin {
   @Post('questions')
   @HttpCode(200)
   async connectCurrentUser(
-    @User() questionBody: requestBodyQuestionToCreate,
+    @Body() questionBody: requestBodyQuestionToCreate,
   ): Promise<OutputTypePair> {
     return this.quizGameSuperAdminService.createQuestion(questionBody);
   }
