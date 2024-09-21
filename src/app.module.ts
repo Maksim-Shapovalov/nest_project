@@ -62,6 +62,18 @@ import { BlogsSQLTypeOrmRepository } from './Blogs/TypeOrm/Blogs.repo.TypeOrm';
 import { PostsPostgresTypeOrmRepository } from './Posts/TypeOrm/Posts.repo.TypeOrm';
 import { CommentSqlTypeOrmRepository } from './Comment/TypeOrm/Comments.repo.TypeOrm';
 import { SecurityDevicesSQLTypeOrmRepository } from './Device/TypeOrm/Device.repo.TypeOrm';
+import {
+  AnswersEntity,
+  QuizGameEntityNotPlayerInfo,
+} from './quiz/entity/QuizGame.entity';
+import { QuizGameTypeOrmRepo } from './quiz/QuizGame.TypeOrmRepo';
+import { QuizGameService } from './quiz/QuizGame.service';
+import { QuizGameController } from './quiz/QuizGame.controller';
+import { QuizGameControllerSuperAdmin } from './quiz/SA.directory/quizGameSuperAdmin.Controller';
+import { QuizGameSuperAdminService } from './quiz/SA.directory/quizGameSuperAdmin.Service';
+import { QuizGameSuperAdminRepository } from './quiz/SA.directory/quizGameSuperAdmin.Repository';
+import { QuestionsEntity } from './quiz/entity/Questions.Entity';
+import { PlayersEntity } from './quiz/entity/Players.Entity';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -98,6 +110,11 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
       DeviceEntity,
       PostsLikeEntity,
       CommentLikeEntity,
+      QuizGameEntityNotPlayerInfo,
+      AnswersEntity,
+      QuestionsEntity,
+      QuestionsEntity,
+      PlayersEntity,
     ]),
     ThrottlerModule.forRoot([
       {
@@ -134,6 +151,8 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
     AllDataClearController,
     DeviceController,
     BlogsSQLController,
+    QuizGameController,
+    QuizGameControllerSuperAdmin,
   ],
   providers: [
     CommentSqlRepository,
@@ -156,6 +175,10 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
     PostsPostgresRepository,
     PostsPostgresTypeOrmRepository,
     UserSQLTypeOrmRepository,
+    QuizGameService,
+    QuizGameTypeOrmRepo,
+    QuizGameSuperAdminService,
+    QuizGameSuperAdminRepository,
   ],
 })
 export class AppModule {}
