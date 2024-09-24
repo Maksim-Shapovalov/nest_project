@@ -26,3 +26,12 @@ export class requestBodyQuestionToCreate {
   @IsNotEmpty()
   correctAnswers: string;
 }
+
+export type questBodyToOutput = {
+  id: string;
+  body: string;
+  correctAnswers: [string];
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+};

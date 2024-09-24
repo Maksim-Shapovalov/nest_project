@@ -62,9 +62,11 @@ export class QuizGameControllerSuperAdmin {
   @Put('questions/:id/publish')
   @HttpCode(200)
   async changePublishedStatusToQuestion(
-    @Body() published: boolean,
+    @Body() body: { published: boolean },
     @Param('id') id: number,
   ) {
+    const published = body.published;
+    console.log(id, 'id', published, 'published');
     return this.quizGameSuperAdminService.updateQuestionPublished(
       published,
       id,

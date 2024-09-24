@@ -85,7 +85,7 @@ export class QuizGameTypeOrmRepo {
   }
   async findPlayer(id: number): Promise<findingPlayer> {
     const findPlayer = await this.dataSource.query(
-      `SELECT * FROM "playersEntity_entity" WHERE id = ${id}`,
+      `SELECT * FROM "players_entity" WHERE id = ${id}`,
     );
     return findPlayer[0];
   }
@@ -97,7 +97,7 @@ export class QuizGameTypeOrmRepo {
   }
   async choiceFiveQuestion() {
     const getRandomFiveQuestion = await this.dataSource
-      .query(`SELECT * FROM "questionsEntity_entity"
+      .query(`SELECT * FROM "questions_entity"
         WHERE "published" = true ORDER BY RANDOM() LIMIT 5`);
     return getRandomFiveQuestion[0];
   }
@@ -121,7 +121,7 @@ export class QuizGameTypeOrmRepo {
   }
   async newPlayerOnQuizGame(userModel: NewestPostLike): Promise<PlayersEntity> {
     const newPlayerOnGameQuiz = await this.dataSource
-      .query(`INSERT INTO public."playersEntity_entity"(
+      .query(`INSERT INTO public."players_entity"(
         id, login, score)
           VALUES(${userModel.userId},
           ${userModel.login}, 0)

@@ -3,10 +3,12 @@ import { PaginationQueryType } from '../../qurey-repo/query-filter';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
+  questionBody,
   QuestionType,
   requestBodyQuestionToCreate,
 } from '../type/question.type';
 import { QuizGameService } from '../QuizGame.service';
+import { AnswerType, updateTypeOfQuestion } from '../type/QuizGame.type';
 
 @Injectable()
 export class QuizGameSuperAdminRepository {
@@ -29,9 +31,8 @@ export class QuizGameSuperAdminRepository {
       ${pageSizeInQuery} OFFSET ${pageBlog}`,
     );
     // const items = await Promise.all(result[0]);
-    const items = await Promise.all(
-      result.map((p) => this.quizGameService.quizGameMapperOnOutputTypePair(p)),
-    );
+    // const items = await Promise.all(result.map((p) => this.questGetMapper(p)));
+    const items = result;
     return {
       pagesCount: pageCountBlogs,
       page: filter.pageNumber,
@@ -69,7 +70,7 @@ export class QuizGameSuperAdminRepository {
     );
     if (!findQuestionInDB[0]) return false;
     await this.dataSource.query(
-      `UPDATE "questions_entity" SET "body" = ${body.body}, "correctAnswers" = ${body.correctAnswers}
+      `UPDATE "questions_entity" SET "body" = '${body.body}', "correctAnswers" = ARRAY['${body.correctAnswers}']
             WHERE "id" = ${id}
             RETURNING *`,
     );
@@ -87,4 +88,15 @@ export class QuizGameSuperAdminRepository {
     );
     return true;
   }
+
+  // async questGetMapper(answer: any): Promise<questionBody> {
+  //   return {
+  //     id: a;
+  //     body: string;
+  //     correctAnswers: string[];
+  //     published: string;
+  //     createdAt: string;
+  //     updatedAt: string;
+  //   };
+  // }
 }
