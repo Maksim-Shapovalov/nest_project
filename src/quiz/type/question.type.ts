@@ -14,7 +14,7 @@ export type questionBody = {
   id: string;
   body: string;
   correctAnswers: string[];
-  published: string;
+  published: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -28,7 +28,7 @@ export class requestBodyQuestionToCreate {
 }
 
 export type questBodyToOutput = {
-  id: string;
+  id: number;
   body: string;
   correctAnswers: [string];
   published: boolean;

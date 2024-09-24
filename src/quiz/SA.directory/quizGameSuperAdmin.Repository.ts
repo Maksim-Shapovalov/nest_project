@@ -3,6 +3,7 @@ import { PaginationQueryType } from '../../qurey-repo/query-filter';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
+  questBodyToOutput,
   questionBody,
   QuestionType,
   requestBodyQuestionToCreate,
@@ -31,8 +32,9 @@ export class QuizGameSuperAdminRepository {
       ${pageSizeInQuery} OFFSET ${pageBlog}`,
     );
     // const items = await Promise.all(result[0]);
-    // const items = await Promise.all(result.map((p) => this.questGetMapper(p)));
-    const items = result;
+    const items = await Promise.all(result.map((p) => this.questGetMapper(p)));
+    console.log(items);
+    // const items = result;
     return {
       pagesCount: pageCountBlogs,
       page: filter.pageNumber,
@@ -65,12 +67,14 @@ export class QuizGameSuperAdminRepository {
     body: requestBodyQuestionToCreate,
     id: number,
   ) {
+    const now = new Date().toISOString();
     const findQuestionInDB = await this.dataSource.query(
       `SELECT * FROM "questions_entity" WHERE id = ${id}`,
     );
     if (!findQuestionInDB[0]) return false;
     await this.dataSource.query(
-      `UPDATE "questions_entity" SET "body" = '${body.body}', "correctAnswers" = ARRAY['${body.correctAnswers}']
+      `UPDATE "questions_entity" SET "body" = '${body.body}',
+ "correctAnswers" = ARRAY['${body.correctAnswers}', "updatedAt = '${now}'"]
             WHERE "id" = ${id}
             RETURNING *`,
     );
@@ -89,14 +93,14 @@ export class QuizGameSuperAdminRepository {
     return true;
   }
 
-  // async questGetMapper(answer: any): Promise<questionBody> {
-  //   return {
-  //     id: a;
-  //     body: string;
-  //     correctAnswers: string[];
-  //     published: string;
-  //     createdAt: string;
-  //     updatedAt: string;
-  //   };
-  // }
+  async questGetMapper(quest: questBodyToOutput): Promise<questionBody> {
+    return {
+      id: quest.id.toString(),
+      body: quest.body,
+      correctAnswers: quest.correctAnswers,
+      published: quest.published,
+      createdAt: quest.createdAt,
+      updatedAt: quest.updatedAt,
+    };
+  }
 }
