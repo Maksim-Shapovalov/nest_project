@@ -108,7 +108,7 @@ export class QuizGameService {
     }));
     findPlayerInGameTheFirstPlayer.answers;
     return {
-      id: game.id,
+      id: game.id.toString(),
       firstPlayerProgress: {
         answers: answer1,
         player: {

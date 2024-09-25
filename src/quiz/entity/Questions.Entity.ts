@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class QuestionsEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
   @Column()
   body: string;
   @Column('text', { array: true })

@@ -15,7 +15,10 @@ import { BasicAuthGuard } from '../../auth/guard/basic-authGuard';
 import { QueryType } from '../../Other/Query.Type';
 import { queryFilter } from '../../qurey-repo/query-filter';
 import { QuizGameSuperAdminService } from './quizGameSuperAdmin.Service';
-import { requestBodyQuestionToCreate } from '../type/question.type';
+import {
+  questionBody,
+  requestBodyQuestionToCreate,
+} from '../type/question.type';
 import { OutputTypePair } from '../type/QuizGame.type';
 
 @Controller('sa/quiz')
@@ -33,7 +36,7 @@ export class QuizGameControllerSuperAdmin {
   @HttpCode(200)
   async connectCurrentUser(
     @Body() questionBody: requestBodyQuestionToCreate,
-  ): Promise<OutputTypePair> {
+  ): Promise<questionBody> {
     return this.quizGameSuperAdminService.createQuestion(questionBody);
   }
 

@@ -48,10 +48,10 @@ export class QuizGameSuperAdminRepository {
     const newQuestion = `INSERT INTO public."questions_entity"(
       id, body, "correctAnswers", published, "createdAt", "updatedAt" )
     VALUES (${generateRandomId.toString()}, '${createNewQuestion.body}', ARRAY['${createNewQuestion.correctAnswers}'],
-     '${createNewQuestion.published}', '${createNewQuestion.updatedAt}', '${createNewQuestion.createdAt}')
+     '${createNewQuestion.published}', '${createNewQuestion.createdAt}', '${createNewQuestion.updatedAt}')
     RETURNING *`;
     const result = await this.dataSource.query(newQuestion);
-    return result[0];
+    return this.questGetMapper(result[0]);
   }
   async deleteQuestionById(id: number) {
     const findQuestionInDB = await this.dataSource.query(

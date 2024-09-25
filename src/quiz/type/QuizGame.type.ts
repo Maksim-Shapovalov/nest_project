@@ -25,7 +25,7 @@ export type AnswerType = {
 };
 
 export type OutputTypePair = {
-  id: number;
+  id: string;
   firstPlayerProgress: {
     answers: Array<AnswerType>;
     player: {
