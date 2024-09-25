@@ -16,7 +16,6 @@ import { QueryType } from '../../Other/Query.Type';
 import { queryFilter } from '../../qurey-repo/query-filter';
 import { QuizGameSuperAdminService } from './quizGameSuperAdmin.Service';
 import { requestBodyQuestionToCreate } from '../type/question.type';
-import { User } from '../../auth/guard/authGuard';
 import { OutputTypePair } from '../type/QuizGame.type';
 
 @Controller('sa/quiz')

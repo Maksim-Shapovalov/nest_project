@@ -21,7 +21,7 @@ export class QuizGameSuperAdminService {
       [question.correctAnswers],
       false,
       now.toISOString(),
-      now.toISOString(),
+      null,
     );
 
     const takeAllQuestions =

@@ -13,7 +13,7 @@ export class QuestionsEntity {
   @Column()
   createdAt: string;
   @Column()
-  updatedAt: string;
+  updatedAt: string | null;
 }
 
 export type QuestionTypeOnMapper = {

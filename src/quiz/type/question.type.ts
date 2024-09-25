@@ -1,5 +1,4 @@
-import { IsEnum, IsNotEmpty, Length } from 'class-validator';
-import { Trim } from '../../Other/trim-validator';
+import { IsNotEmpty, Length } from 'class-validator';
 
 export class QuestionType {
   constructor(
@@ -7,7 +6,7 @@ export class QuestionType {
     public correctAnswers: string[],
     public published: boolean,
     public createdAt: string,
-    public updatedAt: string,
+    public updatedAt: string | null,
   ) {}
 }
 export type questionBody = {
