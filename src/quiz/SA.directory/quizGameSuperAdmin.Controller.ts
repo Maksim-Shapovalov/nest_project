@@ -33,7 +33,7 @@ export class QuizGameControllerSuperAdmin {
   }
   @UseGuards(BasicAuthGuard)
   @Post('questions')
-  @HttpCode(200)
+  @HttpCode(201)
   async connectCurrentUser(
     @Body() questionBody: requestBodyQuestionToCreate,
   ): Promise<questionBody> {
@@ -50,7 +50,7 @@ export class QuizGameControllerSuperAdmin {
   }
   @UseGuards(BasicAuthGuard)
   @Put('questions/:id')
-  @HttpCode(200)
+  @HttpCode(204)
   async ChangeBodyQuestionAndAnswer(
     @Body() questionBody: requestBodyQuestionToCreate,
     @Param('id') id: number,
@@ -62,7 +62,7 @@ export class QuizGameControllerSuperAdmin {
   }
   @UseGuards(BasicAuthGuard)
   @Put('questions/:id/publish')
-  @HttpCode(200)
+  @HttpCode(204)
   async changePublishedStatusToQuestion(
     @Body() body: { published: boolean },
     @Param('id') id: number,
