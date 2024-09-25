@@ -48,7 +48,7 @@ export class QuizGameSuperAdminRepository {
     const newQuestion = `INSERT INTO public."questions_entity"(
       id, body, "correctAnswers", published, "createdAt", "updatedAt" )
     VALUES (${generateRandomId.toString()}, '${createNewQuestion.body}', ARRAY['${createNewQuestion.correctAnswers}'],
-     '${createNewQuestion.published}', '${createNewQuestion.createdAt}', '${createNewQuestion.updatedAt}')
+     '${createNewQuestion.published}', '${createNewQuestion.createdAt}','${createNewQuestion.updatedAt}')
     RETURNING *`;
     const result = await this.dataSource.query(newQuestion);
     return this.questGetMapper(result[0]);
@@ -94,13 +94,23 @@ export class QuizGameSuperAdminRepository {
   }
 
   async questGetMapper(quest: questBodyToOutput): Promise<questionBody> {
+    // if (quest.updatedAt === 'null') {
+    //   return {
+    //     id: quest.id.toString(),
+    //     body: quest.body,
+    //     correctAnswers: quest.correctAnswers,
+    //     published: quest.published,
+    //     createdAt: quest.createdAt,
+    //     updatedAt: null,
+    //   };
+    // }
     return {
       id: quest.id.toString(),
       body: quest.body,
       correctAnswers: quest.correctAnswers,
       published: quest.published,
       createdAt: quest.createdAt,
-      updatedAt: quest.updatedAt,
+      updatedAt: 'null' ? null : quest.updatedAt,
     };
   }
 }
