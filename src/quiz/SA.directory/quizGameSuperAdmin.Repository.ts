@@ -31,10 +31,7 @@ export class QuizGameSuperAdminRepository {
       ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT 
       ${pageSizeInQuery} OFFSET ${pageBlog}`,
     );
-    // const items = await Promise.all(result[0]);
     const items = await Promise.all(result.map((p) => this.questGetMapper(p)));
-    console.log(items);
-    // const items = result;
     return {
       pagesCount: pageCountBlogs,
       page: filter.pageNumber,
@@ -86,11 +83,12 @@ export class QuizGameSuperAdminRepository {
       `SELECT * FROM "questions_entity" WHERE id = ${id}`,
     );
     if (!findQuestionInDB[0]) return false;
-    await this.dataSource.query(
+    const res = await this.dataSource.query(
       `UPDATE "questions_entity" SET "published" = ${published}, "updatedAt" = '${now}'
             WHERE "id" = ${id}
             RETURNING *`,
     );
+    console.log(res);
     return true;
   }
 
@@ -111,7 +109,7 @@ export class QuizGameSuperAdminRepository {
       correctAnswers: quest.correctAnswers,
       published: quest.published,
       createdAt: quest.createdAt,
-      updatedAt: 'null' ? null : quest.updatedAt,
+      updatedAt: quest.updatedAt === 'null' ? null : quest.updatedAt,
     };
   }
 }

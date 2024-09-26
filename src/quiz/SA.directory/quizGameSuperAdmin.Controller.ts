@@ -68,7 +68,6 @@ export class QuizGameControllerSuperAdmin {
     @Param('id') id: number,
   ) {
     const published = body.published;
-    console.log(id, 'id', published, 'published');
     return this.quizGameSuperAdminService.updateQuestionPublished(
       published,
       id,
