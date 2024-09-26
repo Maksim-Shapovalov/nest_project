@@ -74,8 +74,8 @@ export class QuizGameSuperAdminRepository {
     if (!findQuestionInDB[0]) return false;
     await this.dataSource.query(
       `UPDATE "questions_entity" SET "body" = '${body.body}',
- "correctAnswers" = ARRAY['${body.correctAnswers}', "updatedAt = '${now}'"]
-            WHERE "id" = ${id}
+ "correctAnswers" = ARRAY['${body.correctAnswers}'], "updatedAt" = '${now}'
+            WHERE "id" = ${id.toString()}
             RETURNING *`,
     );
     return true;
