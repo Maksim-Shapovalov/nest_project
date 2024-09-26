@@ -19,8 +19,6 @@ import {
   questionBody,
   requestBodyQuestionToCreate,
 } from '../type/question.type';
-import { OutputTypePair } from '../type/QuizGame.type';
-import { Not } from 'typeorm';
 
 @Controller('sa/quiz')
 export class QuizGameControllerSuperAdmin {
@@ -71,9 +69,11 @@ export class QuizGameControllerSuperAdmin {
     @Param('id') id: number,
   ) {
     const published = body.published;
-    return this.quizGameSuperAdminService.updateQuestionPublished(
-      published,
-      id,
-    );
+    const findQuest =
+      await this.quizGameSuperAdminService.updateQuestionPublished(
+        published,
+        id,
+      );
+    if (!findQuest) throw new NotFoundException();
   }
 }
