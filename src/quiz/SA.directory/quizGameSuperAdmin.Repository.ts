@@ -81,12 +81,13 @@ export class QuizGameSuperAdminRepository {
     return true;
   }
   async updateQuestionPublishedRepo(published: boolean, id: number) {
+    const now = new Date().toISOString();
     const findQuestionInDB = await this.dataSource.query(
       `SELECT * FROM "questions_entity" WHERE id = ${id}`,
     );
     if (!findQuestionInDB[0]) return false;
     await this.dataSource.query(
-      `UPDATE "questions_entity" SET "published" = ${published}
+      `UPDATE "questions_entity" SET "published" = ${published}, "updatedAt" = '${now}'
             WHERE "id" = ${id}
             RETURNING *`,
     );
