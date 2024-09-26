@@ -20,6 +20,7 @@ import {
   requestBodyQuestionToCreate,
 } from '../type/question.type';
 import { OutputTypePair } from '../type/QuizGame.type';
+import { Not } from 'typeorm';
 
 @Controller('sa/quiz')
 export class QuizGameControllerSuperAdmin {
@@ -55,10 +56,12 @@ export class QuizGameControllerSuperAdmin {
     @Body() questionBody: requestBodyQuestionToCreate,
     @Param('id') id: number,
   ) {
-    return this.quizGameSuperAdminService.updateQuestionBodyAndCorrectAnswer(
-      questionBody,
-      id,
-    );
+    const findQuest =
+      await this.quizGameSuperAdminService.updateQuestionBodyAndCorrectAnswer(
+        questionBody,
+        id,
+      );
+    if (!findQuest) throw new NotFoundException();
   }
   @UseGuards(BasicAuthGuard)
   @Put('questions/:id/publish')
