@@ -1,3 +1,6 @@
+import { Column } from 'typeorm';
+import { UserEntity } from '../../Users/Type/User.entity';
+
 export class DeviceClass {
   constructor(
     public ip: string,
@@ -20,5 +23,15 @@ export type OutpatModelDevicesUser = {
   ip: string;
   title: string;
   lastActiveDate: string;
-  deviceId: string;
+  deviceId: number;
+};
+
+export type DevicesType = {
+  userId: number;
+  deviceId: number;
+  ip: string;
+  title: string;
+  lastActiveDate: string;
+  iat: number;
+  exp: number;
 };

@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import {
   QuizGameClass,
+  QuizGameClass1,
   QuizGameInDB,
   StatusTypeEnumToObject,
   updateTypeOfQuestion,
@@ -10,11 +11,26 @@ import {
 import { NewestPostLike } from '../Users/Type/User.type';
 import { findingPlayer, PlayersEntity } from './entity/Players.Entity';
 import { QuestionsEntity } from './entity/Questions.Entity';
-import { StatusTypeEnumByAnswersToEndpoint } from './entity/QuizGame.entity';
+import {
+  AnswersEntity,
+  QuizGameEntityNotPlayerInfo,
+  StatusTypeEnumByAnswersToEndpoint,
+} from './entity/QuizGame.entity';
 
 @Injectable()
 export class QuizGameTypeOrmRepo {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  constructor(
+    @InjectRepository(QuestionsEntity)
+    protected questionsEntity: QuestionsEntity,
+    @InjectRepository(QuizGameEntityNotPlayerInfo)
+    protected quizGameEntityNotPlayerInfo: QuizGameEntityNotPlayerInfo,
+    @InjectRepository(AnswersEntity)
+    protected answersEntity: AnswersEntity,
+    @InjectRepository(PlayersEntity)
+    protected playersEntity: PlayersEntity,
+
+    @InjectDataSource() protected dataSource: DataSource,
+  ) {}
 
   async getUnfinishedCurrentGameRepo(userModel: NewestPostLike) {
     const findPair = await this.dataSource
@@ -79,7 +95,7 @@ export class QuizGameTypeOrmRepo {
 
   async getGameById(id: number): Promise<QuizGameInDB> {
     const findQuizGame = await this.dataSource.query(
-      `SELECT * FROM "query_game_entity" WHERE id = ${id}`,
+      `SELECT * FROM "quiz_game_entity_not_player_info" WHERE id = ${id}`,
     );
     return findQuizGame[0];
   }
@@ -91,7 +107,7 @@ export class QuizGameTypeOrmRepo {
   }
   async findActivePair(): Promise<QuizGameInDB | false> {
     const activePair = await this.dataSource.query(
-      `SELECT * FROM "query_game_entity" WHERE "status" = ${StatusTypeEnumToObject.PendingSecondPlayer}`,
+      `SELECT * FROM "quiz_game_entity_not_player_info" WHERE "status" = '${StatusTypeEnumToObject.PendingSecondPlayer}'`,
     );
     return activePair[0] ? activePair[0] : false;
   }
@@ -102,29 +118,27 @@ export class QuizGameTypeOrmRepo {
     return getRandomFiveQuestion[0];
   }
   async createNewPairWithNewSingleUser(
-    newPair: QuizGameClass,
+    newPair: QuizGameClass1,
   ): Promise<QuizGameInDB> {
-    const randomId = Math.floor(Math.random() * 1000000);
+    // const randomId = Math.floor(Math.random() * 1000000);
 
     const newPairWithSingleUser = await this.dataSource
-      .query(`INSERT INTO public."query_game_entity"(
-        id, firstPlayerId, firstPlayerLogin, scoreFirstPlayer,
-         secondPlayerId, secondPlayerLogin, scoreSecondPlayer, question,
-          status, pairCreatedDate, startGameDate, finishGameDate)
-          VALUES(${randomId},
-          ${newPair.firstPlayerId},'${newPair.firstPlayerLogin}',${newPair.scoreFirstPlayer},
-          ${newPair.secondPlayerId},'${newPair.secondPlayerLogin}',${newPair.scoreSecondPlayer},
-          0,'${newPair.status}','${newPair.pairCreatedDate}','${newPair.startGameDate}','${newPair.finishGameDate}')
+      .query(`INSERT INTO public."quiz_game_entity_not_player_info"(
+        "firstPlayerId",status, "pairCreatedDate", "startGameDate", "finishGameDate")
+          VALUES(
+           ${newPair.firstPlayerId},
+          '${newPair.status}','${newPair.pairCreatedDate}','${newPair.startGameDate}','${newPair.finishGameDate}')
           RETURNING *
           `);
+
     return newPairWithSingleUser[0];
   }
   async newPlayerOnQuizGame(userModel: NewestPostLike): Promise<PlayersEntity> {
     const newPlayerOnGameQuiz = await this.dataSource
       .query(`INSERT INTO public."players_entity"(
-        id, login, score)
-          VALUES(${userModel.userId},
-          ${userModel.login}, 0)
+         login, score)
+          VALUES(
+          '${userModel.login}', 0)
           RETURNING *
           `);
     return newPlayerOnGameQuiz[0];
@@ -134,9 +148,9 @@ export class QuizGameTypeOrmRepo {
     const now = new Date();
     const fiveQuestion = await this.choiceFiveQuestion();
     const updatePair = await this.dataSource.query(`
-    UPDATE "query_game_entity"
-    SET "secondPlayerId" = ${newPlayerInGame.id}, "secondPlayerLogin" = ${newPlayerInGame.login}
-    "status" = ${StatusTypeEnumToObject.Active}, "startGameDate" = ${now.toISOString()}, "question" = ${fiveQuestion}
+    UPDATE "quiz_game_entity_not_player_info"
+    SET "secondPlayerId" = ${newPlayerInGame.id},
+    "status" = '${StatusTypeEnumToObject.Active}', "startGameDate" = '${now.toISOString()}', "question" = ARRAY['${fiveQuestion}']
     RETURNING *`);
     return updatePair[0];
   }

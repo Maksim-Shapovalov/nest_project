@@ -2,14 +2,10 @@ import {
   Column,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserEntity } from '../../Users/Type/User.entity';
 import { PlayersEntity } from './Players.Entity';
 import { QuestionsEntity } from './Questions.Entity';
 
@@ -49,15 +45,12 @@ import { QuestionsEntity } from './Questions.Entity';
 export class QuizGameEntityNotPlayerInfo {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToMany(() => PlayersEntity)
-  @JoinColumn()
-  firstPlayer: number;
-  @ManyToMany(() => PlayersEntity)
-  @JoinColumn()
-  secondPlayer: number;
-  @ManyToMany(() => QuestionsEntity)
-  @JoinTable()
-  question: QuestionsEntity | null;
+  @ManyToOne(() => PlayersEntity)
+  @JoinColumn({ name: 'firstPlayerId' })
+  firstPlayerId: number;
+  @ManyToOne(() => PlayersEntity)
+  @JoinColumn({ name: 'secondPlayerId' })
+  secondPlayer: number | null;
   @Column()
   status: string;
   @Column()

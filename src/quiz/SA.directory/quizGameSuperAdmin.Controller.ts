@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -16,6 +17,7 @@ import { QueryType } from '../../Other/Query.Type';
 import { queryFilter } from '../../qurey-repo/query-filter';
 import { QuizGameSuperAdminService } from './quizGameSuperAdmin.Service';
 import {
+  publishType,
   questionBody,
   requestBodyQuestionToCreate,
 } from '../type/question.type';
@@ -65,13 +67,15 @@ export class QuizGameControllerSuperAdmin {
   @Put('questions/:id/publish')
   @HttpCode(204)
   async changePublishedStatusToQuestion(
-    @Body() body: { published: boolean },
+    @Body() body: publishType,
     @Param('id') id: number,
   ) {
-    const published = body.published;
+    if (typeof body.published === 'string') {
+      throw new BadRequestException();
+    }
     const findQuest =
       await this.quizGameSuperAdminService.updateQuestionPublished(
-        published,
+        body.published,
         id,
       );
     if (!findQuest) throw new NotFoundException();

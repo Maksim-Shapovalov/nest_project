@@ -1,5 +1,5 @@
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { PaginationQueryType } from '../../qurey-repo/query-filter';
 import {
   BodyUpdatingPost,
@@ -11,29 +11,40 @@ import { UserSQLRepository } from '../../Users/postgres/User.SqlRepositories';
 import { Injectable } from '@nestjs/common';
 import { NewestPostLike } from '../../Users/Type/User.type';
 import { UserSQLTypeOrmRepository } from '../../Users/TypeORM/User.repo.TypeORm';
+import { PostsEntity, PostsLikeEntity } from '../Type/Posts.entity';
+import { UserEntity } from '../../Users/Type/User.entity';
+import { UserRepository } from '../../Users/User.repository';
 
 @Injectable()
 export class PostsPostgresTypeOrmRepository {
   constructor(
-    @InjectDataSource() protected dataSource: DataSource,
-    protected userSQLRepository: UserSQLTypeOrmRepository,
+    @InjectRepository(PostsEntity)
+    protected postsEntityRepo: Repository<PostsEntity>,
+    @InjectRepository(UserEntity)
+    protected userEntityRepo: Repository<UserEntity>,
+    @InjectRepository(PostsLikeEntity)
+    protected postsLikeEntityRepository: Repository<PostsLikeEntity>,
+    protected userTypeOrmRepo: UserRepository,
   ) {}
   async getAllPosts(filter: PaginationQueryType, userId: number | null) {
     const pageSizeInQuery: number = filter.pageSize;
-    const totalCountPosts = await this.dataSource.query(
-      `SELECT COUNT(*) FROM "posts_entity"`,
-    );
+    const totalCountPosts = await this.postsEntityRepo.findAndCount();
 
-    const totalCount = parseInt(totalCountPosts[0].count);
+    // dataSource.query(
+    //   `SELECT COUNT(*) FROM "posts_entity"`,
+    // );
+
+    const totalCount = parseInt(totalCountPosts[1].toString());
     const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
-    const result = await this.dataSource.query(
-      `SELECT * FROM "posts_entity" 
-      ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT 
-      ${pageSizeInQuery} OFFSET ${pageBlog}`,
-    );
-    // const items = result.map((p) => postsLikeMapper(p,userId))
+    const result = await this.postsEntityRepo.find({
+      order: {
+        [filter.sortBy]: filter.sortDirection,
+      },
+      take: pageSizeInQuery,
+      skip: pageBlog,
+    });
     const itemsPromises = result.map((p) => this.postsLikeMapper(p, userId));
     const items = await Promise.all(itemsPromises);
     return {
@@ -46,10 +57,7 @@ export class PostsPostgresTypeOrmRepository {
   }
 
   async getPostsById(id: number, user: NewestPostLike | null) {
-    const findPosts = await this.dataSource.query(
-      `SELECT * FROM "posts_entity" WHERE id = ${id}`,
-    );
-
+    const findPosts = await this.postsEntityRepo.find({ where: { id: id } });
     if (findPosts.length === 0) {
       return null;
     }
@@ -61,22 +69,23 @@ export class PostsPostgresTypeOrmRepository {
     filter: PaginationQueryType,
     userId: NewestPostLike | null,
   ) {
-    const totalCountPosts = await this.dataSource.query(
-      `SELECT COUNT(*) FROM "posts_entity" WHERE "blogId" = ${blogId}`,
-    );
+    const totalCountPosts = await this.postsEntityRepo.findAndCount({
+      where: { blogId: blogId },
+    });
 
     const pageSizeInQuery: number = filter.pageSize;
-    const totalCount = parseInt(totalCountPosts[0].count);
+    const totalCount = parseInt(totalCountPosts[1].toString());
 
     const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
-    const result = await this.dataSource.query(
-      `SELECT * FROM "posts_entity" WHERE "blogId" = ${blogId} 
-      ORDER BY "${filter.sortBy}" ${filter.sortDirection} LIMIT 
-      ${pageSizeInQuery} OFFSET ${pageBlog}`,
-    );
-    // const items = res.map((p) => postsLikeMapper(p,null))
+    const result = await this.postsEntityRepo.find({
+      order: {
+        [filter.sortBy]: filter.sortDirection,
+      },
+      take: pageSizeInQuery,
+      skip: pageBlog,
+    });
     const itemsPromises = result.map((p) => {
       return this.postsLikeMapper(p, userId ? userId.userId : null);
     });
@@ -95,10 +104,14 @@ export class PostsPostgresTypeOrmRepository {
     user: NewestPostLike | null,
     status: AvailableStatusEnum,
   ) {
-    const likeWithUserId = await this.dataSource.query(
-      `SELECT * FROM "posts_like_entity" WHERE "postId" = ${postId} AND "userId" = ${user ? user.userId : null}`,
-    );
-    const findUser = await this.userSQLRepository.getUserById(user.userId);
+    const likeWithUserId: PostsLikeEntity[] =
+      await this.postsLikeEntityRepository.find({
+        where: { post: postId, user: user.userId },
+      });
+    // await this.dataSource.query(
+    //   `SELECT * FROM "posts_like_entity" WHERE "postId" = ${postId} AND "userId" = ${user ? user.userId : null}`,
+    // );
+    const findUser = await this.userTypeOrmRepo.getUserById(user.userId);
     if (!findUser) {
       return false;
     }
@@ -107,59 +120,65 @@ export class PostsPostgresTypeOrmRepository {
       return false;
     }
     if (likeWithUserId[0]) {
-      const updateStatus = await this.dataSource.query(
-        `UPDATE public."posts_like_entity" SET "likesStatus"= '${status}'
-	      WHERE "postId" = ${postId} AND "userId" = ${user ? user.userId : null}
-	      RETURNING *`,
+      const updateStatus = await this.postsLikeEntityRepository.update(
+        likeWithUserId[0].id,
+        {
+          likesStatus: status,
+        },
       );
+
       if (!updateStatus) return null;
 
       return updateStatus[0];
     } else {
-      const randomId = Math.floor(Math.random() * 1000000);
-      await this.dataSource.query(`INSERT INTO public."posts_like_entity"(
-        id, "postId", "userId", login, "createdAt", "likesStatus")
-        VALUES (${randomId},${postId}, ${user.userId}, '${findUser.login}', '${new Date().toISOString()}', '${status}');`);
+      // const randomId = Math.floor(Math.random() * 1000000);
+      const newPost = await this.postsLikeEntityRepository.create({
+        post: postId,
+        user: user.userId,
+        login: findUser.login,
+        createdAt: new Date().toISOString(),
+        likesStatus: status,
+      });
+      await this.postsLikeEntityRepository.save(newPost);
       return true;
     }
   }
 
   async savePost(post: PostClass, userId: number) {
-    const randomId = Math.floor(Math.random() * 1000000);
-    // await this.postsLikeMapper(post, null);
-    const newPost = `INSERT INTO public."posts_entity"(
-      id, content, "createdAt", title, "shortDescription", "blogId", "blogName")
-    VALUES (${randomId}, '${post.content}', '${post.createdAt}', '${post.title}', '${post.shortDescription}', '${post.blogId}', '${post.blogName}')
-    RETURNING *`;
-    const result = await this.dataSource.query(newPost);
-    return this.postsLikeMapper(result[0], userId);
+    const result = await this.postsEntityRepo.create({
+      content: post.content,
+      createdAt: post.createdAt,
+      title: post.title,
+      shortDescription: post.shortDescription,
+      blogId: post.blogId,
+      blogName: post.blogName,
+    });
+    const savePosts = await this.postsEntityRepo.save(result);
+    return this.postsLikeMapper(savePosts[0], userId);
   }
 
   async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {
-    const findPostQuery = await this.dataSource.query(
-      `SELECT * FROM "posts_entity" WHERE "id" = ${postBody.postId} AND "blogId" = ${postBody.blogId}`,
-    );
+    const findPostQuery = await this.postsEntityRepo.find({
+      where: { id: postBody.postId, blogId: postBody.blogId },
+    });
     if (findPostQuery.length === 0) {
       return null;
     }
-
-    await this.dataSource.query(`
-    UPDATE "posts_entity"
-    SET "title" = '${postBody.title}', "shortDescription" = '${postBody.shortDescription}', "content" = '${postBody.content}', "blogId" = ${postBody.blogId}
-    WHERE "id" = '${postBody.postId}'
-    RETURNING * `);
+    await this.postsEntityRepo.update(postBody.postId, {
+      title: postBody.title,
+      shortDescription: postBody.shortDescription,
+      content: postBody.content,
+      blogId: postBody.blogId,
+    });
     return true;
   }
 
   async deletePostsById(id: number): Promise<boolean> {
-    const findPostInDB = await this.dataSource.query(
-      `SELECT * FROM "posts_entity" WHERE id = ${id}`,
-    );
+    const findPostInDB = await this.postsEntityRepo.find({ where: { id: id } });
     if (!findPostInDB[0]) return false;
-    const findPost = await this.dataSource.query(
-      `DELETE FROM public."posts_entity" WHERE "id" = ${id} ;`,
-    );
-    if (findPost[1] > 0) return true;
+    const findPost = await this.postsEntityRepo.delete(id);
+    if (findPost.affected > 0) return true;
+    return false;
   }
 
   async postsLikeMapper(post: any, userId: number | null) {
@@ -167,22 +186,38 @@ export class PostsPostgresTypeOrmRepository {
     let dislikesCount;
     let myStatus;
     if (userId) {
-      likesCount = await this.dataSource.query(
-        `SELECT COALESCE(COUNT(*), 0)::int as likesCount FROM "posts_like_entity" WHERE "likesStatus" = '${AvailableStatusEnum.like}'AND "postId" = ${post.id}`,
-      );
+      likesCount = await this.postsLikeEntityRepository
+        .createQueryBuilder('like')
+        .where('like.likesStatus = :status', {
+          status: AvailableStatusEnum.like,
+        })
+        .andWhere('like.postId = :postId', { postId: post.id })
+        .getCount();
       //"userId" = ${userId ? userId : null}
-      dislikesCount = await this.dataSource.query(
-        `SELECT COALESCE(COUNT(*), 0)::int as dislikesCount FROM "posts_like_entity" WHERE  "likesStatus" = '${AvailableStatusEnum.dislike}' AND "postId" = ${post.id}`,
-      );
+      dislikesCount = await this.postsLikeEntityRepository
+        .createQueryBuilder('dislike')
+        .where('like.likesStatus = :status', {
+          status: AvailableStatusEnum.dislike,
+        })
+        .andWhere('like.postId = :postId', { postId: post.id })
+        .getCount();
 
-      myStatus = await this.dataSource.query(
-        `SELECT * FROM "posts_like_entity" WHERE "postId" = ${post.id} AND "userId" = ${userId}`,
-      );
+      myStatus = await this.postsLikeEntityRepository
+        .createQueryBuilder('like')
+        .where('like.postId = :postId', { postId: post.id })
+        .andWhere('like.userId = :userId', { userId })
+        .getOne();
     }
 
-    const findThreeLastUser = await this.dataSource.query(
-      `SELECT * FROM "posts_like_entity" WHERE "postId" = ${post.id} AND "likesStatus" = '${AvailableStatusEnum.like}' ORDER BY "createdAt" DESC LIMIT 3 `,
-    );
+    const findThreeLastUser = await this.postsLikeEntityRepository
+      .createQueryBuilder('like')
+      .where('like.postId = :postId', { postId: post.id })
+      .andWhere('like.likesStatus = :status', {
+        status: AvailableStatusEnum.like,
+      })
+      .orderBy('like.createdAt', 'DESC')
+      .take(3)
+      .getMany();
 
     return {
       id: post.id.toString(),
@@ -200,7 +235,7 @@ export class PostsPostgresTypeOrmRepository {
         myStatus: myStatus?.[0]?.likesStatus ?? 'None', //myStatus ? myStatus.likesStatus : 'None'
         newestLikes: findThreeLastUser.map((r) => ({
           addedAt: r.createdAt,
-          userId: r.userId.toString(),
+          userId: r.user.toString(),
           login: r.login,
         })), //findThreeLastUser.map(UserDbType.UserInReqMapper)
       },

@@ -11,7 +11,7 @@ import {
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 import { QuizGameService } from './QuizGame.service';
 import { AnswerType, OutputTypePair } from './type/QuizGame.type';
-import { User } from '../auth/guard/authGuard';
+import { BearerGuard, User } from '../auth/guard/authGuard';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { QuizGameTypeOrmRepo } from './QuizGame.TypeOrmRepo';
 
@@ -21,7 +21,7 @@ export class QuizGameController {
     protected quizGameService: QuizGameService,
     protected quizGameRepo: QuizGameTypeOrmRepo,
   ) {}
-  @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerGuard)
   @Get('my-current')
   @HttpCode(200)
   async getUnfinishedCurrentGame(@User() userModel: NewestPostLike) {
@@ -30,7 +30,7 @@ export class QuizGameController {
     if (!findUnfinishedGameToCurrentUser) throw new NotFoundException();
     return findUnfinishedGameToCurrentUser;
   }
-  @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerGuard)
   @Get(':id')
   @HttpCode(200)
   async getGameById(@Param('id') id: number): Promise<OutputTypePair> {
@@ -39,7 +39,7 @@ export class QuizGameController {
     if (!findQuizGameById) throw new NotFoundException();
     return findQuizGameById;
   }
-  @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerGuard)
   @Post('connection')
   @HttpCode(200)
   async connectCurrentUser(
@@ -50,7 +50,7 @@ export class QuizGameController {
     return findPairWithOneUser;
   }
 
-  @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerGuard)
   @Post('my-current/answers')
   @HttpCode(200)
   async sendAnswer(@Body() answer: string, @User() userModel: NewestPostLike) {

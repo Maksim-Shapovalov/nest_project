@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { QuizGameSuperAdminRepository } from './quizGameSuperAdmin.Repository';
 import { PaginationQueryType } from '../../qurey-repo/query-filter';
 import {
   QuestionType,
   requestBodyQuestionToCreate,
 } from '../type/question.type';
+import { QuizGameSuperAdminRepositoryTypeORM } from './quizGameSuperAdmin.Repository.TypeORM';
 
 @Injectable()
 export class QuizGameSuperAdminService {
   constructor(
-    protected quizGameSuperAdminRepository: QuizGameSuperAdminRepository,
+    protected quizGameSuperAdminRepository: QuizGameSuperAdminRepositoryTypeORM,
   ) {}
   async getAllQuestions(filter: PaginationQueryType) {
     return this.quizGameSuperAdminRepository.getAllQuestions(filter);

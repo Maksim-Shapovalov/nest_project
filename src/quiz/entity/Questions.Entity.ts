@@ -1,18 +1,25 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { QuizGameEntityNotPlayerInfo } from './QuizGame.entity';
 
 @Entity()
 export class QuestionsEntity {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
   @Column()
   body: string;
   @Column('text', { array: true })
-  correctAnswers: string[];
+  correctAnswers: [string];
   @Column({ default: false })
   published: boolean;
   @Column()
   createdAt: string;
-  @Column()
+  @Column({ default: null })
   updatedAt: string | null;
 }
 
@@ -20,3 +27,11 @@ export type QuestionTypeOnMapper = {
   id: number;
   body: string;
 };
+
+@Entity()
+export class QuestionGame {
+  @ManyToOne(() => QuizGameEntityNotPlayerInfo)
+  gameId: number;
+  @ManyToOne(() => QuestionsEntity)
+  questionId: number;
+}

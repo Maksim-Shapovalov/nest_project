@@ -1,10 +1,22 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { AnswersEntity } from './QuizGame.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { AnswersEntity, QuizGameEntityNotPlayerInfo } from './QuizGame.entity';
+import { UserEntity } from '../../Users/Type/User.entity';
 
 @Entity()
 export class PlayersEntity {
   @PrimaryGeneratedColumn()
   id: number;
+  @OneToOne(() => UserEntity)
+  user: UserEntity;
+  @ManyToOne(() => QuizGameEntityNotPlayerInfo)
+  game: QuizGameEntityNotPlayerInfo;
   @Column()
   login: string;
   @Column()

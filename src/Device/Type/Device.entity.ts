@@ -1,10 +1,4 @@
-import {
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Column } from 'typeorm';
 import { UserEntity } from '../../Users/Type/User.entity';
 
@@ -22,7 +16,7 @@ export class DeviceEntity {
   iat: number;
   @Column()
   exp: number;
-  @ManyToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
   user: UserEntity;
 }

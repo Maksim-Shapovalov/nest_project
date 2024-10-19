@@ -16,6 +16,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { UserRepository } from '../Users/User.repository';
 import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class PostsRepository {

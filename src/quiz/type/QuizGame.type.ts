@@ -18,6 +18,17 @@ export class QuizGameClass {
   ) {}
 }
 
+export class QuizGameClass1 {
+  constructor(
+    public firstPlayerId: number,
+    public secondPlayerId: number | null,
+    public status: StatusTypeEnumToObject,
+    public pairCreatedDate: string,
+    public startGameDate: string,
+    public finishGameDate: string,
+  ) {}
+}
+
 export type AnswerType = {
   questionId: string;
   answerStatus: string;

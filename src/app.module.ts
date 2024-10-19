@@ -45,7 +45,6 @@ import { CustomBlogIdValidation } from './Posts/validation/BlogExists.decorator'
 import { ThrottlerModule } from '@nestjs/throttler';
 import { UserSQLRepository } from './Users/postgres/User.SqlRepositories';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SecurityDevicesSQLRepository } from './Device/postgres/SecurityDeviceSQLRepository';
 import { BlogsSQLController } from './Blogs/postgres/Blogs.postgress.controller';
 import { PostsPostgresRepository } from './Posts/postgres/Posts.postgres.repository';
 import { CommentSqlRepository } from './Comment/postgress/Comments.postgress.repository';
@@ -71,9 +70,9 @@ import { QuizGameService } from './quiz/QuizGame.service';
 import { QuizGameController } from './quiz/QuizGame.controller';
 import { QuizGameControllerSuperAdmin } from './quiz/SA.directory/quizGameSuperAdmin.Controller';
 import { QuizGameSuperAdminService } from './quiz/SA.directory/quizGameSuperAdmin.Service';
-import { QuizGameSuperAdminRepository } from './quiz/SA.directory/quizGameSuperAdmin.Repository';
 import { QuestionsEntity } from './quiz/entity/Questions.Entity';
 import { PlayersEntity } from './quiz/entity/Players.Entity';
+import { QuizGameSuperAdminRepositoryTypeORM } from './quiz/SA.directory/quizGameSuperAdmin.Repository.TypeORM';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -142,7 +141,6 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
   ],
   controllers: [
     PostsController,
-
     AppController,
     UserController,
     BlogsController,
@@ -168,7 +166,6 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
     RefreshTokenRepo,
     CustomBlogIdValidation,
     UserSQLRepository,
-    SecurityDevicesSQLRepository,
     SecurityDevicesSQLTypeOrmRepository,
     BlogsSQLTypeOrmRepository,
     PostsPostgresRepository,
@@ -177,7 +174,7 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
     QuizGameService,
     QuizGameTypeOrmRepo,
     QuizGameSuperAdminService,
-    QuizGameSuperAdminRepository,
+    QuizGameSuperAdminRepositoryTypeORM,
   ],
 })
 export class AppModule {}

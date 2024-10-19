@@ -21,7 +21,7 @@ export class PostsEntity {
   content: string;
   @ManyToOne(() => BlogsEntity)
   @JoinColumn()
-  blog: number;
+  blogId: number;
   @Column()
   blogName: string;
   @Column()

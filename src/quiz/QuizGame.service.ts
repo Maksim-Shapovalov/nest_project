@@ -4,6 +4,7 @@ import {
   AnswerType,
   OutputTypePair,
   QuizGameClass,
+  QuizGameClass1,
   QuizGameInDB,
   StatusTypeEnumToObject,
   updateTypeOfQuestion,
@@ -41,13 +42,9 @@ export class QuizGameService {
   async createPair(userModel: NewestPostLike): Promise<OutputTypePair> {
     const newPlayer = await this.quizGameRepo.newPlayerOnQuizGame(userModel);
     const now = new Date();
-    const newActivePair = new QuizGameClass(
+    const newActivePair = new QuizGameClass1(
       newPlayer.id,
-      newPlayer.login,
-      newPlayer.score,
       null,
-      null,
-      0,
       StatusTypeEnumToObject.PendingSecondPlayer,
       now.toISOString(),
       '0',
@@ -92,6 +89,7 @@ export class QuizGameService {
     const findPlayerInGameTheScorePlayer = await this.quizGameRepo.findPlayer(
       game.secondPlayerId,
     );
+    console.log(findPlayerInGameTheFirstPlayer, findPlayerInGameTheScorePlayer);
     // const question = questions.map((q) => ({
     //   id: q.id.toString(),
     //   body: q.body,

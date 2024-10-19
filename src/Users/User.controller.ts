@@ -55,7 +55,7 @@ export class UserController {
       user.login,
       user.email,
     );
-    if (findUser) throw new BadRequestException();
+    if (!findUser) throw new BadRequestException();
     return this.serviceUser.getNewUser(user);
   }
   @UseGuards(BasicAuthGuard)
@@ -63,10 +63,7 @@ export class UserController {
   @HttpCode(204)
   async deleteUserInDB(@Param('id') userId) {
     if (!userId) throw new NotFoundException();
-    const deletedUs = await this.serviceUser.deleteUserById(userId);
-    if (!deletedUs) {
-      throw new NotFoundException();
-    }
+    await this.serviceUser.deleteUserById(userId);
     return HttpCode(204);
   }
 }

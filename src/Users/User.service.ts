@@ -33,7 +33,7 @@ export class UserService {
       Math.floor(10000 + Math.random() * 90000).toString(),
     );
     const createdNewUser = await this.userSQLRepository.saveUser(newUser);
-    return userToPostMapper(createdNewUser[0]);
+    return createdNewUser;
   }
   async deleteUserById(userId: number): Promise<boolean> {
     return await this.userSQLRepository.deleteUserById(userId);

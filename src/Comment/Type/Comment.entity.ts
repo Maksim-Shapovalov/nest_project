@@ -16,7 +16,7 @@ export class CommentEntity {
   userLogin: string;
   @ManyToOne(() => PostsEntity)
   @JoinColumn()
-  post: PostsEntity;
+  postId: PostsEntity;
   @Column()
   createdAt: string;
 }
@@ -25,11 +25,11 @@ export class CommentLikeEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @ManyToOne(() => CommentEntity)
-  @JoinColumn()
-  comment: number;
+  @JoinColumn({ name: 'commentId' })
+  comment: CommentEntity;
   @Column()
   likesStatus: string;
   @ManyToOne(() => UserEntity)
   @JoinColumn()
-  user: number;
+  user: UserEntity;
 }
