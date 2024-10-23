@@ -34,7 +34,10 @@ export type questBodyToOutput = {
   createdAt: string;
   updatedAt: string | null;
 };
-
+export type questBodyToOutput1 = {
+  id: number;
+  body: string;
+};
 export type publishType = {
   published: boolean;
 };

@@ -1,9 +1,11 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { AnswersEntity, QuizGameEntityNotPlayerInfo } from './QuizGame.entity';
@@ -15,13 +17,15 @@ export class PlayersEntity {
   id: number;
   @OneToOne(() => UserEntity)
   user: UserEntity;
-  @ManyToOne(() => QuizGameEntityNotPlayerInfo)
+  @ManyToOne(() => QuizGameEntityNotPlayerInfo, { onDelete: 'CASCADE' })
   game: QuizGameEntityNotPlayerInfo;
   @Column()
   login: string;
   @Column()
   score: number;
-  @OneToMany(() => AnswersEntity, (answer) => answer.player)
+  @OneToMany(() => AnswersEntity, (answer) => answer.player, {
+    onDelete: 'CASCADE',
+  })
   answers: AnswersEntity[];
 }
 

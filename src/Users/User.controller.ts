@@ -55,7 +55,8 @@ export class UserController {
       user.login,
       user.email,
     );
-    if (!findUser) throw new BadRequestException();
+    console.log(findUser);
+    if (findUser) throw new BadRequestException();
     return this.serviceUser.getNewUser(user);
   }
   @UseGuards(BasicAuthGuard)

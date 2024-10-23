@@ -49,7 +49,6 @@ export class AuthController {
       IP: req.ip,
       deviceName: header['user-agent'],
     };
-
     const { accessToken, refreshToken } = await this.authService.signIn(
       body,
       userAgent,

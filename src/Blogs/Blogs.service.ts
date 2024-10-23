@@ -24,7 +24,7 @@ export class BlogsService {
     );
 
     const res = await this.blogsSQLRepository.saveBlog(newBlogs);
-    return blogMapperSQL(res[0]);
+    return res;
   }
   async updateBlogById(blogs: bodyForUpdateBlogs): Promise<boolean> {
     return this.blogsSQLRepository.updateBlogById(blogs);

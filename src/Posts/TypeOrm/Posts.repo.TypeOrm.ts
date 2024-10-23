@@ -154,7 +154,7 @@ export class PostsPostgresTypeOrmRepository {
       blogName: post.blogName,
     });
     const savePosts = await this.postsEntityRepo.save(result);
-    return this.postsLikeMapper(savePosts[0], userId);
+    return this.postsLikeMapper(savePosts, userId);
   }
 
   async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {

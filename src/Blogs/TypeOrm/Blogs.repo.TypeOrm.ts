@@ -74,7 +74,6 @@ export class BlogsSQLTypeOrmRepository {
       createdAt: blog.createdAt,
       isMembership: blog.isMembership,
     });
-
     const result = await this.blogsRepository.save(newBlogs);
     return blogMapperSQL(result);
   }

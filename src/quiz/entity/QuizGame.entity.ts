@@ -2,7 +2,10 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -41,35 +44,52 @@ import { QuestionsEntity } from './Questions.Entity';
 //   @Column()
 //   finishGameDate: string;
 // }
+enum StatusTypeEnum {
+  Active = 'Active',
+  Finished = 'Finished',
+  PendingSecondPlayer = 'PendingSecondPlayer',
+}
 @Entity()
 export class QuizGameEntityNotPlayerInfo {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => PlayersEntity)
-  @JoinColumn({ name: 'firstPlayerId' })
-  firstPlayerId: number;
-  @ManyToOne(() => PlayersEntity)
-  @JoinColumn({ name: 'secondPlayerId' })
-  secondPlayer: number | null;
+  @ManyToOne(() => PlayersEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'firstPlayer' })
+  firstPlayer: PlayersEntity;
+
   @Column()
-  status: string;
+  firstPlayerId: number;
+
+  @ManyToOne(() => PlayersEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'secondPlayer' })
+  secondPlayer: PlayersEntity | null;
+
+  @Column({ default: null })
+  secondPlayerId: number | null;
+  @Column()
+  status: StatusTypeEnum;
   @Column()
   pairCreatedDate: string;
   @Column()
   startGameDate: string;
   @Column()
   finishGameDate: string;
+  @ManyToMany(() => QuestionsEntity, (question) => question.quizGames)
+  @JoinTable({ name: 'quiz_game_questions' })
+  question: QuestionsEntity[] | null;
 }
 @Entity()
 export class AnswersEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @OneToOne(() => QuestionsEntity)
-  question: number;
-  @ManyToOne(() => PlayersEntity, (player) => player.answers)
+  question: QuestionsEntity;
+  @ManyToOne(() => PlayersEntity, (player) => player.answers, {
+    onDelete: 'CASCADE',
+  })
   player: PlayersEntity;
   @Column()
-  answerStatus: StatusTypeEnumByAnswers;
+  answerStatus: StatusTypeEnumByAnswersToEndpoint;
   @Column()
   answer: string;
   @Column()

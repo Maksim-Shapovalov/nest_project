@@ -128,7 +128,7 @@ export class UserSQLTypeOrmRepository {
     loginOrEmail: string,
   ): Promise<FindUserByRecoveryCode> {
     const findUserQuery = await this.userEntityRepo.find({
-      where: [{ login: loginOrEmail, email: loginOrEmail }],
+      where: [{ login: loginOrEmail }, { email: loginOrEmail }],
     });
     // await this.dataSource.query(
     //   `SELECT * FROM "user_entity" WHERE "login" = '${loginOrEmail}' OR "email" = '${loginOrEmail}'`,
@@ -151,12 +151,10 @@ export class UserSQLTypeOrmRepository {
     // await this.dataSource.query(
     //   `SELECT * FROM "user_entity" WHERE login = '${login}' OR email = '${email}'`,
     // );
-    if (findUserQuery.length === 0) {
+    if (!findUserQuery) {
       return null;
     }
-
-    const user = findUserQuery[0];
-    return userToResendMessageMapper(user);
+    return userToResendMessageMapper(findUserQuery);
   }
   async findByLoginAndEmail(
     login: string,

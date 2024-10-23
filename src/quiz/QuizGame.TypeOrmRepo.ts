@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import {
-  QuizGameClass,
+  OutputTypePair,
+  OutputTypePairToGetId,
   QuizGameClass1,
   QuizGameInDB,
-  StatusTypeEnumToObject,
+  StatusTypeEnum,
   updateTypeOfQuestion,
 } from './type/QuizGame.type';
 import { NewestPostLike } from '../Users/Type/User.type';
@@ -21,137 +22,259 @@ import {
 export class QuizGameTypeOrmRepo {
   constructor(
     @InjectRepository(QuestionsEntity)
-    protected questionsEntity: QuestionsEntity,
+    protected questionsEntity: Repository<QuestionsEntity>,
     @InjectRepository(QuizGameEntityNotPlayerInfo)
-    protected quizGameEntityNotPlayerInfo: QuizGameEntityNotPlayerInfo,
+    protected quizGameEntityNotPlayerInfo: Repository<QuizGameEntityNotPlayerInfo>,
     @InjectRepository(AnswersEntity)
-    protected answersEntity: AnswersEntity,
+    protected answersEntity: Repository<AnswersEntity>,
     @InjectRepository(PlayersEntity)
-    protected playersEntity: PlayersEntity,
+    protected playersEntity: Repository<PlayersEntity>,
 
     @InjectDataSource() protected dataSource: DataSource,
   ) {}
 
   async getUnfinishedCurrentGameRepo(userModel: NewestPostLike) {
-    const findPair = await this.dataSource
-      .query(`SELECT * FROM "query_game_entity" 
-    WHERE "firstPlayerId" = ${userModel.userId} AND "firstPlayerLogin" = ${userModel.login} AND "status" = ${StatusTypeEnumToObject.Active}`);
-    return findPair[0];
+    return this.quizGameEntityNotPlayerInfo.findOne({
+      where: {
+        firstPlayerId: userModel.userId,
+        status: StatusTypeEnum.Active,
+      },
+    });
+    // return findPair;
   }
   async getPairGameByPlayerId(
     id: number,
     answer: string,
   ): Promise<updateTypeOfQuestion> {
-    const findPair = await this.dataSource.query(
-      `SELECT * FROM "quiz_game_entity_not_player_info_entity" 
-        WHERE "firstPlayerId" = ${id} OR "secondPlayerId" = ${id}`,
-    );
-    const findPlayer = await this.findPlayer(id);
-    const number = findPlayer.answers.length;
-    const newArray = findPair.question.slice(number);
-    return this.sendAnswerRepo(answer, findPlayer, newArray);
-  }
-  async sendAnswerRepo(
-    answer: string,
-    user: findingPlayer,
-    question: QuestionsEntity,
-  ): Promise<updateTypeOfQuestion> {
-    const findQuestion = await this.dataSource.query(
-      `SELECT * FROM "questions_entity" WHERE "body" = ${question.body}`,
-    );
-    const time = new Date().toISOString();
-    if (!question.correctAnswers.includes(answer)) {
-      return this.addAnswerToDB(
-        findQuestion.id,
-        user.id,
-        StatusTypeEnumByAnswersToEndpoint.incorrect,
-        answer,
-        time,
-      );
+    const now = new Date().toISOString();
+    const findPair_0 = await this.quizGameEntityNotPlayerInfo.findOne({
+      where: [{ firstPlayerId: id, secondPlayerId: id }],
+    });
+    const findPlayer_0 = await this.findPlayer(id);
+    const num = findPair_0.question.slice(findPlayer_0.answers.length)[0];
+    const findQuestion = await this.questionsEntity.findOne({
+      where: { id: num.id },
+    });
+    if (findQuestion.correctAnswers.includes(answer)) {
+      const addAnswer = await this.answersEntity.create({
+        question: num,
+        player: findPlayer_0,
+        answer: answer,
+        answerStatus: StatusTypeEnumByAnswersToEndpoint.correct,
+        addedAt: now,
+      });
+      await this.changeScoreToPlayer(1, findPlayer_0.id);
+      return this.answersEntity.save(addAnswer);
+    } else if (!findQuestion.correctAnswers.includes(answer)) {
+      const addAnswer = await this.answersEntity.create({
+        question: num,
+        player: findPlayer_0,
+        answer: answer,
+        answerStatus: StatusTypeEnumByAnswersToEndpoint.incorrect,
+        addedAt: now,
+      });
+      await this.changeScoreToPlayer(0, findPlayer_0.id);
+      return this.answersEntity.save(addAnswer);
     }
-    return this.addAnswerToDB(
-      findQuestion.id,
-      user.id,
-      StatusTypeEnumByAnswersToEndpoint.correct,
-      answer,
-      time,
-    );
+    // const addAnswer = await this.answersEntity.create({
+    //   question: num,
+    //   player: findPlayer_0,
+    //   answer: answer,
+    //   answerStatus: StatusTypeEnumByAnswersToEndpoint.incorrect
+    //   addedAt:
+    // });
+
+    // const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
+    //   where: [{ firstPlayerId: id, secondPlayerId: id }],
+    // });
+    // const findPlayer = await this.findPlayer(id);
+    // // const findPlayerEntity = await this.findPlayerEntity(id);
+    // const number = findPlayer.answers.length;
+    // await this.playersEntity.update(findPlayer.id, {
+    //   answers: answer,
+    // });
+    // const newArray = findPair.question.slice(number);
+    // // const newArrays = await this.
+    // return this.sendAnswerRepo(answer, findPlayerEntity, newArray);
   }
-  async addAnswerToDB(
-    questionId: number,
-    playerId: number,
-    answerStatus: StatusTypeEnumByAnswersToEndpoint,
-    answer: string,
-    addedAt: string,
-  ): Promise<updateTypeOfQuestion> {
-    const findQuizGame = await this.dataSource.query(`
-    INSERT INTO public."answers_entity"(
-    questionId,playerId, answerStatus, answer, addedAt)
-     VALUES(${questionId},
-     ${playerId}, answerStatus, ${answer}, ${addedAt}
-    `);
-    return findQuizGame[0];
+  async changeScoreToPlayer(point: number, idPlayer: number) {
+    const player = await this.playersEntity.findOne({
+      where: { id: idPlayer },
+    });
+    const newScore = player.score + point;
+    await this.playersEntity.update(idPlayer, {
+      score: newScore,
+    });
+  }
+  // async sendAnswerRepo(
+  //   answer: string,
+  //   user: PlayersEntity,
+  //   question: QuestionsEntity,
+  // ): Promise<updateTypeOfQuestion> {
+  //   const findQuestion = await this.questionsEntity.findOne({
+  //     where: { body: question.body },
+  //   });
+  //   const time = new Date().toISOString();
+  //   if (!question.correctAnswers.includes(answer)) {
+  //     return this.addAnswerToDB(
+  //       findQuestion,
+  //       user,
+  //       StatusTypeEnumByAnswersToEndpoint.incorrect,
+  //       answer,
+  //       time,
+  //     );
+  //   }
+  //   return this.addAnswerToDB(
+  //     findQuestion,
+  //     user,
+  //     StatusTypeEnumByAnswersToEndpoint.correct,
+  //     answer,
+  //     time,
+  //   );
+  // }
+  // async addAnswerToDB(
+  //   question: QuestionsEntity,
+  //   player: PlayersEntity,
+  //   answerStatus: StatusTypeEnumByAnswersToEndpoint,
+  //   answer: string,
+  //   addedAt: string,
+  // ): Promise<updateTypeOfQuestion> {
+  //   const findQuizGame = await this.answersEntity.create({
+  //     question: question,
+  //     player: player,
+  //     answerStatus: answerStatus,
+  //     answer: answer,
+  //     addedAt: addedAt,
+  //   });
+  //   const saveAnswer = await this.answersEntity.save(findQuizGame);
+  //   const result: updateTypeOfQuestion = {
+  //     questionId: saveAnswer.question.id,
+  //     playerId: saveAnswer.player.id,
+  //     answerStatus: StatusTypeEnumByAnswers,
+  //     answer: string,
+  //     addedAt: string,
+  //   };
+  // }
+
+  async getGameById(id: number): Promise<OutputTypePairToGetId> {
+    return this.quizGameEntityNotPlayerInfo.findOne({
+      where: {
+        id: id,
+      },
+      relations: ['question'],
+    });
+
+    // this.dataSource.query(
+    //   `SELECT * FROM "quiz_game_entity_not_player_info" WHERE id = ${id}`,
+    // );
+    // return findQuizGame;
+  }
+  async findPlayer(id: number): Promise<findingPlayer | null> {
+    return this.playersEntity.findOne({
+      where: { id: id },
+      relations: {
+        answers: true,
+      },
+    });
+  }
+  // async findPlayerEntity(id: number) {
+  //   return this.playersEntity.findOne({ where: { id: id } });
+  // }
+  async findActivePair(): Promise<QuizGameEntityNotPlayerInfo | false> {
+    const activePair = await this.quizGameEntityNotPlayerInfo.findOne({
+      where: { status: StatusTypeEnum.PendingSecondPlayer },
+    });
+    return activePair ? activePair : false;
   }
 
-  async getGameById(id: number): Promise<QuizGameInDB> {
-    const findQuizGame = await this.dataSource.query(
-      `SELECT * FROM "quiz_game_entity_not_player_info" WHERE id = ${id}`,
-    );
-    return findQuizGame[0];
-  }
-  async findPlayer(id: number): Promise<findingPlayer> {
-    const findPlayer = await this.dataSource.query(
-      `SELECT * FROM "players_entity" WHERE id = ${id}`,
-    );
-    return findPlayer[0];
-  }
-  async findActivePair(): Promise<QuizGameInDB | false> {
-    const activePair = await this.dataSource.query(
-      `SELECT * FROM "quiz_game_entity_not_player_info" WHERE "status" = '${StatusTypeEnumToObject.PendingSecondPlayer}'`,
-    );
-    return activePair[0] ? activePair[0] : false;
-  }
-  async choiceFiveQuestion() {
-    const getRandomFiveQuestion = await this.dataSource
-      .query(`SELECT * FROM "questions_entity"
-        WHERE "published" = true ORDER BY RANDOM() LIMIT 5`);
-    return getRandomFiveQuestion[0];
-  }
   async createNewPairWithNewSingleUser(
+    newPlayer: PlayersEntity,
     newPair: QuizGameClass1,
+    newPlayerId: number,
   ): Promise<QuizGameInDB> {
     // const randomId = Math.floor(Math.random() * 1000000);
 
-    const newPairWithSingleUser = await this.dataSource
-      .query(`INSERT INTO public."quiz_game_entity_not_player_info"(
-        "firstPlayerId",status, "pairCreatedDate", "startGameDate", "finishGameDate")
-          VALUES(
-           ${newPair.firstPlayerId},
-          '${newPair.status}','${newPair.pairCreatedDate}','${newPair.startGameDate}','${newPair.finishGameDate}')
-          RETURNING *
-          `);
+    const newPairWithSingleUser = await this.quizGameEntityNotPlayerInfo.create(
+      {
+        firstPlayer: newPlayer,
+        firstPlayerId: newPlayerId,
+        status: newPair.status,
+        pairCreatedDate: newPair.pairCreatedDate,
+        startGameDate: newPair.startGameDate,
+        finishGameDate: newPair.finishGameDate,
+        question: null,
+      },
+    );
 
-    return newPairWithSingleUser[0];
+    return this.quizGameEntityNotPlayerInfo.save(newPairWithSingleUser);
   }
-  async newPlayerOnQuizGame(userModel: NewestPostLike): Promise<PlayersEntity> {
-    const newPlayerOnGameQuiz = await this.dataSource
-      .query(`INSERT INTO public."players_entity"(
-         login, score)
-          VALUES(
-          '${userModel.login}', 0)
-          RETURNING *
-          `);
-    return newPlayerOnGameQuiz[0];
-  }
+
   async connectSecondUserWithFirstUserRepo(userModel: NewestPostLike) {
+    const findActivePair = await this.quizGameEntityNotPlayerInfo.findOne({
+      where: {
+        secondPlayerId: null,
+        status: StatusTypeEnum.PendingSecondPlayer,
+      },
+    });
     const newPlayerInGame = await this.newPlayerOnQuizGame(userModel);
     const now = new Date();
-    const fiveQuestion = await this.choiceFiveQuestion();
-    const updatePair = await this.dataSource.query(`
-    UPDATE "quiz_game_entity_not_player_info"
-    SET "secondPlayerId" = ${newPlayerInGame.id},
-    "status" = '${StatusTypeEnumToObject.Active}', "startGameDate" = '${now.toISOString()}', "question" = ARRAY['${fiveQuestion}']
-    RETURNING *`);
-    return updatePair[0];
+    await this.playersEntity.update(newPlayerInGame.id, {
+      game: findActivePair,
+    });
+    await this.quizGameEntityNotPlayerInfo.update(findActivePair.id, {
+      secondPlayer: newPlayerInGame,
+      secondPlayerId: newPlayerInGame.id,
+      status: StatusTypeEnum.Active,
+      startGameDate: now.toISOString(),
+    });
+
+    const findUpdatePair = await this.quizGameEntityNotPlayerInfo.findOne({
+      where: { id: findActivePair.id },
+      relations: {
+        secondPlayer: true,
+      },
+    });
+    return findUpdatePair;
+  }
+
+  async newPlayerOnQuizGame(userModel: NewestPostLike): Promise<PlayersEntity> {
+    const newPlayerOnGameQuiz = await this.playersEntity.create({
+      id: userModel.userId,
+      login: userModel.login,
+      score: 0,
+    });
+    return this.playersEntity.save(newPlayerOnGameQuiz);
+  }
+  async newPlayerOnQuizGameUpdateInfo(
+    userModel: PlayersEntity,
+    quizGame: QuizGameInDB,
+  ): Promise<boolean> {
+    const updatedGame = await this.quizGameEntityNotPlayerInfo.findOne({
+      where: { id: quizGame.id },
+    });
+    await this.playersEntity.update(userModel.id, {
+      game: updatedGame,
+    });
+    return true;
+  }
+
+  async choiceFiveQuestion(gameId: number) {
+    const getRandomFiveQuestion = await this.dataSource
+      .query(`SELECT * FROM "questions_entity"
+        WHERE "published" = true ORDER BY RANDOM() LIMIT 5`);
+    const questions = getRandomFiveQuestion.map((q) => ({ id: q.id }));
+
+    const game = await this.quizGameEntityNotPlayerInfo.findOne({
+      where: { id: gameId },
+      relations: ['question'],
+    });
+
+    if (!game) {
+      throw new Error('Game not found');
+    }
+
+    game.question = questions;
+    await this.quizGameEntityNotPlayerInfo.save(game);
+    return getRandomFiveQuestion[0];
   }
 }

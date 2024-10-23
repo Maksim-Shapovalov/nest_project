@@ -21,6 +21,11 @@ export class QuestionsEntity {
   createdAt: string;
   @Column({ default: null })
   updatedAt: string | null;
+  @ManyToMany(
+    () => QuizGameEntityNotPlayerInfo,
+    (quizGame) => quizGame.question,
+  )
+  quizGames: QuizGameEntityNotPlayerInfo[] | null;
 }
 
 export type QuestionTypeOnMapper = {
@@ -28,10 +33,10 @@ export type QuestionTypeOnMapper = {
   body: string;
 };
 
-@Entity()
-export class QuestionGame {
-  @ManyToOne(() => QuizGameEntityNotPlayerInfo)
-  gameId: number;
-  @ManyToOne(() => QuestionsEntity)
-  questionId: number;
-}
+// @Entity()
+// export class QuestionGame {
+//   @ManyToOne(() => QuizGameEntityNotPlayerInfo)
+//   gameId: number;
+//   @ManyToOne(() => QuestionsEntity)
+//   questionId: number;
+// }

@@ -1,7 +1,11 @@
 import { QuestionsEntity } from '../entity/Questions.Entity';
 import { Column, ManyToOne, OneToOne } from 'typeorm';
 import { PlayersEntity } from '../entity/Players.Entity';
-import { StatusTypeEnumByAnswers } from '../entity/QuizGame.entity';
+import {
+  StatusTypeEnumByAnswers,
+  StatusTypeEnumByAnswersToEndpoint,
+} from '../entity/QuizGame.entity';
+import { questBodyToOutput1 } from './question.type';
 
 export class QuizGameClass {
   constructor(
@@ -22,7 +26,7 @@ export class QuizGameClass1 {
   constructor(
     public firstPlayerId: number,
     public secondPlayerId: number | null,
-    public status: StatusTypeEnumToObject,
+    public status: StatusTypeEnum,
     public pairCreatedDate: string,
     public startGameDate: string,
     public finishGameDate: string,
@@ -48,12 +52,25 @@ export type OutputTypePair = {
   secondPlayerProgress: {
     answers: Array<AnswerType>;
     player: {
-      id: string;
-      login: string;
+      id: string | null;
+      login: string | null;
     };
-    score: number;
+    score: number | null;
   };
-  questions: QuestionsEntity;
+  questions: questBodyToOutput1[] | [];
+  status: StatusTypeEnum;
+  pairCreatedDate: string;
+  startGameDate: string;
+  finishGameDate: string;
+  //  Array<{ id: string; body: string }> | null;
+};
+export type OutputTypePairToGetId = {
+  id: number;
+  firstPlayer: PlayersEntity;
+  firstPlayerId: number;
+  secondPlayer: PlayersEntity | null;
+  secondPlayerId: number | null;
+  question: questBodyToOutput1[] | [];
   status: StatusTypeEnum;
   pairCreatedDate: string;
   startGameDate: string;
@@ -65,12 +82,17 @@ export enum StatusTypeEnumToObject {
   Active = 'Active',
   Finished = 'Finished',
 }
-type StatusTypeEnum = 'PendingSecondPlayer' | 'Active' | 'Finished';
+export enum StatusTypeEnum {
+  PendingSecondPlayer = 'PendingSecondPlayer',
+  Active = 'Active',
+  Finished = 'Finished',
+}
 
 export type updateTypeOfQuestion = {
-  questionId: number;
-  playerId: PlayersEntity;
-  answerStatus: StatusTypeEnumByAnswers;
+  id: number;
+  question: QuestionsEntity;
+  player: PlayersEntity;
+  answerStatus: StatusTypeEnumByAnswersToEndpoint;
   answer: string;
   addedAt: string;
 };
@@ -78,7 +100,6 @@ export type QuizGameInDB = {
   id: number;
   firstPlayerId: number;
   secondPlayerId: number | null;
-  question: QuestionsEntity | null;
   status: StatusTypeEnum;
   pairCreatedDate: string;
   startGameDate: string;
