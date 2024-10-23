@@ -1,4 +1,4 @@
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsBoolean, IsNotEmpty, Length } from 'class-validator';
 
 export class QuestionType {
   constructor(
@@ -23,7 +23,7 @@ export class requestBodyQuestionToCreate {
   @Length(10, 500)
   body: string;
   @IsNotEmpty()
-  correctAnswers: string;
+  correctAnswers: [string];
 }
 
 export type questBodyToOutput = {
@@ -38,6 +38,11 @@ export type questBodyToOutput1 = {
   id: number;
   body: string;
 };
-export type publishType = {
+export class PublishType {
+  @IsNotEmpty()
+  @IsBoolean()
   published: boolean;
-};
+}
+// export type publishType = {
+//   published: boolean;
+// };

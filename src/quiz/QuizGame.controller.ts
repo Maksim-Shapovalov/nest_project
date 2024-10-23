@@ -12,7 +12,6 @@ import { QuizGameService } from './QuizGame.service';
 import { AnswerType, OutputTypePair } from './type/QuizGame.type';
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { NewestPostLike } from '../Users/Type/User.type';
-import { QuizGameTypeOrmRepo } from './QuizGame.TypeOrmRepo';
 
 @Controller('pair-game-quiz/pairs')
 export class QuizGameController {

@@ -70,7 +70,7 @@ export class QuizGameSuperAdminRepositoryTypeORM {
     if (!findQuestionInDB[0]) return false;
     await this.quizGameRepository.update(id, {
       body: body.body,
-      correctAnswers: [body.correctAnswers],
+      correctAnswers: body.correctAnswers,
       updatedAt: now,
     });
     return true;

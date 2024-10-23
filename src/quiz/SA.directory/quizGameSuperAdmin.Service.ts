@@ -18,7 +18,7 @@ export class QuizGameSuperAdminService {
     const now = new Date();
     const createNewQuestion = new QuestionType(
       question.body,
-      [question.correctAnswers],
+      question.correctAnswers,
       false,
       now.toISOString(),
       null,
