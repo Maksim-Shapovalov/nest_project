@@ -17,8 +17,8 @@ export class PostsService {
 
   async createNewPosts(
     bodyPost: BodyPostToRequest1,
-    userId: number | null,
-    blogId?: number,
+    userId: string | null,
+    blogId?: string,
   ) {
     const findBlogName = await this.blogsSQLRepository.getBlogsById(
       blogId ?? bodyPost.blogId,
@@ -39,7 +39,7 @@ export class PostsService {
     return this.postsSQLRepository.savePost(newPosts, userId);
   }
   async updateStatusLikeInUser(
-    postId: number,
+    postId: string,
     status: AvailableStatusEnum,
     user: NewestPostLike | null,
   ) {
@@ -61,7 +61,7 @@ export class PostsService {
     return await this.postsSQLRepository.updatePostsById(postBody);
   }
 
-  async deletePostsById(id: number): Promise<boolean> {
+  async deletePostsById(id: string): Promise<boolean> {
     return await this.postsSQLRepository.deletePostsById(id);
   }
 }

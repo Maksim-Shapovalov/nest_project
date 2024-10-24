@@ -11,8 +11,8 @@ import { UserEntity } from '../../Users/Type/User.entity';
 
 @Entity()
 export class PostsEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
   @Column()
   title: string;
   @Column()
@@ -21,7 +21,7 @@ export class PostsEntity {
   content: string;
   @ManyToOne(() => BlogsEntity)
   @JoinColumn()
-  blogId: number;
+  blogId: string;
   @Column()
   blogName: string;
   @Column()
@@ -30,15 +30,15 @@ export class PostsEntity {
 @Entity()
 export class PostsLikeEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
   @ManyToOne(() => PostsEntity)
   @JoinColumn()
-  post: number;
+  post: string;
   @Column()
   likesStatus: string;
   @ManyToOne(() => UserEntity)
   @JoinColumn()
-  user: number;
+  user: string;
   @Column()
   createdAt: string;
   @Column()

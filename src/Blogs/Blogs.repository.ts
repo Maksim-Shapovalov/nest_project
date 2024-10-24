@@ -9,11 +9,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Blog, UserDocument } from './Type/Blogs.schemas';
 import { Injectable } from '@nestjs/common';
+import { CustomUUIDValidation } from '../Other/validator.validateUUID';
 
 @Injectable()
 export class BlogsRepository {
   constructor(
     @InjectModel(Blog.name) protected blogModel: Model<UserDocument>,
+    private readonly customUUIDValidation: CustomUUIDValidation,
   ) {}
   async getAllBlogs(
     filter: BlogsPaginationQueryType,
@@ -43,8 +45,8 @@ export class BlogsRepository {
       items: items,
     };
   }
-  async getBlogsById(id: string | number): Promise<BlogsOutputModel | null> {
-    if (!ObjectId.isValid(id)) return null;
+  async getBlogsById(id: string): Promise<BlogsOutputModel | null> {
+    if (!this.customUUIDValidation.validate(id)) return null;
     const findCursor = await this.blogModel.findOne({ _id: new ObjectId(id) });
     if (!findCursor) return null;
     return blogMapper(findCursor);

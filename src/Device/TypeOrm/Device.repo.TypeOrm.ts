@@ -1,6 +1,10 @@
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DevicesUserDB, OutpatModelDevicesUser } from '../Type/Device.user';
+import {
+  DeviceClass,
+  DevicesUserDB,
+  OutpatModelDevicesUser,
+} from '../Type/Device.user';
 import { setting } from '../../setting';
 import { JwtService } from '@nestjs/jwt';
 
@@ -19,7 +23,7 @@ export class SecurityDevicesSQLTypeOrmRepository {
     protected userEntityRepo: Repository<UserEntity>,
   ) {}
 
-  async getDevice(sessionId: number) {
+  async getDevice(sessionId: string) {
     const device = await this.deviceEntityRepository.find({
       where: { deviceId: sessionId },
     });
@@ -30,7 +34,7 @@ export class SecurityDevicesSQLTypeOrmRepository {
     }
     return device;
   }
-  async getDeviceByIdDeviceAndUSerID(deviceId: number, userId: number) {
+  async getDeviceByIdDeviceAndUSerID(deviceId: string, userId: string) {
     const user = await this.userEntityRepo.findOne({ where: { id: userId } });
     if (!user) {
       return null;
@@ -41,27 +45,33 @@ export class SecurityDevicesSQLTypeOrmRepository {
     if (!findDeviceInDB) return null;
     return findDeviceInDB[0];
   }
-  async addDeviceInDB(token: DevicesUserDB, refreshToken: string) {
+  async createDeviceAndSaveToDB(device: DeviceClass, userId: string) {
+    const user = await this.userEntityRepo.findOne({
+      where: { id: userId },
+    });
+    const newDevice = await this.deviceEntityRepository.create({
+      ip: device.ip,
+      title: device.title,
+      lastActiveDate: device.lastActiveDate,
+      user: user,
+    });
+    return this.deviceEntityRepository.save(newDevice);
+  }
+  async addDeviceInDB(token: DeviceEntity, refreshToken: string) {
     const parser = await this.jwtService.verify(refreshToken, {
       secret: setting.JWT_REFRESH_SECRET,
     });
-    const user = await this.userEntityRepo.findOne({
-      where: { id: +token.userId },
-    });
-    const newDevice = await this.deviceEntityRepository.create({
-      deviceId: +token.deviceId,
-      ip: token.ip,
-      title: token.title,
-      lastActiveDate: token.lastActiveDate,
+    // const user = await this.userEntityRepo.findOne({
+    //   where: { id: token.user.id },
+    // });
+    await this.deviceEntityRepository.update(token.deviceId, {
       iat: parser.iat,
       exp: parser.exp,
-      user: user,
     });
-    await this.deviceEntityRepository.save(newDevice);
     return true;
   }
 
-  async updateDevice(deviceId: number) {
+  async updateDevice(deviceId: string) {
     const currencyDay = new Date().toISOString();
     return this.deviceEntityRepository.update(deviceId, {
       lastActiveDate: currencyDay,
@@ -69,7 +79,7 @@ export class SecurityDevicesSQLTypeOrmRepository {
   }
 
   async getAllDevices(
-    userId: number,
+    userId: string,
   ): Promise<OutpatModelDevicesUser[] | null> {
     const user = await this.userEntityRepo.findOne({ where: { id: userId } });
     if (!user) {
@@ -88,8 +98,8 @@ export class SecurityDevicesSQLTypeOrmRepository {
   }
 
   async deletingDevicesExceptId(
-    userId: number,
-    deviceId: number,
+    userId: string,
+    deviceId: string,
   ): Promise<boolean | null> {
     const user = await this.userEntityRepo.findOne({ where: { id: userId } });
     if (!user) {
@@ -107,7 +117,7 @@ export class SecurityDevicesSQLTypeOrmRepository {
     return true;
   }
 
-  async deletingAllDevices(userId: number, deviceId: number): Promise<boolean> {
+  async deletingAllDevices(userId: string, deviceId: string): Promise<boolean> {
     await this.deviceEntityRepository
       .createQueryBuilder()
       .delete()

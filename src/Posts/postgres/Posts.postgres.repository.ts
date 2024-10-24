@@ -17,7 +17,7 @@ export class PostsPostgresRepository {
     @InjectDataSource() protected dataSource: DataSource,
     protected userSQLRepository: UserSQLRepository,
   ) {}
-  async getAllPosts(filter: PaginationQueryType, userId: number | null) {
+  async getAllPosts(filter: PaginationQueryType, userId: string | null) {
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountPosts = await this.dataSource.query(
       `SELECT COUNT(*) FROM "Posts"`,
@@ -44,7 +44,7 @@ export class PostsPostgresRepository {
     };
   }
 
-  async getPostsById(id: number, user: NewestPostLike | null) {
+  async getPostsById(id: string, user: NewestPostLike | null) {
     const findPosts = await this.dataSource.query(
       `SELECT * FROM "Posts" WHERE id = ${id}`,
     );
@@ -90,7 +90,7 @@ export class PostsPostgresRepository {
     };
   }
   async updateStatusLikeUser(
-    postId: number,
+    postId: string,
     user: NewestPostLike | null,
     status: AvailableStatusEnum,
   ) {
@@ -122,7 +122,7 @@ export class PostsPostgresRepository {
     }
   }
 
-  async savePost(post: PostClass, userId: number) {
+  async savePost(post: PostClass, userId: string) {
     const randomId = Math.floor(Math.random() * 1000000);
     // await this.postsLikeMapper(post, null);
     const newPost = `INSERT INTO public."Posts"(
@@ -160,7 +160,7 @@ export class PostsPostgresRepository {
     if (findPost[1] > 0) return true;
   }
 
-  async postsLikeMapper(post: any, userId: number | null) {
+  async postsLikeMapper(post: any, userId: string | null) {
     let likesCount;
     let dislikesCount;
     let myStatus;

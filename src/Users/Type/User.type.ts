@@ -22,7 +22,7 @@ export class UserDbType {
 }
 
 export type NewestPostLike = {
-  userId: number;
+  userId: string;
   addedAt: string;
   login: string;
 };

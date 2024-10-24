@@ -21,16 +21,18 @@ import { SoftAuthGuard } from '../auth/guard/softAuthGuard';
 import { BearerAuthGuard } from '../auth/guard/bearer-authGuard';
 import { ContentClass } from '../Posts/Posts.controller';
 import { CommentSqlTypeOrmRepository } from './TypeOrm/Comments.repo.TypeOrm';
+import { CustomUUIDValidation } from '../Other/validator.validateUUID';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
     protected serviceComments: CommentsService,
     protected commentsSQLRepository: CommentSqlTypeOrmRepository,
+    private readonly customUUIDValidation: CustomUUIDValidation,
   ) {}
   @UseGuards(SoftAuthGuard)
   @Get(':id')
-  async getCommentsById(@Param('id') id: number, @Req() request) {
+  async getCommentsById(@Param('id') id: string, @Req() request) {
     const user = request.user as NewestPostLike;
     if (!id) throw new NotFoundException();
     const findComments = await this.commentsSQLRepository.getCommentById(
@@ -45,11 +47,11 @@ export class CommentsController {
   @Put(':id')
   @HttpCode(204)
   async updateCommentByCommentId(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() content: ContentClass,
     @Req() request,
   ) {
-    if (!id || !ObjectId.isValid(id)) throw new NotFoundException();
+    if (!this.customUUIDValidation.validate(id)) throw new NotFoundException();
     const user = request.user as NewestPostLike;
     if (!user) throw new NotFoundException();
     const comment = await this.commentsSQLRepository.getCommentById(id, user);
@@ -70,7 +72,7 @@ export class CommentsController {
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() inputLikeStatus: StatusLikes,
     @User() userModel: NewestPostLike,
   ) {
@@ -92,7 +94,7 @@ export class CommentsController {
   @UseGuards(BearerGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteCommentByCommentId(@Param('id') id: number, @Req() request) {
+  async deleteCommentByCommentId(@Param('id') id: string, @Req() request) {
     const user = request.user as NewestPostLike;
     if (!id) throw new NotFoundException();
     const comment = await this.commentsSQLRepository.getCommentById(

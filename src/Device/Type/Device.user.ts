@@ -6,7 +6,7 @@ export class DeviceClass {
     public ip: string,
     public title: string,
     public lastActiveDate: string,
-    public deviceId: string,
+    // public deviceId: string,
     public userId: string,
   ) {}
 }
@@ -16,14 +16,13 @@ export type DevicesUserDB = {
   ip: string;
   title: string;
   lastActiveDate: string;
-  deviceId: string;
   userId: string;
 };
 export type OutpatModelDevicesUser = {
   ip: string;
   title: string;
   lastActiveDate: string;
-  deviceId: number;
+  deviceId: string;
 };
 
 export type DevicesType = {

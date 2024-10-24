@@ -172,8 +172,8 @@ export class AuthController {
 
     const deletedDevice =
       await this.securityDeviceService.deletingDevicesExceptId(
-        +userId,
-        +deviceId,
+        userId,
+        deviceId,
       );
     const validToken =
       await this.refreshTokenRepo.DeleteRefreshTokenInData(token);
@@ -188,7 +188,7 @@ export class AuthController {
   async me(@Req() request) {
     const user = request.user as NewestPostLike;
     if (!user) throw new UnauthorizedException();
-    const result = await this.userSQLRepository.getUserById(+user.userId);
+    const result = await this.userSQLRepository.getUserById(user.userId);
     return {
       email: result.email,
       login: result.login,

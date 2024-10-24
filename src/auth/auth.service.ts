@@ -55,20 +55,20 @@ export class AuthService {
         userAgent.IP || '123',
         userAgent.deviceName || 'internet',
         new Date().toISOString(),
-        Math.floor(10000 + Math.random() * 90000).toString(),
         user.id,
       );
-      // await this.deviceSQLRepo.addDeviceInDB(createRefreshTokenMeta);
 
-      //
+      const addDeviceToDB = await this.deviceSQLRepo.createDeviceAndSaveToDB(
+        createRefreshTokenMeta,
+        user.id,
+      );
       const bodyToAccessToken = {
         userId: user.id.toString(),
       };
       const bodyToRefreshToken = {
         userId: user.id.toString(),
-        deviceId: createRefreshTokenMeta.deviceId,
+        deviceId: addDeviceToDB.deviceId,
       };
-
       const accessToken: string = await this.jwtService.signAsync(
         bodyToAccessToken,
         { secret: setting.JWT_SECRET, expiresIn: '1000s' },
@@ -79,16 +79,12 @@ export class AuthService {
       );
       // await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
       await this.refreshTokenRepo.AddRefreshTokenInData(refreshToken);
-      await this.deviceSQLRepo.addDeviceInDB(
-        createRefreshTokenMeta,
-        refreshToken,
-      );
-
+      await this.deviceSQLRepo.addDeviceInDB(addDeviceToDB, refreshToken);
       return { accessToken, refreshToken };
     }
     throw new UnauthorizedException();
   }
-  async updateJWT(userId: number, oldRefreshToken: string) {
+  async updateJWT(userId: string, oldRefreshToken: string) {
     // await this.refreshTokenRepo.DeleteRefreshTokenInData(oldRefreshToken);
     const parser = await this.jwtService.verify(oldRefreshToken, {
       secret: setting.JWT_REFRESH_SECRET,

@@ -50,7 +50,7 @@ export type BlogsType = WithId<{
   isMembership: boolean;
 }>;
 export type BlogsTypeSQL = {
-  id: number;
+  id: string;
   name: string;
   description: string;
   websiteUrl: string;

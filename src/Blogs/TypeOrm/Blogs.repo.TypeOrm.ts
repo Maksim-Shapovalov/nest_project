@@ -61,7 +61,7 @@ export class BlogsSQLTypeOrmRepository {
     };
   }
 
-  async getBlogsById(id: number): Promise<BlogsOutputModel | null> {
+  async getBlogsById(id: string): Promise<BlogsOutputModel | null> {
     const findCursor = await this.blogsRepository.find({ where: { id: id } });
     if (!findCursor) return null;
     return blogMapperSQL(findCursor[0]);
@@ -79,7 +79,7 @@ export class BlogsSQLTypeOrmRepository {
   }
   async updateBlogById(blogs: bodyForUpdateBlogs): Promise<boolean> {
     const findBlogQuery = await this.blogsRepository.find({
-      where: { id: +blogs.id },
+      where: { id: blogs.id },
     });
     if (findBlogQuery.length === 0) {
       return null;
@@ -91,7 +91,7 @@ export class BlogsSQLTypeOrmRepository {
     });
     return true;
   }
-  async deleteBlogsById(id: number): Promise<boolean> {
+  async deleteBlogsById(id: string): Promise<boolean> {
     const findBlogInDB = await this.blogsRepository.find({ where: { id: id } });
     if (!findBlogInDB[0]) return false;
 
@@ -99,7 +99,7 @@ export class BlogsSQLTypeOrmRepository {
     if (deleteResult.affected > 0) return true;
     return false;
   }
-  async deletePostInBlogById(blogId: number, postId: number): Promise<boolean> {
+  async deletePostInBlogById(blogId: string, postId: string): Promise<boolean> {
     const post = await this.postsRepository.findOne({
       where: { id: postId, blogId: blogId },
     });

@@ -41,7 +41,7 @@ export class BlogsController {
     return this.blogsSQLRepository.getAllBlogs(filter);
   }
   @Get(':id')
-  async getBlogById(@Param('id') id: number) {
+  async getBlogById(@Param('id') id: string) {
     const blog = await this.blogsSQLRepository.getBlogsById(id);
     if (blog) {
       return blog;
@@ -53,7 +53,7 @@ export class BlogsController {
   @UseGuards(SoftAuthGuard)
   @Get(':id/posts')
   async getPostsByBlogId(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Query() query: QueryType,
     @User() userModel: NewestPostLike,
   ) {
@@ -72,7 +72,7 @@ export class BlogsController {
   @Post(':id/posts')
   @HttpCode(201)
   async createPostInBlogByBlogId(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() blogsInputModel: BodyPostToRequest,
     @Req() request,
   ) {
@@ -129,7 +129,7 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteBlogById(@Param('id') id: number) {
+  async deleteBlogById(@Param('id') id: string) {
     const deleted = await this.blogsService.deleteBlogsById(id);
 
     if (!deleted) {

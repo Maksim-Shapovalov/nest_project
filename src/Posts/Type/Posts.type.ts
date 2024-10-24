@@ -1,5 +1,5 @@
 import { WithId } from 'mongodb';
-import { IsEnum, Length, Validate } from 'class-validator';
+import { IsEnum, IsUUID, Length, Validate } from 'class-validator';
 import { Trim } from '../../Other/trim-validator';
 import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
 import { CustomBlogIdValidation } from '../validation/BlogExists.decorator';
@@ -9,7 +9,7 @@ export class PostClass {
     public title: string,
     public shortDescription: string,
     public content: string,
-    public blogId: number,
+    public blogId: string,
     public blogName: string,
     public createdAt: string,
   ) {}
@@ -104,6 +104,7 @@ export class BodyPostToPut {
   content: string;
   @Trim()
   @Validate(CustomBlogIdValidation)
+  @IsUUID(undefined, { each: true })
   blogId: number;
 }
 export class BodyPostToRequest1 {
@@ -114,7 +115,8 @@ export class BodyPostToRequest1 {
   @Length(1, 1000)
   content: string;
   @Validate(CustomBlogIdValidation)
-  blogId: number;
+  @IsUUID(undefined, { each: true })
+  blogId: string;
 }
 
 export type PostsType = WithId<{
@@ -132,7 +134,8 @@ export type PostsType = WithId<{
 }>;
 
 export class BodyUpdatingPost {
-  postId: number;
+  @IsUUID(undefined, { each: true })
+  postId: string;
   @Length(1, 30)
   title: string;
   @Length(1, 100)
@@ -140,5 +143,6 @@ export class BodyUpdatingPost {
   @Length(1, 1000)
   content: string;
   @Validate(CustomBlogIdValidation)
-  blogId: number;
+  @IsUUID(undefined, { each: true })
+  blogId: string;
 }

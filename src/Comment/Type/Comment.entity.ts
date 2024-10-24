@@ -5,8 +5,8 @@ import { PostsEntity } from '../../Posts/Type/Posts.entity';
 
 @Entity()
 export class CommentEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
   @Column()
   content: string;
   @ManyToOne(() => UserEntity)
@@ -22,8 +22,8 @@ export class CommentEntity {
 }
 @Entity()
 export class CommentLikeEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
   @ManyToOne(() => CommentEntity)
   @JoinColumn({ name: 'commentId' })
   comment: CommentEntity;

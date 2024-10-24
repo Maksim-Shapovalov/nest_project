@@ -13,8 +13,8 @@ import { UserEntity } from '../../Users/Type/User.entity';
 
 @Entity()
 export class PlayersEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn()
+  id: string;
   @OneToOne(() => UserEntity)
   user: UserEntity;
   @ManyToOne(() => QuizGameEntityNotPlayerInfo, { onDelete: 'CASCADE' })
@@ -30,7 +30,7 @@ export class PlayersEntity {
 }
 
 export type findingPlayer = {
-  id: number;
+  id: string;
   login: string;
   score: number;
   answers: AnswersEntity[];

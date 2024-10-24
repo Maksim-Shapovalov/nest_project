@@ -3,8 +3,8 @@ import { Column } from 'typeorm';
 
 @Entity()
 export class BlogsEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
   @Column()
   name: string;
   @Column()

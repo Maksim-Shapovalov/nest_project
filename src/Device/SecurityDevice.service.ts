@@ -8,7 +8,7 @@ export class SecurityDeviceService {
     protected securitySQLDevicesRepo: SecurityDevicesSQLTypeOrmRepository,
   ) {}
   async getAllDevices(
-    userId: number,
+    userId: string,
   ): Promise<OutpatModelDevicesUser[] | null> {
     const devices = await this.securitySQLDevicesRepo.getAllDevices(userId);
     if (!devices) {
@@ -17,14 +17,14 @@ export class SecurityDeviceService {
     return devices;
   }
 
-  async deletingDevicesExceptId(userId: number, deviceId: number) {
+  async deletingDevicesExceptId(userId: string, deviceId: string) {
     return this.securitySQLDevicesRepo.deletingDevicesExceptId(
       userId,
       deviceId,
     );
   }
 
-  async deletingAllDevices(user: number, device: number) {
+  async deletingAllDevices(user: string, device: string) {
     return this.securitySQLDevicesRepo.deletingAllDevices(user, device);
   }
 }

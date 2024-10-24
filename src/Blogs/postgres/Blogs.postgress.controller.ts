@@ -39,7 +39,7 @@ export class BlogsSQLController {
     return this.blogsRepository.getAllBlogs(filter);
   }
   @Get(':id')
-  async getBlogById(@Param('id') id: number) {
+  async getBlogById(@Param('id') id: string) {
     const blog = await this.blogsSQLRepository.getBlogsById(id);
     if (blog) {
       return blog;
@@ -66,7 +66,7 @@ export class BlogsSQLController {
   @Post(':id/posts')
   @HttpCode(201)
   async createPostInBlogByBlogId(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() blogsInputModel: BodyPostToRequest,
     @Req() request,
   ) {
@@ -122,8 +122,8 @@ export class BlogsSQLController {
   @Put(':blogId/posts/:postId')
   @HttpCode(204)
   async updatePostInBlogByBlogIdAndPostId(
-    @Param('blogId') blogId: number,
-    @Param('postId') postId: number,
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
     @Body()
     postUpdateModel: BodyPostToRequest,
   ) {
@@ -144,7 +144,7 @@ export class BlogsSQLController {
   }
   @Delete(':id')
   @HttpCode(204)
-  async deleteBlogById(@Param('id') id: number) {
+  async deleteBlogById(@Param('id') id: string) {
     const deleted = await this.blogsService.deleteBlogsById(id);
 
     if (!deleted) {
@@ -155,8 +155,8 @@ export class BlogsSQLController {
   @Delete(':blogId/posts/:postId')
   @HttpCode(204)
   async deletePostInBlogById(
-    @Param('blogId') blogId: number,
-    @Param('postId') postId: number,
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
   ) {
     if (!blogId || !postId) throw new NotFoundException();
     const deleted = await this.blogsService.deletePostInBlogById(

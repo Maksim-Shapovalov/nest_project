@@ -73,6 +73,7 @@ import { QuizGameSuperAdminService } from './quiz/SA.directory/quizGameSuperAdmi
 import { QuestionsEntity } from './quiz/entity/Questions.Entity';
 import { PlayersEntity } from './quiz/entity/Players.Entity';
 import { QuizGameSuperAdminRepositoryTypeORM } from './quiz/SA.directory/quizGameSuperAdmin.Repository.TypeORM';
+import { CustomUUIDValidation } from './Other/validator.validateUUID';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -165,6 +166,7 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
     AppService,
     RefreshTokenRepo,
     CustomBlogIdValidation,
+    CustomUUIDValidation,
     UserSQLRepository,
     SecurityDevicesSQLTypeOrmRepository,
     BlogsSQLTypeOrmRepository,

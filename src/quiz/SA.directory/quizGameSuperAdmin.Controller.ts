@@ -21,10 +21,14 @@ import {
   questionBody,
   requestBodyQuestionToCreate,
 } from '../type/question.type';
+import { CustomUUIDValidation } from '../../Other/validator.validateUUID';
 
 @Controller('sa/quiz')
 export class QuizGameControllerSuperAdmin {
-  constructor(protected quizGameSuperAdminService: QuizGameSuperAdminService) {}
+  constructor(
+    protected quizGameSuperAdminService: QuizGameSuperAdminService,
+    private readonly customUUIDValidation: CustomUUIDValidation,
+  ) {}
   @UseGuards(BasicAuthGuard)
   @Get('questions')
   @HttpCode(200)
@@ -44,7 +48,9 @@ export class QuizGameControllerSuperAdmin {
   @UseGuards(BasicAuthGuard)
   @Delete('questions/:id')
   @HttpCode(204)
-  async sendAnswer(@Param('id') id: number) {
+  async sendAnswer(@Param('id') id: string) {
+    if (!id || !this.customUUIDValidation.validate(id))
+      throw new NotFoundException();
     const deleteQuestion =
       await this.quizGameSuperAdminService.deleteQuestionById(id);
     if (!deleteQuestion) throw new NotFoundException();
@@ -54,8 +60,10 @@ export class QuizGameControllerSuperAdmin {
   @HttpCode(204)
   async ChangeBodyQuestionAndAnswer(
     @Body() questionBody: requestBodyQuestionToCreate,
-    @Param('id') id: number,
+    @Param('id') id: string,
   ) {
+    if (!id || !this.customUUIDValidation.validate(id))
+      throw new NotFoundException();
     const findQuest =
       await this.quizGameSuperAdminService.updateQuestionBodyAndCorrectAnswer(
         questionBody,
@@ -68,8 +76,10 @@ export class QuizGameControllerSuperAdmin {
   @HttpCode(204)
   async changePublishedStatusToQuestion(
     @Body() body: PublishType,
-    @Param('id') id: number,
+    @Param('id') id: string,
   ) {
+    if (!id || !this.customUUIDValidation.validate(id))
+      throw new NotFoundException();
     if (typeof body.published === 'string') {
       throw new BadRequestException();
     }

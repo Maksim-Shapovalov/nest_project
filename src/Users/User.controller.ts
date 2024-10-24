@@ -36,9 +36,7 @@ export class UserController {
   @HttpCode(200)
   async getUserByCodeIdInDB(@Param('id') userId) {
     if (!userId) throw new NotFoundException();
-    const user = await this.userRepository.getUserByIdWithMapper(
-      userId.toString(),
-    );
+    const user = await this.userRepository.getUserByIdWithMapper(userId);
     if (!user) throw new NotFoundException();
     return user;
   }
@@ -55,7 +53,6 @@ export class UserController {
       user.login,
       user.email,
     );
-    console.log(findUser);
     if (findUser) throw new BadRequestException();
     return this.serviceUser.getNewUser(user);
   }

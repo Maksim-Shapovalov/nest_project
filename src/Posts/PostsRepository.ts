@@ -100,7 +100,7 @@ export class PostsRepository {
   }
   async updateStatusLikeUser(
     postId: string,
-    userId: number,
+    userId: string,
     status: AvailableStatusEnum,
   ) {
     const likeWithUserId = await this.postLikeModel

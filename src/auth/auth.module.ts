@@ -24,6 +24,7 @@ import { UserSQLTypeOrmRepository } from '../Users/TypeORM/User.repo.TypeORm';
 import { SecurityDevicesSQLTypeOrmRepository } from '../Device/TypeOrm/Device.repo.TypeOrm';
 import { DeviceEntity } from '../Device/Type/Device.entity';
 import { UserEntity } from '../Users/Type/User.entity';
+import { CustomUUIDValidation } from '../Other/validator.validateUUID';
 // const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 @Module({
   controllers: [AuthController],
@@ -56,6 +57,7 @@ import { UserEntity } from '../Users/Type/User.entity';
     SecurityDevicesSQLTypeOrmRepository,
     SecurityDeviceService,
     DeletedTokenRepoRepository,
+    CustomUUIDValidation,
     UserRepository,
     AuthService,
     RefreshTokenRepo,

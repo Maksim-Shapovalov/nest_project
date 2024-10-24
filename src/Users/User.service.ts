@@ -35,7 +35,7 @@ export class UserService {
     const createdNewUser = await this.userSQLRepository.saveUser(newUser);
     return createdNewUser;
   }
-  async deleteUserById(userId: number): Promise<boolean> {
+  async deleteUserById(userId: string): Promise<boolean> {
     return await this.userSQLRepository.deleteUserById(userId);
   }
   async _generateHash(password: string, salt: string) {

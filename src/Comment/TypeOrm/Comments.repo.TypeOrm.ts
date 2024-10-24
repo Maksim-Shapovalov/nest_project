@@ -25,7 +25,7 @@ export class CommentSqlTypeOrmRepository {
   ) {}
 
   async getCommentsInPost(
-    postId: number,
+    postId: string,
     filter: PaginationQueryType,
     userId: NewestPostLike | null,
   ) {
@@ -76,7 +76,7 @@ export class CommentSqlTypeOrmRepository {
     };
   }
 
-  async saveComments(comments: CommentsClass, userId: number) {
+  async saveComments(comments: CommentsClass, userId: string) {
     const user = await this.userEntityRepo.findOne({
       where: { id: comments.commentatorInfo.userId },
     });
@@ -94,7 +94,7 @@ export class CommentSqlTypeOrmRepository {
     return this.commentsMapper(savePosts[0], userId);
   }
 
-  async getCommentById(commentId: number, userId: NewestPostLike | null) {
+  async getCommentById(commentId: string, userId: NewestPostLike | null) {
     const findComments = await this.commentEntityRepository.findAndCount({
       where: {
         id: commentId,
@@ -107,7 +107,7 @@ export class CommentSqlTypeOrmRepository {
   }
 
   async updateCommentsByCommentId(
-    commentId: number,
+    commentId: string,
     content: string,
   ): Promise<boolean> {
     const findComments = await this.commentEntityRepository.findAndCount({
@@ -123,8 +123,8 @@ export class CommentSqlTypeOrmRepository {
   }
 
   async updateStatusLikeUser(
-    commentId: number,
-    userId: number,
+    commentId: string,
+    userId: string,
     status: AvailableStatusEnum,
   ) {
     const likeWithUserId = await this.commentLikeEntityRepository
@@ -136,15 +136,9 @@ export class CommentSqlTypeOrmRepository {
       .andWhere('like.userId = :userId', { userId: userId })
       .getCount();
 
-    // await this.dataSource.query(
-    //   `SELECT * FROM "comment_like_entity" WHERE "commentId" = ${commentId} AND "userId" = ${userId}`,
-    // );
     const comment = await this.commentEntityRepository.find({
       where: { id: commentId },
     });
-    //   await this.dataSource.query(
-    //   `SELECT * FROM "comment_entity" WHERE id = ${commentId}`,
-    // );
 
     if (!comment) {
       return false;
@@ -156,10 +150,6 @@ export class CommentSqlTypeOrmRepository {
         { likesStatus: status },
       );
 
-      // await this.dataSource.query(`UPDATE public."comment_like_entity"
-      // SET "likesStatus"= '${status}'
-      // WHERE "commentId" = ${commentId} AND "userId" = ${+userId}
-      // RETURNING *`);
       if (!updateStatus) return null;
 
       return true;
@@ -178,11 +168,11 @@ export class CommentSqlTypeOrmRepository {
     }
   }
 
-  async deleteCommentsByCommentId(commentId: number): Promise<boolean> {
+  async deleteCommentsByCommentId(commentId: string): Promise<boolean> {
     await this.userEntityRepo.delete(commentId);
     return true;
   }
-  async commentsMapper(comment: any, userId: number | null) {
+  async commentsMapper(comment: any, userId: string | null) {
     // let likeCount;
     // let dislikeCount;
     let myStatus;
@@ -212,7 +202,7 @@ export class CommentSqlTypeOrmRepository {
     }
 
     return {
-      id: comment.id.toString(),
+      id: comment.id,
       content: comment.content,
       commentatorInfo: {
         userId: comment.commentatorInfo

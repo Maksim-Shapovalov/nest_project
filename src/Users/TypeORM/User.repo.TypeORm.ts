@@ -78,7 +78,7 @@ export class UserSQLTypeOrmRepository {
       items: items,
     };
   }
-  async getUserById(id: number): Promise<FindUserByRecoveryCode | null> {
+  async getUserById(id: string): Promise<FindUserByRecoveryCode | null> {
     const getUserQuery = await this.userEntityRepo.find({ where: { id: id } });
     // await this.dataSource.query(`SELECT * FROM "user_entity" WHERE id = ${id}`);
     if (getUserQuery.length === 0) {
@@ -86,27 +86,10 @@ export class UserSQLTypeOrmRepository {
     }
     return userToResendMessageMapper(getUserQuery[0]);
   }
-  // async getUserByIdWithMapper(id: string): Promise<UserOutputModel | null> {
-  //   const getUserQuery = 'SELECT * FROM "user_entity" WHERE id = $1';
-  //   const getUserValues = [id];
-  //   const result = await this.dataSource
-  //     .query(getUserQuery, getUserValues)
-  //     .then((result) => result.rows);
-  //
-  //   if (result.length === 0) {
-  //     return null;
-  //   }
-  //
-  //   const user = result[0];
-  //   return userMapper(user);
-  // }
   async findUsersByCode(codeUser: string): Promise<FindUserByRecoveryCode> {
     const getUsersQuery = await this.userEntityRepo.find({
       where: { confirmationCode: codeUser },
     });
-    // await this.dataSource.query(
-    //   `SELECT * FROM "user_entity" WHERE "confirmationCode" = '${codeUser}'`,
-    // );
     if (getUsersQuery.length === 0) {
       return null;
     }
@@ -118,9 +101,6 @@ export class UserSQLTypeOrmRepository {
     await this.userEntityRepo.update(codeUser, {
       isConfirmed: true,
     });
-    // await this.dataSource.query(`
-    //   UPDATE "user_entity" SET "isConfirmed" = true WHERE "confirmationCode" = '${codeUser}'`);
-
     return true;
   }
 
@@ -130,9 +110,6 @@ export class UserSQLTypeOrmRepository {
     const findUserQuery = await this.userEntityRepo.find({
       where: [{ login: loginOrEmail }, { email: loginOrEmail }],
     });
-    // await this.dataSource.query(
-    //   `SELECT * FROM "user_entity" WHERE "login" = '${loginOrEmail}' OR "email" = '${loginOrEmail}'`,
-    // );
 
     if (findUserQuery.length === 0) {
       return null;
@@ -148,9 +125,7 @@ export class UserSQLTypeOrmRepository {
     const findUserQuery = await this.userEntityRepo.find({
       where: [{ login: login }, { email: email }],
     });
-    // await this.dataSource.query(
-    //   `SELECT * FROM "user_entity" WHERE login = '${login}' OR email = '${email}'`,
-    // );
+
     if (!findUserQuery) {
       return null;
     }
@@ -163,9 +138,6 @@ export class UserSQLTypeOrmRepository {
     const findUserQuery = await this.userEntityRepo.find({
       where: { login: login, email: email },
     });
-    // await this.dataSource.query(
-    //   `SELECT * FROM "user_entity" WHERE login = '${login}' AND email = '${email}'`,
-    // );
 
     if (findUserQuery.length === 0) {
       return null;
@@ -179,29 +151,7 @@ export class UserSQLTypeOrmRepository {
     return this.userEntityRepo.update(possibleUser.email, {
       recoveryCode: possibleUser.recoveryCode,
     });
-    // await this.dataSource.query(
-    //   `UPDATE "user_entity" SET recovery_code = ${possibleUser.recoveryCode} WHERE email = ${possibleUser.email}`,
-    // );
   }
-  // async findUserByCodeInValidation(
-  //   code: string | null,
-  // ): Promise<UserOutputModel | null> {
-  //   const findUserQuery =
-  //     'SELECT * FROM "user_entity" WHERE recovery_code = $1';
-  //   const findUserValues = [code];
-  //   const result = await this.dataSource
-  //     .query(findUserQuery, findUserValues)
-  //     .then((result) => result.rows);
-  //
-  //   if (result.length === 0) {
-  //     return null;
-  //   }
-  //
-  //   const user = result[0];
-  //   const mappedUser = userMapper(user);
-  //
-  //   return mappedUser;
-  // }
 
   async findUserByRecoveryCode(newDataUser: newDataUser2) {
     const findUserQuery = await this.userEntityRepo.update(
@@ -212,19 +162,11 @@ export class UserSQLTypeOrmRepository {
       },
     );
 
-    // this.dataSource.query(
-    //   `UPDATE "user_entity" SET "passwordHash" = '${newDataUser.newPassword}', "passwordSalt" = '${newDataUser.newSalt}' WHERE "recoveryCode" = '${newDataUser.recoveryCode}' RETURNING *`,
-    // );
-
     if (!findUserQuery) {
       return false;
     }
 
     return findUserQuery[0];
-
-    // const deleteUserQuery = 'DELETE FROM "Users" WHERE "recovery_code" = ${}';
-    // const deleteUserValues = [newDataUser.recoveryCode];
-    // await this.dataSource.query(deleteUserQuery, deleteUserValues);
   }
 
   async updateCodeToResendingMessage(userEmail: string, info: any) {
@@ -238,19 +180,9 @@ export class UserSQLTypeOrmRepository {
       expirationDate: expirationDate,
     });
 
-    // await this.dataSource.query(`
-    // UPDATE "user_entity"
-    // SET "confirmationCode" = '${info.confirmationCode}', "expirationDate" = '${expirationDate}'
-    // WHERE "email" = '${userEmail}'
-    // RETURNING * `);
-
     const findUserQuery = await this.userEntityRepo.find({
       where: { email: userEmail },
     });
-
-    // await this.dataSource.query(
-    //   `SELECT * FROM "user_entity" WHERE "email" = '${userEmail}'`,
-    // );
 
     if (findUserQuery.length === 0) {
       return null;
@@ -260,30 +192,17 @@ export class UserSQLTypeOrmRepository {
     return user;
   }
 
-  // async deleteUserById(userId: number): Promise<boolean> {
-  //   const deleteUserQuery = await this.dataSource.query(
-  //     'DELETE FROM public."Users" WHERE "id" = $1;',
-  //     [userId],
-  //   );
-  //
-  //   return deleteUserQuery.rowCount === 1;
-  // }
-  async deleteUserById(userId: number): Promise<boolean> {
+  async deleteUserById(userId: string): Promise<boolean> {
     const findUserInDB = await this.userEntityRepo.find({
       where: { id: userId },
     });
-    // dataSource.query(
-    //   `SELECT * FROM "user_entity" WHERE id = ${userId}`,
-    // );
+
     if (!findUserInDB[0]) return false;
     const user = await this.userEntityRepo.delete(userId);
 
-    // dataSource.query(
-    //   `DELETE FROM public."user_entity" WHERE "id" = ${userId} ;`,
-    // );
     if (user[1] > 0) return true;
   }
-  //: Promise<UserMongoDbType>
+
   async saveUser(user: UserDbType): Promise<UserToShow> {
     const saveUserQuery = await this.userEntityRepo.create({
       login: user.login,

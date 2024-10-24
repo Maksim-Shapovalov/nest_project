@@ -53,7 +53,7 @@ export class UserSQLRepository {
       items: items,
     };
   }
-  async getUserById(id: number): Promise<FindUserByRecoveryCode | null> {
+  async getUserById(id: string): Promise<FindUserByRecoveryCode | null> {
     const getUserQuery = await this.dataSource.query(
       `SELECT * FROM "user_entity" WHERE id = ${id}`,
     );
@@ -61,9 +61,7 @@ export class UserSQLRepository {
       return null;
     }
 
-    const user = getUserQuery[0];
-
-    return user;
+    return getUserQuery[0];
   }
   async getUserByIdWithMapper(id: string): Promise<UserOutputModel | null> {
     const getUserQuery = 'SELECT * FROM "Users" WHERE id = $1';

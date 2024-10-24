@@ -11,7 +11,7 @@ import { BlogsSQLTypeOrmRepository } from '../../Blogs/TypeOrm/Blogs.repo.TypeOr
 export class CustomBlogIdValidation implements ValidatorConstraintInterface {
   constructor(private blogRepository: BlogsSQLTypeOrmRepository) {}
 
-  async validate(blogId: number): Promise<boolean> {
+  async validate(blogId: string): Promise<boolean> {
     const blog = await this.blogRepository.getBlogsById(blogId);
     if (!blog) {
       return false;

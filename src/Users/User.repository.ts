@@ -14,7 +14,8 @@ import add from 'date-fns/add';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocuments } from './Type/User.schemas';
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CustomUUIDValidation } from '../Other/validator.validateUUID';
 
 type possibleUser = {
   email: string;
@@ -29,6 +30,7 @@ export type newDataUser2 = {
 export class UserRepository {
   constructor(
     @InjectModel(User.name) protected userModel: Model<UserDocuments>,
+    private readonly customUUIDValidation: CustomUUIDValidation,
   ) {}
   async getAllUsers(
     filter: UserPaginationQueryType,
@@ -60,13 +62,14 @@ export class UserRepository {
       items: items,
     };
   }
-  async getUserById(id: number): Promise<UserMongoDbType | null> {
+  async getUserById(id: string): Promise<UserMongoDbType | null> {
     const user = await this.userModel.findOne({ _id: id }).lean();
     if (!user) return null;
     return user;
   }
   async getUserByIdWithMapper(id: string): Promise<UserOutputModel | null> {
-    if (!ObjectId.isValid(id)) return null;
+    if (!id || !this.customUUIDValidation.validate(id))
+      throw new NotFoundException();
     const user = await this.userModel.findOne({ _id: new ObjectId(id) }).lean();
     if (user === null) return null;
     return userMapper(user);

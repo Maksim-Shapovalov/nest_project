@@ -6,10 +6,7 @@ import {
 } from './Type/Blogs.type';
 
 import { Injectable } from '@nestjs/common';
-import {
-  blogMapperSQL,
-  BlogsSQLTypeOrmRepository,
-} from './TypeOrm/Blogs.repo.TypeOrm';
+import { BlogsSQLTypeOrmRepository } from './TypeOrm/Blogs.repo.TypeOrm';
 
 @Injectable()
 export class BlogsService {
@@ -29,20 +26,10 @@ export class BlogsService {
   async updateBlogById(blogs: bodyForUpdateBlogs): Promise<boolean> {
     return this.blogsSQLRepository.updateBlogById(blogs);
   }
-  async deleteBlogsById(id: number): Promise<boolean> {
+  async deleteBlogsById(id: string): Promise<boolean> {
     return await this.blogsSQLRepository.deleteBlogsById(id);
   }
-  async deletePostInBlogById(blogId: number, postId: number): Promise<boolean> {
+  async deletePostInBlogById(blogId: string, postId: string): Promise<boolean> {
     return await this.blogsSQLRepository.deletePostInBlogById(blogId, postId);
   }
 }
-// const blogMapper = (blog: WithId<BlogsType>): BlogsOutputModel => {
-//   return {
-//     id: blog._id.toHexString(),
-//     name: blog.name,
-//     description: blog.description,
-//     websiteUrl: blog.websiteUrl,
-//     createdAt: blog.createdAt,
-//     isMembership: blog.isMembership,
-//   };
-// };

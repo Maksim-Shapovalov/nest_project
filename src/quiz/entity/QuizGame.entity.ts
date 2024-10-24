@@ -12,38 +12,6 @@ import {
 import { PlayersEntity } from './Players.Entity';
 import { QuestionsEntity } from './Questions.Entity';
 
-// @Entity()
-// export class QuizGameEntity {
-//   @PrimaryGeneratedColumn()
-//   id: number;
-//   @ManyToMany(() => UserEntity)
-//   @JoinColumn()
-//   firstPlayer: number;
-//   @JoinColumn()
-//   firstPlayerLogin: string;
-//   // @OneToMany(() => UserEntity)
-//   // firstPlayerAnswer: string;
-//   @JoinColumn()
-//   scoreFirstPlayer: number;
-//   @ManyToMany(() => UserEntity)
-//   @JoinColumn()
-//   secondPlayer: number;
-//   @JoinColumn()
-//   secondPlayerLogin: string;
-//   @JoinColumn()
-//   scoreSecondPlayer: number;
-//   @ManyToMany(() => AnswersEntity)
-//   @JoinColumn()
-//   question: number | null;
-//   @Column()
-//   status: string;
-//   @Column()
-//   pairCreatedDate: string;
-//   @Column()
-//   startGameDate: string;
-//   @Column()
-//   finishGameDate: string;
-// }
 enum StatusTypeEnum {
   Active = 'Active',
   Finished = 'Finished',
@@ -51,21 +19,21 @@ enum StatusTypeEnum {
 }
 @Entity()
 export class QuizGameEntityNotPlayerInfo {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
   @ManyToOne(() => PlayersEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'firstPlayer' })
   firstPlayer: PlayersEntity;
 
   @Column()
-  firstPlayerId: number;
+  firstPlayerId: string;
 
   @ManyToOne(() => PlayersEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'secondPlayer' })
   secondPlayer: PlayersEntity | null;
 
   @Column({ default: null })
-  secondPlayerId: number | null;
+  secondPlayerId: string | null;
   @Column()
   status: StatusTypeEnum;
   @Column()
@@ -84,10 +52,14 @@ export class AnswersEntity {
   id: number;
   @OneToOne(() => QuestionsEntity)
   question: QuestionsEntity;
+  @Column()
+  questionId: string;
   @ManyToOne(() => PlayersEntity, (player) => player.answers, {
     onDelete: 'CASCADE',
   })
   player: PlayersEntity;
+  @Column()
+  playerId: string;
   @Column()
   answerStatus: StatusTypeEnumByAnswersToEndpoint;
   @Column()

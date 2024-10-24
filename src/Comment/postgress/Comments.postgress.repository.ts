@@ -53,7 +53,7 @@ export class CommentSqlRepository {
     };
   }
 
-  async saveComments(comments: CommentsClass, userId: number) {
+  async saveComments(comments: CommentsClass, userId: string) {
     const randomId = Math.floor(Math.random() * 1000000);
     const newComments = await this.dataSource
       .query(`INSERT INTO public."Comments"(
@@ -142,7 +142,7 @@ export class CommentSqlRepository {
      WHERE id = ${commentId};`);
     return true;
   }
-  async commentsMapper(comment: any, userId: number | null) {
+  async commentsMapper(comment: any, userId: string | null) {
     // let likeCount;
     // let dislikeCount;
     let myStatus;

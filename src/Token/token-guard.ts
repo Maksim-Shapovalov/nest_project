@@ -17,8 +17,8 @@ import { SecurityDevicesSQLTypeOrmRepository } from '../Device/TypeOrm/Device.re
 
 export interface CustomRequest extends Request {
   token: {
-    userId: number;
-    deviceId: number;
+    userId: string;
+    deviceId: string;
   };
   cookies: {
     [key: string]: string;

@@ -1,10 +1,6 @@
 import { QuestionsEntity } from '../entity/Questions.Entity';
-import { Column, ManyToOne, OneToOne } from 'typeorm';
 import { PlayersEntity } from '../entity/Players.Entity';
-import {
-  StatusTypeEnumByAnswers,
-  StatusTypeEnumByAnswersToEndpoint,
-} from '../entity/QuizGame.entity';
+import { StatusTypeEnumByAnswersToEndpoint } from '../entity/QuizGame.entity';
 import { questBodyToOutput1 } from './question.type';
 
 export class QuizGameClass {
@@ -24,8 +20,8 @@ export class QuizGameClass {
 
 export class QuizGameClass1 {
   constructor(
-    public firstPlayerId: number,
-    public secondPlayerId: number | null,
+    public firstPlayerId: string,
+    public secondPlayerId: string | null,
     public status: StatusTypeEnum,
     public pairCreatedDate: string,
     public startGameDate: string,
@@ -65,11 +61,11 @@ export type OutputTypePair = {
   //  Array<{ id: string; body: string }> | null;
 };
 export type OutputTypePairToGetId = {
-  id: number;
+  id: string;
   firstPlayer: PlayersEntity;
-  firstPlayerId: number;
+  firstPlayerId: string;
   secondPlayer: PlayersEntity | null;
-  secondPlayerId: number | null;
+  secondPlayerId: string | null;
   question: questBodyToOutput1[] | [];
   status: StatusTypeEnum;
   pairCreatedDate: string;
@@ -96,14 +92,26 @@ export type updateTypeOfQuestion = {
   answer: string;
   addedAt: string;
 };
-export type QuizGameInDB = {
+export type updateTypeOfQuestion1 = {
   id: number;
-  firstPlayerId: number;
-  secondPlayerId: number | null;
+  questionId: string;
+  playerId: string;
+  answerStatus: StatusTypeEnumByAnswersToEndpoint;
+  answer: string;
+  addedAt: string;
+};
+export type QuizGameInDB = {
+  id: string;
+  firstPlayerId: string;
+  secondPlayerId: string | null;
   status: StatusTypeEnum;
   pairCreatedDate: string;
   startGameDate: string;
+  question: questBodyToOutput1[];
   finishGameDate: string;
+};
+export type AnswerInput = {
+  answer: string;
 };
 //firstPlayerLogin: string;
 //   scoreFirstPlayer: number;

@@ -50,7 +50,7 @@ export class QuizGameSuperAdminRepositoryTypeORM {
 
     return this.questGetMapper(saveQuestion);
   }
-  async deleteQuestionById(id: number) {
+  async deleteQuestionById(id: string) {
     const findQuestionInDB = await this.quizGameRepository.find({
       where: { id: id },
     });
@@ -61,7 +61,7 @@ export class QuizGameSuperAdminRepositoryTypeORM {
   }
   async updateQuestionAndCorrectAnswerRepo(
     body: requestBodyQuestionToCreate,
-    id: number,
+    id: string,
   ) {
     const now = new Date().toISOString();
     const findQuestionInDB = await this.quizGameRepository.find({
@@ -75,7 +75,7 @@ export class QuizGameSuperAdminRepositoryTypeORM {
     });
     return true;
   }
-  async updateQuestionPublishedRepo(published: boolean, id: number) {
+  async updateQuestionPublishedRepo(published: boolean, id: string) {
     const now = new Date().toISOString();
     const findQuestionInDB = await this.quizGameRepository.find({
       where: { id: id },

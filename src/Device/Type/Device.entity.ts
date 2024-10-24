@@ -4,18 +4,18 @@ import { UserEntity } from '../../Users/Type/User.entity';
 
 @Entity()
 export class DeviceEntity {
-  @PrimaryGeneratedColumn()
-  deviceId: number;
+  @PrimaryGeneratedColumn('uuid')
+  deviceId: string;
   @Column()
   ip: string;
   @Column()
   title: string;
   @Column()
   lastActiveDate: string;
-  @Column()
-  iat: number;
-  @Column()
-  exp: number;
+  @Column({ default: null })
+  iat: number | null;
+  @Column({ default: null })
+  exp: number | null;
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
   user: UserEntity;

@@ -60,7 +60,7 @@ export class PostsController {
   @Get(':id')
   @HttpCode(200)
   async getPostByPostId(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @User() userModel: NewestPostLike,
   ) {
     const post = await this.postsSQLRepository.getPostsById(id, userModel);
@@ -73,7 +73,7 @@ export class PostsController {
   @HttpCode(200)
   async getCommentByCommendIdInPosts(
     @Query() query: QueryType,
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Req() request,
   ) {
     if (!id) throw new NotFoundException();
@@ -94,7 +94,7 @@ export class PostsController {
   @HttpCode(201)
   async createCommentsInPostById(
     @Body() contentInput: ContentClass,
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Req() request,
   ) {
     const user = request.user as NewestPostLike;
@@ -123,7 +123,7 @@ export class PostsController {
   @Put(':id')
   @HttpCode(204)
   async updatePostByPostId(
-    @Param('id') postId: number,
+    @Param('id') postId: string,
     @Body() postInputModel: BodyPostToRequest1,
   ) {
     const bodyPost: BodyUpdatingPost = {
@@ -145,7 +145,7 @@ export class PostsController {
   @Put(':id/like-status')
   @HttpCode(204)
   async appropriationLike(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @User() userModel: NewestPostLike,
     // @Req() request,
     @Body() inputLikeStatus: StatusLikes,
@@ -163,7 +163,7 @@ export class PostsController {
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deletePostByPostId(@Param('id') id: number) {
+  async deletePostByPostId(@Param('id') id: string) {
     const deleted = await this.postsService.deletePostsById(id);
 
     if (!deleted) throw new NotFoundException();

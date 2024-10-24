@@ -35,7 +35,7 @@ export class BearerGuard implements CanActivate {
       );
       const userId = decodedToken.userId;
 
-      const user = await this.userSQLRepository.getUserById(+userId);
+      const user = await this.userSQLRepository.getUserById(userId);
       if (!user) throw new Error();
 
       const mapUser = UserDbType.UserInReqMapper(user);

@@ -11,7 +11,7 @@ export class CommentsService {
     protected commentsRepository: CommentSqlTypeOrmRepository,
   ) {}
   async createdNewComments(
-    postId: number,
+    postId: string,
     content: string,
     userId: NewestPostLike,
   ) {
@@ -34,15 +34,15 @@ export class CommentsService {
     return this.commentsRepository.saveComments(newComment, userId.userId);
   }
 
-  async updateComment(commentId: number, content: string) {
+  async updateComment(commentId: string, content: string) {
     return await this.commentsRepository.updateCommentsByCommentId(
       commentId,
       content,
     );
   }
   async updateStatusLikeInUser(
-    commentId: number,
-    userId: number,
+    commentId: string,
+    userId: string,
     status: AvailableStatusEnum,
   ) {
     return this.commentsRepository.updateStatusLikeUser(
@@ -52,7 +52,7 @@ export class CommentsService {
     );
   }
 
-  async deletedComment(commentId: number) {
+  async deletedComment(commentId: string) {
     return await this.commentsRepository.deleteCommentsByCommentId(commentId);
   }
 }

@@ -26,7 +26,7 @@ export class PostsPostgresTypeOrmRepository {
     protected postsLikeEntityRepository: Repository<PostsLikeEntity>,
     protected userTypeOrmRepo: UserRepository,
   ) {}
-  async getAllPosts(filter: PaginationQueryType, userId: number | null) {
+  async getAllPosts(filter: PaginationQueryType, userId: string | null) {
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountPosts = await this.postsEntityRepo.findAndCount();
 
@@ -56,7 +56,7 @@ export class PostsPostgresTypeOrmRepository {
     };
   }
 
-  async getPostsById(id: number, user: NewestPostLike | null) {
+  async getPostsById(id: string, user: NewestPostLike | null) {
     const findPosts = await this.postsEntityRepo.find({ where: { id: id } });
     if (findPosts.length === 0) {
       return null;
@@ -65,7 +65,7 @@ export class PostsPostgresTypeOrmRepository {
   }
 
   async getPostInBlogs(
-    blogId: number,
+    blogId: string,
     filter: PaginationQueryType,
     userId: NewestPostLike | null,
   ) {
@@ -100,7 +100,7 @@ export class PostsPostgresTypeOrmRepository {
     };
   }
   async updateStatusLikeUser(
-    postId: number,
+    postId: string,
     user: NewestPostLike | null,
     status: AvailableStatusEnum,
   ) {
@@ -144,7 +144,7 @@ export class PostsPostgresTypeOrmRepository {
     }
   }
 
-  async savePost(post: PostClass, userId: number) {
+  async savePost(post: PostClass, userId: string) {
     const result = await this.postsEntityRepo.create({
       content: post.content,
       createdAt: post.createdAt,
@@ -173,7 +173,7 @@ export class PostsPostgresTypeOrmRepository {
     return true;
   }
 
-  async deletePostsById(id: number): Promise<boolean> {
+  async deletePostsById(id: string): Promise<boolean> {
     const findPostInDB = await this.postsEntityRepo.find({ where: { id: id } });
     if (!findPostInDB[0]) return false;
     const findPost = await this.postsEntityRepo.delete(id);
@@ -181,7 +181,7 @@ export class PostsPostgresTypeOrmRepository {
     return false;
   }
 
-  async postsLikeMapper(post: any, userId: number | null) {
+  async postsLikeMapper(post: any, userId: string | null) {
     let likesCount;
     let dislikesCount;
     let myStatus;

@@ -5,10 +5,10 @@ export class CommentsClass {
   constructor(
     public content: string,
     public commentatorInfo: {
-      userId: number;
+      userId: string;
       userLogin: string;
     },
-    public postId: number,
+    public postId: string,
     public createdAt: string,
     // public statuses: LikesTypeDb[]
   ) {}
