@@ -107,7 +107,7 @@ export type QuizGameInDB = {
   status: StatusTypeEnum;
   pairCreatedDate: string;
   startGameDate: string;
-  question: questBodyToOutput1[];
+  question: questBodyToOutput1[] | [];
   finishGameDate: string;
 };
 export type AnswerInput = {

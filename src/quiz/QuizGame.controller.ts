@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { QuizGameService } from './QuizGame.service';
@@ -29,7 +30,9 @@ export class QuizGameController {
   ): Promise<OutputTypePair> {
     const findUnfinishedGameToCurrentUser: OutputTypePair | false =
       await this.quizGameService.getUnfinishedCurrentGameService(userModel);
-    if (!findUnfinishedGameToCurrentUser) throw new NotFoundException();
+    if (findUnfinishedGameToCurrentUser === false)
+      throw new UnauthorizedException();
+
     return findUnfinishedGameToCurrentUser;
   }
   @UseGuards(BearerGuard)
@@ -37,7 +40,7 @@ export class QuizGameController {
   @HttpCode(200)
   async getGameById(@Param('id') id: string): Promise<OutputTypePair> {
     if (!id || !this.customUUIDValidation.validate(id))
-      throw new NotFoundException();
+      throw new BadRequestException();
     const findQuizGameById: OutputTypePair | false =
       await this.quizGameService.getGameById(id);
     if (!findQuizGameById) throw new NotFoundException();
@@ -62,12 +65,10 @@ export class QuizGameController {
     @Body() answer: AnswerInput,
     @User() userModel: NewestPostLike,
   ) {
-    const sendAnswer: AnswerType | null =
+    const sendAnswer: AnswerType | false | 'end' =
       await this.quizGameService.sendAnswerService(answer.answer, userModel);
-    if (!sendAnswer)
-      throw new BadRequestException({
-        message: 'number of responses exceeded',
-      });
+    if (!sendAnswer) throw new UnauthorizedException();
+    if (sendAnswer === 'end') throw NotFoundException;
     return sendAnswer;
   }
 }

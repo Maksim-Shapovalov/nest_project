@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import {
   OutputTypePair,
   OutputTypePairToGetId,
@@ -39,7 +39,7 @@ export class QuizGameTypeOrmRepo {
     return this.quizGameEntityNotPlayerInfo.findOne({
       where: {
         firstPlayerId: userModel.userId,
-        status: StatusTypeEnum.Active,
+        status: In([StatusTypeEnum.Active, StatusTypeEnum.PendingSecondPlayer]),
       },
       relations: {
         question: true,
@@ -50,15 +50,18 @@ export class QuizGameTypeOrmRepo {
   async updateAnswerToPlayerIdInGame(
     id: string,
     answer: string,
-  ): Promise<updateTypeOfQuestion1 | false> {
+  ): Promise<updateTypeOfQuestion1 | false | 'end'> {
     const now = new Date().toISOString();
     const findPair_0 = await this.quizGameEntityNotPlayerInfo.findOne({
       where: [{ firstPlayerId: id }, { secondPlayerId: id }],
       relations: ['question'],
     });
+    if (!findPair_0) return false;
+    if (findPair_0.status === StatusTypeEnum.Finished) return 'end';
     const findPlayer_0 = await this.findPlayer(id);
     const numberOfResponse = findPlayer_0.answers.length;
     if (numberOfResponse >= 5) {
+      await this.endGameAndCountingScore(findPlayer_0);
       return false;
     }
     const num = findPair_0.question.slice(findPlayer_0.answers.length)[0];
@@ -74,25 +77,18 @@ export class QuizGameTypeOrmRepo {
         : StatusTypeEnumByAnswersToEndpoint.incorrect,
       playerId: findPlayer_0.id,
     });
-    console.log(1);
-    console.log(addAnswer, 'addAnswer');
     const savedAnswer = await this.answersEntity.save(addAnswer);
-    console.log(2);
     const scoreChange = findQuestion.correctAnswers.includes(answer) ? 1 : 0;
     await this.changeScoreToPlayer(scoreChange, findPlayer_0.id, savedAnswer);
-    console.log(savedAnswer);
     return this.answersEntity.findOne({
       where: { id: savedAnswer.id },
     });
-    // return savedAnswer;
-    // return findAnswer;
   }
   async changeScoreToPlayer(
     point: number,
     idPlayer: string,
     addAnswer: AnswersEntity,
   ) {
-    console.log(addAnswer, 'addAnswer');
     const player = await this.playersEntity.findOne({
       where: { id: idPlayer },
       relations: ['answers'],
@@ -100,13 +96,11 @@ export class QuizGameTypeOrmRepo {
     player.score = player.score + point;
     player.answers.push(addAnswer);
     await this.playersEntity.save(player);
-    console.log('Player after save:', player);
     const findPlayer = await this.playersEntity.findOne({
       where: { id: idPlayer },
       relations: ['answers'],
     });
 
-    console.log(findPlayer, 'findPlayer');
     return findPlayer;
   }
   async getGameById(id: string): Promise<OutputTypePairToGetId> {
@@ -116,11 +110,6 @@ export class QuizGameTypeOrmRepo {
       },
       relations: ['question'],
     });
-
-    // this.dataSource.query(
-    //   `SELECT * FROM "quiz_game_entity_not_player_info" WHERE id = ${id}`,
-    // );
-    // return findQuizGame;
   }
   async findPlayer(id: string): Promise<findingPlayer | null> {
     return this.playersEntity.findOne({
@@ -130,9 +119,6 @@ export class QuizGameTypeOrmRepo {
       },
     });
   }
-  // async findPlayerEntity(id: number) {
-  //   return this.playersEntity.findOne({ where: { id: id } });
-  // }
   async findActivePair(): Promise<QuizGameEntityNotPlayerInfo | false> {
     const activePair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: { status: StatusTypeEnum.PendingSecondPlayer },
@@ -145,6 +131,16 @@ export class QuizGameTypeOrmRepo {
       where: [{ firstPlayerId: player.id, secondPlayerId: player.id }],
       relations: ['question'],
     });
+    const now = new Date().toISOString();
+    if (
+      findPair_0.secondPlayer.answers.length >= 5 &&
+      findPair_0.firstPlayer.answers.length >= 5
+    ) {
+      findPair_0.finishGameDate = now;
+      findPair_0.status = StatusTypeEnum.Finished;
+      await this.quizGameEntityNotPlayerInfo.save(findPair_0);
+    }
+    return true;
   }
 
   async createNewPairWithNewSingleUser(

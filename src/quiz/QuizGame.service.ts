@@ -11,6 +11,7 @@ import {
 } from './type/QuizGame.type';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { QuizGameEntityNotPlayerInfo } from './entity/QuizGame.entity';
+import { faIR } from 'date-fns/locale';
 
 @Injectable()
 export class QuizGameService {
@@ -21,6 +22,7 @@ export class QuizGameService {
   ): Promise<OutputTypePair | false> {
     const findPairToCurrentUser =
       await this.quizGameRepo.getUnfinishedCurrentGameRepo(userModel);
+    // if (findPairToCurrentUser.firstPlayerId !== userModel.userId) return null;
     if (!findPairToCurrentUser) return false;
     return this.quizGameMapperOnOutputTypePair(findPairToCurrentUser);
   }
@@ -38,10 +40,15 @@ export class QuizGameService {
     userModel: NewestPostLike,
   ): Promise<OutputTypePair | false> {
     const findCurrencyPair = await this.quizGameRepo.findActivePair();
+    if (
+      (findCurrencyPair &&
+        findCurrencyPair.firstPlayerId === userModel.userId) ||
+      (findCurrencyPair && findCurrencyPair.secondPlayerId === userModel.userId)
+    )
+      return false;
     if (!findCurrencyPair) {
       return await this.createPair(userModel);
     }
-    if (findCurrencyPair.firstPlayerId === userModel.userId) return false;
     const updateBodyPairConnectSecondUser =
       await this.quizGameRepo.connectSecondUserWithFirstUserRepo(userModel);
     const game = await this.getGameByIdInService(findCurrencyPair.id);
@@ -81,10 +88,11 @@ export class QuizGameService {
   async sendAnswerService(
     answer: string,
     user: NewestPostLike,
-  ): Promise<AnswerType | null> {
-    const findPlayerInGame: updateTypeOfQuestion1 | false =
+  ): Promise<AnswerType | false | 'end'> {
+    const findPlayerInGame: updateTypeOfQuestion1 | false | 'end' =
       await this.quizGameRepo.updateAnswerToPlayerIdInGame(user.userId, answer);
-    if (!findPlayerInGame) return null;
+    if (!findPlayerInGame) return false;
+    if (findPlayerInGame === 'end') return 'end';
     return this.answerBodyMapper(findPlayerInGame);
   }
 
@@ -103,14 +111,24 @@ export class QuizGameService {
   ): Promise<OutputTypePair> {
     const now = new Date().toISOString();
     const findPlayer = await this.quizGameRepo.findPlayer(game.firstPlayerId);
-    const questions = game.question.map((q) => ({
-      id: q.id,
-      body: q.body,
-    }));
-    const findSecondPlayer = await this.quizGameRepo.findPlayer(
-      game.secondPlayerId,
-    );
-    console.log(findPlayer);
+    let questions1 = [];
+    if (questions1.length > 0) {
+      questions1 = game.question.map((q) => ({
+        id: q.id,
+        body: q.body,
+      }));
+    }
+    // const questions = game.question.map((q) => ({
+    //   id: q.id,
+    //   body: q.body,
+    // }));
+    let findSecondPlayer = null;
+    if (game.secondPlayerId !== null) {
+      findSecondPlayer = await this.quizGameRepo.findPlayer(
+        game.secondPlayerId,
+      );
+    }
+
     const answer = findPlayer.answers.map((m) => ({
       questionId: m.questionId.toString(),
       answerStatus: m.answerStatus,
@@ -143,7 +161,7 @@ export class QuizGameService {
         },
         score: findSecondPlayer ? findSecondPlayer.score : 0,
       },
-      questions: questions,
+      questions: questions1,
       status: game.status,
       pairCreatedDate: now,
       startGameDate: 'string',
