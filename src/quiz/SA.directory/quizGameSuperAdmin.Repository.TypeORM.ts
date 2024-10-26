@@ -56,8 +56,7 @@ export class QuizGameSuperAdminRepositoryTypeORM {
     });
     if (findQuestionInDB.length === 0) return false;
     const deleteResult = await this.quizGameRepository.delete(id);
-    if (deleteResult.affected > 0) return true;
-    return false;
+    return deleteResult.affected > 0;
   }
   async updateQuestionAndCorrectAnswerRepo(
     body: requestBodyQuestionToCreate,

@@ -26,8 +26,10 @@ export class QuizGameService {
     if (!findPairToCurrentUser) return false;
     return this.quizGameMapperOnOutputTypePair(findPairToCurrentUser);
   }
-  async getGameById(id: string): Promise<OutputTypePair | false> {
+  async getGameById(id: string): Promise<OutputTypePair | false | 'end'> {
     const findGame = await this.quizGameRepo.getGameById(id);
+    if (findGame.secondPlayerId !== id || findGame.firstPlayerId !== id)
+      return 'end';
     if (!findGame) return false;
     return this.returnMapperByGameId(findGame);
   }
@@ -39,7 +41,10 @@ export class QuizGameService {
   async findActivePairInService(
     userModel: NewestPostLike,
   ): Promise<OutputTypePair | false> {
-    const findCurrencyPair = await this.quizGameRepo.findActivePair();
+    const findCurrencyPair = await this.quizGameRepo.findActivePair(
+      userModel.userId,
+    );
+    if (findCurrencyPair === 'Active') return null;
     if (
       (findCurrencyPair &&
         findCurrencyPair.firstPlayerId === userModel.userId) ||
@@ -66,8 +71,8 @@ export class QuizGameService {
       null,
       StatusTypeEnum.PendingSecondPlayer,
       now.toISOString(),
-      '0',
-      '0',
+      null,
+      null,
     );
     const newPair = await this.quizGameRepo.createNewPairWithNewSingleUser(
       newPlayer,
@@ -153,19 +158,22 @@ export class QuizGameService {
         },
         score: findPlayer.score,
       },
-      secondPlayerProgress: {
-        answers: answer1,
-        player: {
-          id: findSecondPlayer ? findSecondPlayer.id : null,
-          login: findSecondPlayer ? findSecondPlayer.login : null,
-        },
-        score: findSecondPlayer ? findSecondPlayer.score : 0,
-      },
-      questions: questions1,
+      secondPlayerProgress:
+        findSecondPlayer !== null
+          ? {
+              answers: answer1,
+              player: {
+                id: findSecondPlayer.id,
+                login: findSecondPlayer.login,
+              },
+              score: findSecondPlayer.score,
+            }
+          : null,
+      questions: findSecondPlayer !== null ? questions1 : null,
       status: game.status,
       pairCreatedDate: now,
-      startGameDate: 'string',
-      finishGameDate: 'string',
+      startGameDate: game.startGameDate,
+      finishGameDate: game.finishGameDate,
     };
   }
 
@@ -178,7 +186,6 @@ export class QuizGameService {
     const findSecondPlayer = await this.quizGameRepo.findPlayer(
       game1.secondPlayerId,
     );
-    console.log(findSecondPlayer, 'findSecondPlayer-----------');
     const answer = findSecondPlayer.answers.map((m) => ({
       questionId: m.questionId.toString(),
       answerStatus: m.answerStatus,
@@ -206,7 +213,7 @@ export class QuizGameService {
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: now,
-      finishGameDate: 'string',
+      finishGameDate: game.finishGameDate,
     };
   }
   async returnMapperByGameId(
@@ -245,23 +252,22 @@ export class QuizGameService {
         },
         score: findFirstPlayer.score,
       },
-      secondPlayerProgress: {
-        answers: answer1,
-        player: {
-          id:
-            game.secondPlayerId !== null
-              ? game.secondPlayerId.toString()
-              : null,
-          login:
-            findSecondPlayer.login !== null ? findSecondPlayer.login : null,
-        },
-        score: findSecondPlayer.score ? findSecondPlayer.score : 0,
-      },
-      questions: questions,
-      status: game.status,
+      secondPlayerProgress:
+        game.secondPlayerId !== null
+          ? {
+              answers: answer1,
+              player: {
+                id: game.secondPlayerId.toString(),
+                login: findSecondPlayer.login,
+              },
+              score: findSecondPlayer.score,
+            }
+          : null,
+      questions: game.secondPlayerId !== null ? questions : null,
+      status: game.secondPlayerId !== null ? game.status : null,
       pairCreatedDate: game.pairCreatedDate,
-      startGameDate: game.startGameDate,
-      finishGameDate: game.finishGameDate,
+      startGameDate: game.secondPlayerId !== null ? game.startGameDate : null,
+      finishGameDate: game.secondPlayerId !== null ? game.finishGameDate : null,
     };
   }
 }

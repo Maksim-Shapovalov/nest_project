@@ -119,7 +119,20 @@ export class QuizGameTypeOrmRepo {
       },
     });
   }
-  async findActivePair(): Promise<QuizGameEntityNotPlayerInfo | false> {
+  async findActivePair(
+    userId: string,
+  ): Promise<QuizGameEntityNotPlayerInfo | false | 'Active'> {
+    const activePairs = await this.quizGameEntityNotPlayerInfo.find({
+      where: { status: StatusTypeEnum.Active },
+    });
+    const userPairs = activePairs.map((pair) => {
+      return {
+        pair,
+        isUserInPair:
+          pair.firstPlayerId === userId || pair.secondPlayerId === userId,
+      };
+    });
+    if (userPairs.length > 0) return 'Active';
     const activePair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: { status: StatusTypeEnum.PendingSecondPlayer },
     });

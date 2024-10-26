@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -31,7 +32,7 @@ export class QuizGameController {
     const findUnfinishedGameToCurrentUser: OutputTypePair | false =
       await this.quizGameService.getUnfinishedCurrentGameService(userModel);
     if (findUnfinishedGameToCurrentUser === false)
-      throw new UnauthorizedException();
+      throw new NotFoundException();
 
     return findUnfinishedGameToCurrentUser;
   }
@@ -41,8 +42,9 @@ export class QuizGameController {
   async getGameById(@Param('id') id: string): Promise<OutputTypePair> {
     if (!id || !this.customUUIDValidation.validate(id))
       throw new BadRequestException();
-    const findQuizGameById: OutputTypePair | false =
+    const findQuizGameById: OutputTypePair | false | 'end' =
       await this.quizGameService.getGameById(id);
+    if (findQuizGameById === 'end') throw new UnauthorizedException();
     if (!findQuizGameById) throw new NotFoundException();
     //ser
     return findQuizGameById;
@@ -53,9 +55,10 @@ export class QuizGameController {
   async connectCurrentUser(
     @User() userModel: NewestPostLike,
   ): Promise<OutputTypePair> {
-    const findPairWithOneUser: OutputTypePair | false =
+    const findPairWithOneUser: OutputTypePair | false | null =
       await this.quizGameService.findActivePairInService(userModel);
-    if (!findPairWithOneUser) throw new BadRequestException();
+    if (findPairWithOneUser === null) throw new UnauthorizedException();
+    if (!findPairWithOneUser) throw new ForbiddenException();
     return findPairWithOneUser;
   }
 
@@ -68,8 +71,8 @@ export class QuizGameController {
   ) {
     const sendAnswer: AnswerType | false | 'end' =
       await this.quizGameService.sendAnswerService(answer.answer, userModel);
-    if (!sendAnswer) throw new UnauthorizedException();
-    if (sendAnswer === 'end') throw NotFoundException;
+    if (!sendAnswer) throw new ForbiddenException();
+    if (sendAnswer === 'end') throw new UnauthorizedException();
     return sendAnswer;
   }
 }

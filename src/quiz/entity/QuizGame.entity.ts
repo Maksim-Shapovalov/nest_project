@@ -38,10 +38,10 @@ export class QuizGameEntityNotPlayerInfo {
   status: StatusTypeEnum;
   @Column()
   pairCreatedDate: string;
-  @Column()
-  startGameDate: string;
-  @Column()
-  finishGameDate: string;
+  @Column({ default: null })
+  startGameDate: string | null;
+  @Column({ default: null })
+  finishGameDate: string | null;
   @ManyToMany(() => QuestionsEntity, (question) => question.quizGames)
   @JoinTable({ name: 'quiz_game_questions' })
   question: QuestionsEntity[] | null;

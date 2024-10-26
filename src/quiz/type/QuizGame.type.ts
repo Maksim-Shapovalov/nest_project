@@ -24,8 +24,8 @@ export class QuizGameClass1 {
     public secondPlayerId: string | null,
     public status: StatusTypeEnum,
     public pairCreatedDate: string,
-    public startGameDate: string,
-    public finishGameDate: string,
+    public startGameDate: string | null,
+    public finishGameDate: string | null,
   ) {}
 }
 
