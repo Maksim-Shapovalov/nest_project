@@ -44,7 +44,7 @@ export class QuizGameController {
       throw new BadRequestException();
     const findQuizGameById: OutputTypePair | false | 'end' =
       await this.quizGameService.getGameById(id);
-    if (findQuizGameById === 'end') throw new UnauthorizedException();
+    if (findQuizGameById === 'end') throw new ForbiddenException();
     if (!findQuizGameById) throw new NotFoundException();
     //ser
     return findQuizGameById;
@@ -57,8 +57,8 @@ export class QuizGameController {
   ): Promise<OutputTypePair> {
     const findPairWithOneUser: OutputTypePair | false | null =
       await this.quizGameService.findActivePairInService(userModel);
-    if (findPairWithOneUser === null) throw new UnauthorizedException();
-    if (!findPairWithOneUser) throw new ForbiddenException();
+    if (findPairWithOneUser === null) throw new ForbiddenException();
+    if (!findPairWithOneUser) throw new UnauthorizedException();
     //res
     return findPairWithOneUser;
   }

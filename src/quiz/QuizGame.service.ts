@@ -64,13 +64,13 @@ export class QuizGameService {
     );
   }
   async createPair(userModel: NewestPostLike): Promise<OutputTypePair> {
+    const now = new Date().toISOString();
     const newPlayer = await this.quizGameRepo.newPlayerOnQuizGame(userModel);
-    const now = new Date();
     const newActivePair = new QuizGameClass1(
       newPlayer.id,
       null,
       StatusTypeEnum.PendingSecondPlayer,
-      now.toISOString(),
+      now,
       null,
       null,
     );
@@ -102,7 +102,6 @@ export class QuizGameService {
   }
 
   async answerBodyMapper(answer: updateTypeOfQuestion1): Promise<AnswerType> {
-    console.log(answer, 'answer');
     return {
       // questionId: answer.question.id.toString(),
       questionId: answer.questionId.toString(),
@@ -114,7 +113,6 @@ export class QuizGameService {
   async quizGameMapperOnOutputTypePair(
     game: QuizGameInDB,
   ): Promise<OutputTypePair> {
-    const now = new Date().toISOString();
     const findPlayer = await this.quizGameRepo.findPlayer(game.firstPlayerId);
     let questions1 = [];
     if (questions1.length > 0) {
@@ -171,7 +169,7 @@ export class QuizGameService {
           : null,
       questions: findSecondPlayer !== null ? questions1 : null,
       status: game.status,
-      pairCreatedDate: now,
+      pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,
       finishGameDate: game.finishGameDate,
     };

@@ -36,7 +36,7 @@ export class QuizGameTypeOrmRepo {
   ) {}
 
   async getUnfinishedCurrentGameRepo(userModel: NewestPostLike) {
-    return this.quizGameEntityNotPlayerInfo.findOne({
+    const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: {
         firstPlayerId: userModel.userId,
         status: In([StatusTypeEnum.Active, StatusTypeEnum.PendingSecondPlayer]),
@@ -45,7 +45,8 @@ export class QuizGameTypeOrmRepo {
         question: true,
       },
     });
-    // return findPair;
+    if (!findPair) return false;
+    return findPair;
   }
   async updateAnswerToPlayerIdInGame(
     id: string,
