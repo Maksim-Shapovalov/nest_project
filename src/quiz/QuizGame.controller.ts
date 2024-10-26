@@ -44,6 +44,7 @@ export class QuizGameController {
     const findQuizGameById: OutputTypePair | false =
       await this.quizGameService.getGameById(id);
     if (!findQuizGameById) throw new NotFoundException();
+    //ser
     return findQuizGameById;
   }
   @UseGuards(BearerGuard)
