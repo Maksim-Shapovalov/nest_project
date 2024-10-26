@@ -59,6 +59,7 @@ export class QuizGameController {
       await this.quizGameService.findActivePairInService(userModel);
     if (findPairWithOneUser === null) throw new UnauthorizedException();
     if (!findPairWithOneUser) throw new ForbiddenException();
+    //res
     return findPairWithOneUser;
   }
 
