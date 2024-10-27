@@ -26,10 +26,19 @@ export class QuizGameService {
     if (!findPairToCurrentUser) return false;
     return this.quizGameMapperOnOutputTypePair(findPairToCurrentUser);
   }
-  async getGameById(id: string): Promise<OutputTypePair | false | 'end'> {
+  async getGameById(
+    id: string,
+    userModel: NewestPostLike,
+  ): Promise<OutputTypePair | false | 'end'> {
     const findGame = await this.quizGameRepo.getGameById(id);
+    console.log(id);
+    console.log(findGame, 'findGame');
+    console.log(userModel, 'userModel');
     if (!findGame) return false;
-    if (findGame.secondPlayerId !== id || findGame.firstPlayerId !== id)
+    if (
+      findGame.firstPlayerId !== userModel.userId &&
+      findGame.secondPlayerId !== userModel.userId
+    )
       return 'end';
     return this.returnMapperByGameId(findGame);
   }
@@ -235,19 +244,23 @@ export class QuizGameService {
     const findSecondPlayer = await this.quizGameRepo.findPlayer(
       game.secondPlayerId,
     );
-    const answer = findFirstPlayer.answers.map((m) => ({
-      questionId: m.question.toString(),
+    console.log(findFirstPlayer.answers, 'findFirstPlayer.answers');
+    console.log(findSecondPlayer.answers, 'findSecondPlayer.answers');
+    let answer = [];
+    let answer1 = [];
+    answer = findFirstPlayer.answers.map((m) => ({
+      questionId: m.questionId.toString(),
       answerStatus: m.answerStatus,
       addedAt: m.addedAt,
     }));
-
-    const answer1 = findSecondPlayer
+    answer1 = findSecondPlayer
       ? findSecondPlayer.answers.map((m) => ({
-          questionId: m.question.toString(),
+          questionId: m.questionId.toString(),
           answerStatus: m.answerStatus,
           addedAt: m.addedAt,
         }))
       : [];
+
     const questions = game.question.map((m) => ({
       id: m.id.toString(),
       body: m.body,
@@ -281,79 +294,3 @@ export class QuizGameService {
     };
   }
 }
-/*
-return {
-      id: game.id.toString(),
-      firstPlayerProgress: {
-        answers: answer1,
-        player: {
-          id: game.firstPlayerId.toString(),
-          login: findPlayerInGameTheFirstPlayer.login,
-        },
-        score: findPlayerInGameTheFirstPlayer.score,
-      },
-      secondPlayerProgress: {
-        answers: findPlayerInGameTheScorePlayer ? answer2 : [],
-        player: {
-          id: game.secondPlayerId ? game.secondPlayerId.toString() : null,
-          login: findPlayerInGameTheScorePlayer
-            ? findPlayerInGameTheScorePlayer.login
-            : null,
-        },
-        score: findPlayerInGameTheScorePlayer
-          ? findPlayerInGameTheScorePlayer.score
-          : 0,
-      },
-      questions: fiveQuestion,
-      status: game.status,
-      pairCreatedDate: 'string',
-      startGameDate: 'string',
-      finishGameDate: 'string',
-    };
- */
-// export const quizGameMapperOnOutputTypePair = (
-//   game: QuizGameInDB,
-//   // questions: Array<QuestionsEntity> | null,
-// ): OutputTypePair => {
-//   const findPlayerInGame = await
-//   // const question = questions.map((q) => ({
-//   //   id: q.id.toString(),
-//   //   body: q.body,
-//   // }));
-//   return {
-//     id: game.id,
-//     firstPlayerProgress: {
-//       answers: [],
-//       player: {
-//         id: game.firstPlayerId.toString(),
-//         login: game.firstPlayerLogin,
-//       },
-//       score: game.scoreFirstPlayer,
-//     },
-//     secondPlayerProgress: {
-//       answers: [
-//         {
-//           questionId: 'string',
-//           answerStatus: 'string',
-//           addedAt: 'string',
-//         },
-//       ],
-//       player: {
-//         id: game.secondPlayerId.toString(),
-//         login: game.secondPlayerLogin,
-//       },
-//       score: game.scoreSecondPlayer,
-//     },
-//     questions: game.question,
-//     status: game.status,
-//     pairCreatedDate: 'string',
-//     startGameDate: 'string',
-//     finishGameDate: 'string',
-//   };
-// };
-// questions: Array<QuestionsEntity> | null,
-// const question = questions.map((q) => ({
-//   id: q.id.toString(),
-//   body: q.body,
-// }));
-// questions: questions ? question : null,

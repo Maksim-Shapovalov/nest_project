@@ -36,15 +36,20 @@ export class QuizGameTypeOrmRepo {
   ) {}
 
   async getUnfinishedCurrentGameRepo(userModel: NewestPostLike) {
-    const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
+    const pairs = await this.quizGameEntityNotPlayerInfo.find({
       where: {
-        firstPlayerId: userModel.userId,
         status: In([StatusTypeEnum.Active, StatusTypeEnum.PendingSecondPlayer]),
       },
       relations: {
         question: true,
       },
     });
+    const findPair = pairs.find(
+      (pair) =>
+        pair.firstPlayerId === userModel.userId ||
+        pair.secondPlayerId === userModel.userId,
+    );
+    console.log(findPair, 'findPair');
     if (!findPair || findPair.status === StatusTypeEnum.Finished) return false;
     return findPair;
   }
@@ -81,6 +86,7 @@ export class QuizGameTypeOrmRepo {
     //   return false;
     // }
     const num = findPair.question.slice(numberOfResponse)[0];
+    if (!num) return false;
     console.log(num, 'num');
     const findQuestion = await this.questionsEntity.findOne({
       where: { id: num.id },
@@ -201,6 +207,7 @@ export class QuizGameTypeOrmRepo {
   }
 
   async connectSecondUserWithFirstUserRepo(userModel: NewestPostLike) {
+    await this.deleteAnswerPlayer(userModel.userId);
     const findActivePair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: {
         secondPlayerId: null,

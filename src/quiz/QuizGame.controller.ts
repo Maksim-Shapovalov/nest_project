@@ -39,11 +39,14 @@ export class QuizGameController {
   @UseGuards(BearerGuard)
   @Get(':id')
   @HttpCode(200)
-  async getGameById(@Param('id') id: string): Promise<OutputTypePair> {
+  async getGameById(
+    @Param('id') id: string,
+    @User() userModel: NewestPostLike,
+  ): Promise<OutputTypePair> {
     if (!id || !this.customUUIDValidation.validate(id))
       throw new BadRequestException();
     const findQuizGameById: OutputTypePair | false | 'end' =
-      await this.quizGameService.getGameById(id);
+      await this.quizGameService.getGameById(id, userModel);
     if (findQuizGameById === 'end') throw new ForbiddenException();
     if (!findQuizGameById) throw new NotFoundException();
     //ser
