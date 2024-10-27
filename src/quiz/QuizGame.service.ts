@@ -44,13 +44,13 @@ export class QuizGameService {
     const findCurrencyPair = await this.quizGameRepo.findActivePair(
       userModel.userId,
     );
-    if (findCurrencyPair === 'Active') return null;
-    if (
-      (findCurrencyPair &&
-        findCurrencyPair.firstPlayerId === userModel.userId) ||
-      (findCurrencyPair && findCurrencyPair.secondPlayerId === userModel.userId)
-    )
-      return false;
+    if (findCurrencyPair === 'Active') return false;
+    // if (
+    //   (findCurrencyPair &&
+    //     findCurrencyPair.firstPlayerId === userModel.userId) ||
+    //   (findCurrencyPair && findCurrencyPair.secondPlayerId === userModel.userId)
+    // )
+    //   return false;
     if (!findCurrencyPair) {
       return await this.createPair(userModel);
     }
@@ -63,8 +63,10 @@ export class QuizGameService {
       updateBodyPairConnectSecondUser,
     );
   }
+
   async createPair(userModel: NewestPostLike): Promise<OutputTypePair> {
     const now = new Date().toISOString();
+    await this.quizGameRepo.deleteAnswerPlayer(userModel.userId);
     const newPlayer = await this.quizGameRepo.newPlayerOnQuizGame(userModel);
     const newActivePair = new QuizGameClass1(
       newPlayer.id,
@@ -93,12 +95,22 @@ export class QuizGameService {
   async sendAnswerService(
     answer: string,
     user: NewestPostLike,
-  ): Promise<AnswerType | false | 'end'> {
-    const findPlayerInGame: updateTypeOfQuestion1 | false | 'end' =
+  ): Promise<AnswerType | false | string> {
+    const findPlayerInGame: updateTypeOfQuestion1 | false | string =
       await this.quizGameRepo.updateAnswerToPlayerIdInGame(user.userId, answer);
-    if (!findPlayerInGame) return false;
-    if (findPlayerInGame === 'end') return 'end';
-    return this.answerBodyMapper(findPlayerInGame);
+    switch (findPlayerInGame) {
+      case 'await':
+        return 'await';
+      case false:
+        return false;
+      case 'end':
+        return 'end';
+      default:
+        if (typeof findPlayerInGame !== 'string') {
+          return this.answerBodyMapper(findPlayerInGame);
+        }
+        return false;
+    }
   }
 
   async answerBodyMapper(answer: updateTypeOfQuestion1): Promise<AnswerType> {

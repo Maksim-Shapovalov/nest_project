@@ -51,21 +51,37 @@ export class QuizGameTypeOrmRepo {
   async updateAnswerToPlayerIdInGame(
     id: string,
     answer: string,
-  ): Promise<updateTypeOfQuestion1 | false | 'end'> {
+  ): Promise<updateTypeOfQuestion1 | false | string> {
     const now = new Date().toISOString();
-    const findPair_0 = await this.quizGameEntityNotPlayerInfo.findOne({
+    const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: [{ firstPlayerId: id }, { secondPlayerId: id }],
       relations: ['question'],
     });
-    if (!findPair_0) return false;
-    if (findPair_0.status === StatusTypeEnum.Finished) return 'end';
+    if (!findPair) return false;
+    switch (findPair.status) {
+      case StatusTypeEnum.PendingSecondPlayer:
+        return 'await';
+      case StatusTypeEnum.Finished:
+        return 'end';
+      default:
+        break;
+    }
+    // if (findPair_0.status === StatusTypeEnum.PendingSecondPlayer)
+    //   return 'await';
+    // if (findPair_0.status === StatusTypeEnum.Finished) return 'end';
     const findPlayer_0 = await this.findPlayer(id);
     const numberOfResponse = findPlayer_0.answers.length;
-    if (numberOfResponse >= 5) {
-      await this.endGameAndCountingScore(findPlayer_0);
-      return false;
+    if (numberOfResponse === 5) {
+      const verifyAnswerTwoPlayer =
+        await this.endGameAndCountingScore(findPlayer_0);
+      if (!verifyAnswerTwoPlayer) return false;
     }
-    const num = findPair_0.question.slice(findPlayer_0.answers.length)[0];
+    // if (numberOfResponse > 5) {
+    //   await this.endGameAndCountingScore(findPlayer_0);
+    //   return false;
+    // }
+    const num = findPair.question.slice(numberOfResponse)[0];
+    console.log(num, 'num');
     const findQuestion = await this.questionsEntity.findOne({
       where: { id: num.id },
     });
@@ -124,8 +140,12 @@ export class QuizGameTypeOrmRepo {
     userId: string,
   ): Promise<QuizGameEntityNotPlayerInfo | false | 'Active'> {
     const activePairs = await this.quizGameEntityNotPlayerInfo.find({
-      where: { status: StatusTypeEnum.Active },
+      where: [
+        { status: StatusTypeEnum.Active },
+        { status: StatusTypeEnum.PendingSecondPlayer },
+      ],
     });
+
     const userPairs = activePairs.map((pair) => {
       return {
         pair,
@@ -133,7 +153,7 @@ export class QuizGameTypeOrmRepo {
           pair.firstPlayerId === userId || pair.secondPlayerId === userId,
       };
     });
-    if (userPairs.length > 0) return 'Active';
+    if (userPairs.length > 0 && userPairs[0].isUserInPair) return 'Active';
     const activePair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: { status: StatusTypeEnum.PendingSecondPlayer },
     });
@@ -142,19 +162,18 @@ export class QuizGameTypeOrmRepo {
 
   async endGameAndCountingScore(player: findingPlayer) {
     const findPair_0 = await this.quizGameEntityNotPlayerInfo.findOne({
-      where: [{ firstPlayerId: player.id, secondPlayerId: player.id }],
-      relations: ['question'],
+      where: [{ firstPlayerId: player.id }, { secondPlayerId: player.id }],
     });
+    const findPlayer1 = await this.findPlayer(findPair_0.firstPlayerId);
+    const findPlayer2 = await this.findPlayer(findPair_0.secondPlayerId);
     const now = new Date().toISOString();
-    if (
-      findPair_0.secondPlayer.answers.length >= 5 &&
-      findPair_0.firstPlayer.answers.length >= 5
-    ) {
+    if (findPlayer1.answers.length >= 5 && findPlayer2.answers.length >= 5) {
       findPair_0.finishGameDate = now;
       findPair_0.status = StatusTypeEnum.Finished;
       await this.quizGameEntityNotPlayerInfo.save(findPair_0);
+      return findPair_0;
     }
-    return true;
+    return false;
   }
 
   async createNewPairWithNewSingleUser(
@@ -224,6 +243,18 @@ export class QuizGameTypeOrmRepo {
     await this.playersEntity.update(userModel.id, {
       game: updatedGame,
     });
+    return true;
+  }
+  async deleteAnswerPlayer(playerId: string): Promise<boolean> {
+    const findPlayer = await this.playersEntity.findOne({
+      where: { id: playerId },
+    });
+    await this.answersEntity.delete({
+      playerId: playerId,
+    });
+    if (!findPlayer) return true;
+    findPlayer.answers = [];
+    await this.playersEntity.save(findPlayer);
     return true;
   }
 

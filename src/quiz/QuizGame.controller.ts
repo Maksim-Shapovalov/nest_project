@@ -55,11 +55,9 @@ export class QuizGameController {
   async connectCurrentUser(
     @User() userModel: NewestPostLike,
   ): Promise<OutputTypePair> {
-    const findPairWithOneUser: OutputTypePair | false | null =
+    const findPairWithOneUser: OutputTypePair | false =
       await this.quizGameService.findActivePairInService(userModel);
-    if (findPairWithOneUser === null) throw new ForbiddenException();
-    if (!findPairWithOneUser) throw new UnauthorizedException();
-    //res
+    if (!findPairWithOneUser) throw new ForbiddenException();
     return findPairWithOneUser;
   }
 
@@ -70,10 +68,20 @@ export class QuizGameController {
     @Body() answer: AnswerInput,
     @User() userModel: NewestPostLike,
   ) {
-    const sendAnswer: AnswerType | false | 'end' =
+    const sendAnswer: AnswerType | false | string =
       await this.quizGameService.sendAnswerService(answer.answer, userModel);
-    if (!sendAnswer) throw new ForbiddenException();
-    if (sendAnswer === 'end') throw new UnauthorizedException();
-    return sendAnswer;
+    switch (sendAnswer) {
+      case false:
+        throw new ForbiddenException();
+      case 'await':
+        throw new ForbiddenException();
+      case 'end':
+        throw new UnauthorizedException();
+      default:
+        return sendAnswer;
+    }
+    // if (!sendAnswer || sendAnswer === 'await') throw new ForbiddenException();
+    // if (sendAnswer === 'end') throw new UnauthorizedException();
+    // return sendAnswer;
   }
 }
