@@ -120,13 +120,15 @@ export class QuizGameTypeOrmRepo {
 
     return findPlayer;
   }
-  async getGameById(id: string): Promise<OutputTypePairToGetId> {
-    return this.quizGameEntityNotPlayerInfo.findOne({
+  async getGameById(id: string): Promise<OutputTypePairToGetId | false> {
+    const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: {
         id: id,
       },
       relations: ['question'],
     });
+    if (!findPair) return false;
+    return findPair;
   }
   async findPlayer(id: string): Promise<findingPlayer | null> {
     return this.playersEntity.findOne({

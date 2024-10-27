@@ -28,9 +28,9 @@ export class QuizGameService {
   }
   async getGameById(id: string): Promise<OutputTypePair | false | 'end'> {
     const findGame = await this.quizGameRepo.getGameById(id);
+    if (!findGame) return false;
     if (findGame.secondPlayerId !== id || findGame.firstPlayerId !== id)
       return 'end';
-    if (!findGame) return false;
     return this.returnMapperByGameId(findGame);
   }
   async getGameByIdInService(id: string): Promise<OutputTypePair | false> {
