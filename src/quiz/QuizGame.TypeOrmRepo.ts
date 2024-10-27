@@ -203,7 +203,15 @@ export class QuizGameTypeOrmRepo {
       },
     );
 
-    return this.quizGameEntityNotPlayerInfo.save(newPairWithSingleUser);
+    const savePair = await this.quizGameEntityNotPlayerInfo.save(
+      newPairWithSingleUser,
+    );
+    return this.quizGameEntityNotPlayerInfo.findOne({
+      where: { id: savePair.id },
+      relations: {
+        question: true,
+      },
+    });
   }
 
   async connectSecondUserWithFirstUserRepo(userModel: NewestPostLike) {

@@ -11,7 +11,6 @@ import {
 } from './type/QuizGame.type';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { QuizGameEntityNotPlayerInfo } from './entity/QuizGame.entity';
-import { faIR } from 'date-fns/locale';
 
 @Injectable()
 export class QuizGameService {
@@ -31,9 +30,6 @@ export class QuizGameService {
     userModel: NewestPostLike,
   ): Promise<OutputTypePair | false | 'end'> {
     const findGame = await this.quizGameRepo.getGameById(id);
-    console.log(id);
-    console.log(findGame, 'findGame');
-    console.log(userModel, 'userModel');
     if (!findGame) return false;
     if (
       findGame.firstPlayerId !== userModel.userId &&
@@ -136,7 +132,8 @@ export class QuizGameService {
   ): Promise<OutputTypePair> {
     const findPlayer = await this.quizGameRepo.findPlayer(game.firstPlayerId);
     let questions1 = [];
-    if (questions1.length > 0) {
+    // console.log(game.question.length, 'game.question.length');
+    if (game && game.question.length > 0) {
       questions1 = game.question.map((q) => ({
         id: q.id,
         body: q.body,
@@ -189,7 +186,8 @@ export class QuizGameService {
             }
           : null,
       questions: findSecondPlayer !== null ? questions1 : null,
-      status: game.status,
+      status:
+        game.status !== null ? game.status : StatusTypeEnum.PendingSecondPlayer,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,
       finishGameDate: game.finishGameDate,
@@ -244,8 +242,6 @@ export class QuizGameService {
     const findSecondPlayer = await this.quizGameRepo.findPlayer(
       game.secondPlayerId,
     );
-    console.log(findFirstPlayer.answers, 'findFirstPlayer.answers');
-    console.log(findSecondPlayer.answers, 'findSecondPlayer.answers');
     let answer = [];
     let answer1 = [];
     answer = findFirstPlayer.answers.map((m) => ({
@@ -287,7 +283,7 @@ export class QuizGameService {
             }
           : null,
       questions: game.secondPlayerId !== null ? questions : null,
-      status: game.secondPlayerId !== null ? game.status : null,
+      status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.secondPlayerId !== null ? game.startGameDate : null,
       finishGameDate: game.secondPlayerId !== null ? game.finishGameDate : null,
