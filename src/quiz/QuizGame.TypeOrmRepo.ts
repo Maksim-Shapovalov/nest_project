@@ -45,7 +45,7 @@ export class QuizGameTypeOrmRepo {
         question: true,
       },
     });
-    if (!findPair) return false;
+    if (!findPair || findPair.status === StatusTypeEnum.Finished) return false;
     return findPair;
   }
   async updateAnswerToPlayerIdInGame(
