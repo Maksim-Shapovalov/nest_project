@@ -240,8 +240,10 @@ export class QuizGameTypeOrmRepo {
     });
   }
 
-  async connectSecondUserWithFirstUserRepo(userModel: NewestPostLike) {
-    const now = new Date();
+  async connectSecondUserWithFirstUserRepo(
+    userModel: NewestPostLike,
+    now: string,
+  ) {
     await this.deleteAnswerPlayer(userModel.userId);
     const findActivePair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: {
@@ -257,7 +259,7 @@ export class QuizGameTypeOrmRepo {
       secondPlayer: newPlayerInGame,
       secondPlayerId: newPlayerInGame.id,
       status: StatusTypeEnum.Active,
-      startGameDate: now.toISOString(),
+      startGameDate: now,
     });
 
     return this.quizGameEntityNotPlayerInfo.findOne({

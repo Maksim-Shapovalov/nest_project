@@ -59,8 +59,12 @@ export class QuizGameService {
     if (!findCurrencyPair) {
       return await this.createPair(userModel);
     }
+    const now = new Date().toISOString();
     const updateBodyPairConnectSecondUser =
-      await this.quizGameRepo.connectSecondUserWithFirstUserRepo(userModel);
+      await this.quizGameRepo.connectSecondUserWithFirstUserRepo(
+        userModel,
+        now,
+      );
     const game = await this.getGameByIdInService(findCurrencyPair.id);
     if (!game) return await this.createPair(userModel);
     return this.quizGameMapperAddSecondPlayer(
