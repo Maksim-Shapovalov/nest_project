@@ -53,7 +53,6 @@ export class PostsService {
       user || null,
       status,
     );
-    console.log(post);
     return post;
   }
 

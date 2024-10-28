@@ -37,22 +37,17 @@ export class TokenRefreshGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest() as CustomRequest;
     const refreshToken = request.cookies.refreshToken;
-    console.log(refreshToken);
     if (!refreshToken) throw new UnauthorizedException();
-    console.log(1);
     let parser;
-    console.log(2);
     try {
       parser = await this.jwtService.verify(refreshToken, {
         secret: setting.JWT_REFRESH_SECRET,
       });
-      console.log(parser, 'parser');
       const validToken2: PayloadTypeRefresh =
         await this.securityDevicesSQLTypeOrmRepository.getDeviceByIdDeviceAndUSerID(
           parser.deviceId,
           parser.userId,
         );
-      console.log(validToken2, 'validToken2');
 
       // await this.dataSource.query(
       //   `SELECT * FROM "device_entity" WHERE "userId" = ${parser.userId} AND "deviceId" = ${parser.deviceId}`,
@@ -66,11 +61,9 @@ export class TokenRefreshGuard implements CanActivate {
         };
         return true;
       }
-      console.log(3);
       throw new UnauthorizedException();
       // jwt.verify(refreshToken) as PayloadTypeRefresh;
     } catch (e) {
-      console.log(4);
       throw new UnauthorizedException();
     }
   }

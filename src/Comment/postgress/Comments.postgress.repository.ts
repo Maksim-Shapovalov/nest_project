@@ -23,7 +23,6 @@ export class CommentSqlRepository {
     const findComments = await this.dataSource.query(
       `SELECT COUNT(*) FROM "Comments" WHERE "postId" = ${postId}`,
     );
-    console.log(findComments);
     if (findComments[0].count === '0') return null;
     const pageSizeInQuery: number = filter.pageSize;
     // const totalCountBlogs = await this.dataSource.query(
