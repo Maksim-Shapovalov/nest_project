@@ -80,9 +80,6 @@ export class QuizGameTypeOrmRepo {
       default:
         break;
     }
-    // if (findPair_0.status === StatusTypeEnum.PendingSecondPlayer)
-    //   return 'await';
-    // if (findPair_0.status === StatusTypeEnum.Finished) return 'end';
     const findPlayer_0 = await this.findPlayer(id);
     const numberOfResponse = findPlayer_0.answers.length;
     if (numberOfResponse === 5) {
@@ -112,10 +109,34 @@ export class QuizGameTypeOrmRepo {
       const verifyAnswerTwoPlayer =
         await this.endGameAndCountingScore(findPlayer_0);
       if (!verifyAnswerTwoPlayer) return false;
+      if (typeof verifyAnswerTwoPlayer !== 'boolean') {
+        await this.addBonusPoint(verifyAnswerTwoPlayer);
+      }
     }
     return this.answersEntity.findOne({
       where: { id: savedAnswer.id },
     });
+  }
+
+  async addBonusPoint(game: QuizGameEntityNotPlayerInfo) {
+    const lastAnswerFirstPlayer = game.firstPlayer.answers[-1];
+    const lastAnswerSecondPlayer = game.secondPlayer.answers[-1];
+    const fastestResponder =
+      lastAnswerFirstPlayer.addedAt < lastAnswerSecondPlayer.addedAt
+        ? game.firstPlayer
+        : game.secondPlayer;
+    const findCorrectAnswer = fastestResponder.answers.filter(
+      (a) => a.answerStatus === StatusTypeEnumByAnswersToEndpoint.correct,
+    );
+    if (findCorrectAnswer.length > 0) {
+      const findPlayerInDB = await this.playersEntity.findOne({
+        where: { id: fastestResponder.id },
+      });
+      findPlayerInDB.score++;
+      await this.playersEntity.save(findPlayerInDB);
+      return true;
+    }
+    return true;
   }
   async changeScoreToPlayer(
     point: number,
