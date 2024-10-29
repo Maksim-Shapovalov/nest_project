@@ -109,7 +109,9 @@ export class QuizGameTypeOrmRepo {
       const verifyAnswerTwoPlayer =
         await this.endGameAndCountingScore(findPlayer_0);
       if (!verifyAnswerTwoPlayer) return false;
+      console.log(typeof verifyAnswerTwoPlayer);
       if (typeof verifyAnswerTwoPlayer !== 'boolean') {
+        console.log(typeof verifyAnswerTwoPlayer);
         await this.addBonusPoint(verifyAnswerTwoPlayer);
       }
     }
@@ -119,12 +121,18 @@ export class QuizGameTypeOrmRepo {
   }
 
   async addBonusPoint(game: QuizGameEntityNotPlayerInfo) {
-    const lastAnswerFirstPlayer = game.firstPlayer.answers[-1];
-    const lastAnswerSecondPlayer = game.secondPlayer.answers[-1];
+    const [findPlayerFirst, findPlayerSecond] = await Promise.all([
+      this.findPlayer(game.firstPlayerId),
+      this.findPlayer(game.secondPlayerId),
+    ]);
+    // const lastAnswerFirstPlayer1 = findPlayerFirst.answers.slice(-1)[0];
+    // const lastAnswerSecondPlayer1 = findPlayerSecond.answers.slice(-1)[0];
+    const lastAnswerFirstPlayer = findPlayerFirst.answers.at(-1);
+    const lastAnswerSecondPlayer = findPlayerSecond.answers.at(-1);
     const fastestResponder =
       lastAnswerFirstPlayer.addedAt < lastAnswerSecondPlayer.addedAt
-        ? game.firstPlayer
-        : game.secondPlayer;
+        ? findPlayerFirst
+        : findPlayerSecond;
     const findCorrectAnswer = fastestResponder.answers.filter(
       (a) => a.answerStatus === StatusTypeEnumByAnswersToEndpoint.correct,
     );
@@ -203,6 +211,9 @@ export class QuizGameTypeOrmRepo {
     const now = new Date().toISOString();
     const findPair_0 = await this.quizGameEntityNotPlayerInfo.findOne({
       where: [{ firstPlayerId: player.id }, { secondPlayerId: player.id }],
+      relations: {
+        question: true,
+      },
     });
     const [findPlayer1, findPlayer2] = await Promise.all([
       this.findPlayer(findPair_0.firstPlayerId),
