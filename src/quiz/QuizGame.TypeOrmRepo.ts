@@ -90,10 +90,6 @@ export class QuizGameTypeOrmRepo {
         await this.endGameAndCountingScore(findPlayer_0);
       if (!verifyAnswerTwoPlayer) return false;
     }
-    // if (numberOfResponse > 5) {
-    //   await this.endGameAndCountingScore(findPlayer_0);
-    //   return false;
-    // }
     const num = findPair.question.slice(numberOfResponse)[0];
     if (!num) return false;
     const findQuestion = await this.questionsEntity.findOne({
@@ -112,11 +108,9 @@ export class QuizGameTypeOrmRepo {
     const scoreChange = findQuestion.correctAnswers.includes(answer) ? 1 : 0;
     await this.changeScoreToPlayer(scoreChange, findPlayer_0.id, savedAnswer);
     const findPlayer = await this.findPlayer(id);
-    console.log(findPlayer.answers.length, 'findPlayer.answers.length');
     if (findPlayer.answers.length === 5) {
       const verifyAnswerTwoPlayer =
         await this.endGameAndCountingScore(findPlayer_0);
-      console.log(verifyAnswerTwoPlayer, 'verifyAnswerTwoPlayer-------------');
       if (!verifyAnswerTwoPlayer) return false;
     }
     return this.answersEntity.findOne({
@@ -189,25 +183,42 @@ export class QuizGameTypeOrmRepo {
     const findPair_0 = await this.quizGameEntityNotPlayerInfo.findOne({
       where: [{ firstPlayerId: player.id }, { secondPlayerId: player.id }],
     });
-    const findPlayer1 = await this.findPlayer(findPair_0.firstPlayerId);
-    const findPlayer2 = await this.findPlayer(findPair_0.secondPlayerId);
-    if (findPlayer1.answers.length === 5 && findPlayer2.answers.length === 5) {
+    const [findPlayer1, findPlayer2] = await Promise.all([
+      this.findPlayer(findPair_0.firstPlayerId),
+      this.findPlayer(findPair_0.secondPlayerId),
+    ]);
+    const player1Completed = findPlayer1.answers.length === 5;
+    const player2Completed = findPlayer2.answers.length === 5;
+    //   this.findPlayer(findPair_0.firstPlayerId);
+    // const findPlayer2 = await
+    if (player1Completed && player2Completed) {
       findPair_0.finishGameDate = now;
       findPair_0.status = StatusTypeEnum.Finished;
       await this.quizGameEntityNotPlayerInfo.save(findPair_0);
       return findPair_0;
-    } else if (
-      findPlayer1.answers.length === 5 &&
-      findPlayer2.answers.length != 5
-    ) {
-      return true;
-    } else if (
-      findPlayer1.answers.length != 5 &&
-      findPlayer2.answers.length === 5
-    ) {
+    }
+    if (player1Completed || player2Completed) {
       return true;
     }
+
     return false;
+    // if (findPlayer1.answers.length === 5 && findPlayer2.answers.length === 5) {
+    //   findPair_0.finishGameDate = now;
+    //   findPair_0.status = StatusTypeEnum.Finished;
+    //   await this.quizGameEntityNotPlayerInfo.save(findPair_0);
+    //   return findPair_0;
+    // } else if (
+    //   findPlayer1.answers.length === 5 &&
+    //   findPlayer2.answers.length != 5
+    // ) {
+    //   return true;
+    // } else if (
+    //   findPlayer1.answers.length != 5 &&
+    //   findPlayer2.answers.length === 5
+    // ) {
+    //   return true;
+    // }
+    // return false;
   }
 
   async createNewPairWithNewSingleUser(

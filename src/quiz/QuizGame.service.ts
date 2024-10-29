@@ -46,6 +46,7 @@ export class QuizGameService {
   async findActivePairInService(
     userModel: NewestPostLike,
   ): Promise<OutputTypePair | false> {
+    const now = new Date().toISOString();
     const findCurrencyPair = await this.quizGameRepo.findActivePair(
       userModel.userId,
     );
@@ -59,7 +60,6 @@ export class QuizGameService {
     if (!findCurrencyPair) {
       return await this.createPair(userModel);
     }
-    const now = new Date().toISOString();
     const updateBodyPairConnectSecondUser =
       await this.quizGameRepo.connectSecondUserWithFirstUserRepo(
         userModel,
