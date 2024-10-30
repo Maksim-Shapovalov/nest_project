@@ -211,6 +211,10 @@ export class QuizGameService {
       answerStatus: m.answerStatus,
       addedAt: m.addedAt,
     }));
+    const fiveQuestionsMapper = fiveQuestion.map((m) => ({
+      id: m.id,
+      body: m.body,
+    }));
     return {
       id: game.id,
       firstPlayerProgress: {
@@ -229,7 +233,7 @@ export class QuizGameService {
         },
         score: findSecondPlayer.score,
       },
-      questions: fiveQuestion,
+      questions: fiveQuestionsMapper,
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,

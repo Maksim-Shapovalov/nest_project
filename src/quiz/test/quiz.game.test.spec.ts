@@ -16,7 +16,7 @@ describe(' tests for QuizGame', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    // request(app.getHttpServer()).delete('testing/all-data');
+    await request(app.getHttpServer()).delete('/testing/all-data');
   });
   // beforeAll(async () => {
   //   await request(app.getHttpServer()).delete('testing/all-data');
@@ -24,7 +24,9 @@ describe(' tests for QuizGame', () => {
   afterAll(async () => {
     await app.close();
   });
-
+  it('should ', async () => {
+    expect(1).toBe(1);
+  });
   it('--POST create user', async () => {
     const login = setting.Username;
     const password = setting.Password;
