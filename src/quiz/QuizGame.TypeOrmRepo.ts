@@ -357,24 +357,11 @@ export class QuizGameTypeOrmRepo {
     const getRandomFiveQuestion = await this.questionsEntity
       .createQueryBuilder('q')
       .where('q.published = true')
-      .orderBy('RANDOM')
+      .orderBy('RANDOM()')
       .take(5)
       .getMany();
-    // await this.dataSource.query(
-    //   `SELECT * FROM "questions_entity"
-    //     WHERE "published" = true
-    //      ORDER BY RANDOM() LIMIT 5`,
-    // );
-    // const questions = getRandomFiveQuestion.map((q) => ({
-    //   id: q.id,
-    //   body: q.body,
-    // }));
-    // console.log(questions, 'questions');
-
     game.question = getRandomFiveQuestion;
     await this.quizGameEntityNotPlayerInfo.save(game);
-
-    console.log(game, 'game');
     return getRandomFiveQuestion;
   }
 }

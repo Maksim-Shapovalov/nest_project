@@ -51,12 +51,6 @@ export class QuizGameService {
       userModel.userId,
     );
     if (findCurrencyPair === 'Active') return false;
-    // if (
-    //   (findCurrencyPair &&
-    //     findCurrencyPair.firstPlayerId === userModel.userId) ||
-    //   (findCurrencyPair && findCurrencyPair.secondPlayerId === userModel.userId)
-    // )
-    //   return false;
     if (!findCurrencyPair) {
       return await this.createPair(userModel);
     }
@@ -203,6 +197,7 @@ export class QuizGameService {
     game1: QuizGameEntityNotPlayerInfo,
   ): Promise<OutputTypePair> {
     const fiveQuestion = await this.quizGameRepo.choiceFiveQuestion(game.id);
+    console.log(fiveQuestion, 'fiveQuestion');
     const findSecondPlayer = await this.quizGameRepo.findPlayer(
       game1.secondPlayerId,
     );
