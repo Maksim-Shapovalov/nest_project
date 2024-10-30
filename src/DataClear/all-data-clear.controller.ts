@@ -1,4 +1,4 @@
-import { Controller, Delete, HttpCode, Injectable } from '@nestjs/common';
+import { Controller, Delete, HttpCode } from '@nestjs/common';
 
 import { AllDataClearRepo } from './AllDataClearRepo';
 

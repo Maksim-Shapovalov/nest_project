@@ -32,8 +32,7 @@ export class UserService {
       },
       Math.floor(10000 + Math.random() * 90000).toString(),
     );
-    const createdNewUser = await this.userSQLRepository.saveUser(newUser);
-    return createdNewUser;
+    return this.userSQLRepository.saveUser(newUser);
   }
   async deleteUserById(userId: string): Promise<boolean> {
     return await this.userSQLRepository.deleteUserById(userId);

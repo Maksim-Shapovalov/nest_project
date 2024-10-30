@@ -202,7 +202,6 @@ export class QuizGameService {
     game: OutputTypePair,
     game1: QuizGameEntityNotPlayerInfo,
   ): Promise<OutputTypePair> {
-    const now = new Date().toISOString();
     const fiveQuestion = await this.quizGameRepo.choiceFiveQuestion(game.id);
     const findSecondPlayer = await this.quizGameRepo.findPlayer(
       game1.secondPlayerId,
@@ -233,7 +232,7 @@ export class QuizGameService {
       questions: fiveQuestion,
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
-      startGameDate: now,
+      startGameDate: game.startGameDate,
       finishGameDate: game.finishGameDate,
     };
   }
