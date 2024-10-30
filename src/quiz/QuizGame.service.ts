@@ -201,11 +201,15 @@ export class QuizGameService {
     const findSecondPlayer = await this.quizGameRepo.findPlayer(
       game1.secondPlayerId,
     );
-    const answer = findSecondPlayer.answers.map((m) => ({
-      questionId: m.questionId.toString(),
-      answerStatus: m.answerStatus,
-      addedAt: m.addedAt,
-    }));
+    const answer = findSecondPlayer.answers
+      .map((m) => ({
+        questionId: m.questionId.toString(),
+        answerStatus: m.answerStatus,
+        addedAt: m.addedAt,
+      }))
+      .sort(
+        (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+      );
     const fiveQuestionsMapper = fiveQuestion.map((m) => ({
       id: m.id,
       body: m.body,
@@ -213,7 +217,10 @@ export class QuizGameService {
     return {
       id: game.id,
       firstPlayerProgress: {
-        answers: game.firstPlayerProgress.answers,
+        answers: game.firstPlayerProgress.answers.sort(
+          (a, b) =>
+            new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+        ),
         player: {
           id: game.firstPlayerProgress.player.id,
           login: game.firstPlayerProgress.player.login,
@@ -246,17 +253,26 @@ export class QuizGameService {
     );
     let answer = [];
     let answer1 = [];
-    answer = findFirstPlayer.answers.map((m) => ({
-      questionId: m.questionId.toString(),
-      answerStatus: m.answerStatus,
-      addedAt: m.addedAt,
-    }));
+    answer = findFirstPlayer.answers
+      .map((m) => ({
+        questionId: m.questionId.toString(),
+        answerStatus: m.answerStatus,
+        addedAt: m.addedAt,
+      }))
+      .sort(
+        (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+      );
     answer1 = findSecondPlayer
-      ? findSecondPlayer.answers.map((m) => ({
-          questionId: m.questionId.toString(),
-          answerStatus: m.answerStatus,
-          addedAt: m.addedAt,
-        }))
+      ? findSecondPlayer.answers
+          .map((m) => ({
+            questionId: m.questionId.toString(),
+            answerStatus: m.answerStatus,
+            addedAt: m.addedAt,
+          }))
+          .sort(
+            (a, b) =>
+              new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+          )
       : [];
 
     const questions = game.question.map((m) => ({

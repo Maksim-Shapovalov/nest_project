@@ -176,12 +176,23 @@ export class QuizGameTypeOrmRepo {
     return findPair;
   }
   async findPlayer(id: string): Promise<findingPlayer | null> {
-    return this.playersEntity.findOne({
-      where: { id: id },
-      relations: {
-        answers: true,
-      },
-    });
+    // return this.playersEntity.findOne({
+    //   where: { id: id },
+    //   relations: {
+    //     answers: true,
+    //   },
+    // });
+    // return this.playersEntity.findOne({
+    //   where: { id: id },
+    //   relations: {
+    //     answers: true,
+    //   },
+    // });
+    return this.playersEntity
+      .createQueryBuilder('q')
+      .leftJoinAndSelect('q.answers', 'a')
+      .where('q.id = :id', { id })
+      .getOne();
   }
   async findActivePair(
     userId: string,
