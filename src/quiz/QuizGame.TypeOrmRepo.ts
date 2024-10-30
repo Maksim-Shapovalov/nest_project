@@ -354,26 +354,19 @@ export class QuizGameTypeOrmRepo {
     if (!game) {
       throw new Error('Game not found');
     }
-    const selectedIds = new Set(game.question.map((q) => q.id));
-
-    // Выполняем запрос к базе данных
-    const getRandomFiveQuestion = await this.dataSource.query(`
-    SELECT * FROM "questions_entity"
-    WHERE "published" = true
-      AND "id" NOT IN (${Array.from(selectedIds).join(',')})
-    ORDER BY RANDOM() LIMIT 5
-  `);
-
-    // const getRandomFiveQuestion = await this.dataSource
-    //   .query(`SELECT * FROM "questions_entity"
-    //     WHERE "published" = true ORDER BY RANDOM() LIMIT 5`);
+    const getRandomFiveQuestion = await this.dataSource.query(
+      `SELECT * FROM "questions_entity"
+        WHERE "published" = true
+         ORDER BY RANDOM() LIMIT 5`,
+    );
     const questions = getRandomFiveQuestion.map((q) => ({
       id: q.id,
       body: q.body,
     }));
-
+    console.log(questions, 'questions');
     game.question = questions;
     await this.quizGameEntityNotPlayerInfo.save(game);
+    console.log(game, 'game');
     return questions;
   }
 }
