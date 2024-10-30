@@ -347,13 +347,6 @@ export class QuizGameTypeOrmRepo {
   }
 
   async choiceFiveQuestion(gameId: string) {
-    const getRandomFiveQuestion = await this.dataSource
-      .query(`SELECT * FROM "questions_entity"
-        WHERE "published" = true ORDER BY RANDOM() LIMIT 5`);
-    const questions = getRandomFiveQuestion.map((q) => ({
-      id: q.id,
-      body: q.body,
-    }));
     const game = await this.quizGameEntityNotPlayerInfo.findOne({
       where: { id: gameId },
       relations: ['question'],
@@ -361,6 +354,23 @@ export class QuizGameTypeOrmRepo {
     if (!game) {
       throw new Error('Game not found');
     }
+    const selectedIds = new Set(game.question.map((q) => q.id));
+
+    // Выполняем запрос к базе данных
+    const getRandomFiveQuestion = await this.dataSource.query(`
+    SELECT * FROM "questions_entity"
+    WHERE "published" = true
+      AND "id" NOT IN (${Array.from(selectedIds).join(',')})
+    ORDER BY RANDOM() LIMIT 5
+  `);
+
+    // const getRandomFiveQuestion = await this.dataSource
+    //   .query(`SELECT * FROM "questions_entity"
+    //     WHERE "published" = true ORDER BY RANDOM() LIMIT 5`);
+    const questions = getRandomFiveQuestion.map((q) => ({
+      id: q.id,
+      body: q.body,
+    }));
 
     game.question = questions;
     await this.quizGameEntityNotPlayerInfo.save(game);
