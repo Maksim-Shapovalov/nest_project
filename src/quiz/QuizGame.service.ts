@@ -25,17 +25,9 @@ export class QuizGameService {
     if (!findPairToCurrentUser) return false;
     return this.quizGameMapperOnOutputTypePair(findPairToCurrentUser);
   }
-  async getGameById(
-    id: string,
-    userModel: NewestPostLike,
-  ): Promise<OutputTypePair | false | 'end'> {
+  async getGameById(id: string): Promise<OutputTypePair | false> {
     const findGame = await this.quizGameRepo.getGameById(id);
     if (!findGame) return false;
-    if (
-      findGame.firstPlayerId !== userModel.userId &&
-      findGame.secondPlayerId !== userModel.userId
-    )
-      return 'end';
     return this.returnMapperByGameId(findGame);
   }
   async getGameByIdInService(id: string): Promise<OutputTypePair | false> {
@@ -98,27 +90,15 @@ export class QuizGameService {
   async sendAnswerService(
     answer: string,
     user: NewestPostLike,
-  ): Promise<AnswerType | false | string> {
-    const findPlayerInGame: updateTypeOfQuestion1 | false | string =
+  ): Promise<AnswerType | false> {
+    const findPlayerInGame: updateTypeOfQuestion1 | false =
       await this.quizGameRepo.updateAnswerToPlayerIdInGame(user.userId, answer);
-    switch (findPlayerInGame) {
-      case 'await':
-        return 'await';
-      case false:
-        return false;
-      case 'end':
-        return 'end';
-      default:
-        if (typeof findPlayerInGame !== 'string') {
-          return this.answerBodyMapper(findPlayerInGame);
-        }
-        return false;
-    }
+    // if (!findPlayerInGame) return false;
+    return findPlayerInGame ? findPlayerInGame : false;
   }
 
   async answerBodyMapper(answer: updateTypeOfQuestion1): Promise<AnswerType> {
     return {
-      // questionId: answer.question.id.toString(),
       questionId: answer.questionId.toString(),
       answerStatus: answer.answerStatus,
       addedAt: answer.addedAt,

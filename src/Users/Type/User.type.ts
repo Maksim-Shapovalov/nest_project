@@ -84,3 +84,8 @@ export type EmailConfirmations = {
   expirationDate: string;
   isConfirmed: boolean;
 };
+
+export type BodyUserToLogin = {
+  loginOrEmail: string;
+  password: string;
+};

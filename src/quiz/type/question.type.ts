@@ -1,4 +1,11 @@
-import { IsBoolean, IsNotEmpty, Length } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class QuestionType {
   constructor(
@@ -23,7 +30,10 @@ export class requestBodyQuestionToCreate {
   @Length(10, 500)
   body: string;
   @IsNotEmpty()
-  correctAnswers: [string];
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  correctAnswers: string[];
 }
 
 export type questBodyToOutput = {

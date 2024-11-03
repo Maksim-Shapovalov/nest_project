@@ -23,7 +23,7 @@ import {
 } from '../type/question.type';
 import { CustomUUIDValidation } from '../../Other/validator.validateUUID';
 
-@Controller('sa/quiz')
+@Controller('sa/quiz/')
 export class QuizGameControllerSuperAdmin {
   constructor(
     protected quizGameSuperAdminService: QuizGameSuperAdminService,
@@ -80,9 +80,9 @@ export class QuizGameControllerSuperAdmin {
   ) {
     if (!id || !this.customUUIDValidation.validate(id))
       throw new NotFoundException();
-    if (typeof body.published === 'string') {
-      throw new BadRequestException();
-    }
+    // if (typeof body.published === 'string') {
+    //   throw new BadRequestException();
+    // }
     const findQuest =
       await this.quizGameSuperAdminService.updateQuestionPublished(
         body.published,

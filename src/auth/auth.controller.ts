@@ -17,6 +17,7 @@ import { Request, Response } from 'express';
 import { UserService } from '../Users/User.service';
 import { BearerGuard } from './guard/authGuard';
 import {
+  BodyUserToLogin,
   FindUserByRecoveryCode,
   NewestPostLike,
   UserBasicRequestBody,
@@ -41,7 +42,7 @@ export class AuthController {
   @HttpCode(200)
   async loginInApp(
     @Headers() header,
-    @Body() body: { loginOrEmail: string; password: string },
+    @Body() body: BodyUserToLogin,
     @Res({ passthrough: true }) response: Response,
     @Req() req: Request,
   ) {

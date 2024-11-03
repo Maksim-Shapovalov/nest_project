@@ -55,7 +55,7 @@ export class QuizGameTypeOrmRepo {
   async updateAnswerToPlayerIdInGame(
     id: string,
     answer: string,
-  ): Promise<updateTypeOfQuestion1 | false | string> {
+  ): Promise<updateTypeOfQuestion1 | false> {
     const now = new Date().toISOString();
     // await this.endGameAndCountingScore1(id);
     const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
@@ -72,14 +72,6 @@ export class QuizGameTypeOrmRepo {
       relations: ['question'],
     });
     if (!findPair) return false;
-    switch (findPair.status) {
-      case StatusTypeEnum.PendingSecondPlayer:
-        return 'await';
-      case StatusTypeEnum.Finished:
-        return 'end';
-      default:
-        break;
-    }
     const findPlayer_0 = await this.findPlayer(id);
     const numberOfResponse = findPlayer_0.answers.length;
     if (numberOfResponse === 5) {
@@ -109,9 +101,7 @@ export class QuizGameTypeOrmRepo {
       const verifyAnswerTwoPlayer =
         await this.endGameAndCountingScore(findPlayer_0);
       if (!verifyAnswerTwoPlayer) return false;
-      console.log(typeof verifyAnswerTwoPlayer);
       if (typeof verifyAnswerTwoPlayer !== 'boolean') {
-        console.log(typeof verifyAnswerTwoPlayer);
         await this.addBonusPoint(verifyAnswerTwoPlayer);
       }
     }
@@ -158,12 +148,10 @@ export class QuizGameTypeOrmRepo {
     player.score = player.score + point;
     player.answers.push(addAnswer);
     await this.playersEntity.save(player);
-    const findPlayer = await this.playersEntity.findOne({
+    return this.playersEntity.findOne({
       where: { id: idPlayer },
       relations: ['answers'],
     });
-
-    return findPlayer;
   }
   async getGameById(id: string): Promise<OutputTypePairToGetId | false> {
     const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
@@ -176,18 +164,6 @@ export class QuizGameTypeOrmRepo {
     return findPair;
   }
   async findPlayer(id: string): Promise<findingPlayer | null> {
-    // return this.playersEntity.findOne({
-    //   where: { id: id },
-    //   relations: {
-    //     answers: true,
-    //   },
-    // });
-    // return this.playersEntity.findOne({
-    //   where: { id: id },
-    //   relations: {
-    //     answers: true,
-    //   },
-    // });
     return this.playersEntity
       .createQueryBuilder('q')
       .leftJoinAndSelect('q.answers', 'a')

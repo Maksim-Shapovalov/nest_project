@@ -10,6 +10,7 @@ import { RefreshTokenRepo } from '../Token/refreshToken-repo';
 import { setting } from '../setting';
 import { JwtService } from '@nestjs/jwt';
 import {
+  BodyUserToLogin,
   FindUserByRecoveryCode,
   UserOutputModel,
 } from '../Users/Type/User.type';
@@ -32,7 +33,7 @@ export class AuthService {
   ) {}
 
   async signIn(
-    body: { loginOrEmail: string; password: string },
+    body: BodyUserToLogin,
     userAgent: { IP: string; deviceName: string },
   ): Promise<any> {
     const user: UserOutputModel = await this.usersService.checkCredentials(
