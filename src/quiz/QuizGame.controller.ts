@@ -29,15 +29,12 @@ export class QuizGameController {
     @User() userModel: NewestPostLike,
     @Query() query: QueryType2,
   ) {
-    console.log(query, 'query');
     const filter = queryFilterByQuizGame(query);
-    console.log(filter, ';filter----');
     const findHistoryGameByPlayer =
       await this.quizGameService.getHistoryGameByPlayerService(
         userModel,
         filter,
       );
-    console.log(findHistoryGameByPlayer, 'findHistoryGameByPlayer');
 
     return findHistoryGameByPlayer;
   }

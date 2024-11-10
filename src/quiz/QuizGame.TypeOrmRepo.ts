@@ -418,26 +418,27 @@ export class QuizGameTypeOrmRepo {
     // if (game.secondPlayerId !== null) {
     //   findSecondPlayer = await this.findPlayer(game.secondPlayerId);
     // }
-    const answer = findPlayer.answers.map((m) => ({
-      questionId: m.questionId.toString(),
-      answerStatus: m.answerStatus,
-      addedAt: m.addedAt,
-    }));
+    const answer = findPlayer.answers
+      .map((m) => ({
+        questionId: m.questionId.toString(),
+        answerStatus: m.answerStatus,
+        addedAt: m.addedAt,
+      }))
+      .sort(
+        (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+      );
     const answer1 = findSecondPlayer
-      ? findSecondPlayer.answers.map((m) => ({
-          questionId: m.questionId.toString(),
-          answerStatus: m.answerStatus,
-          addedAt: m.addedAt,
-        }))
+      ? findSecondPlayer.answers
+          .map((m) => ({
+            questionId: m.questionId.toString(),
+            answerStatus: m.answerStatus,
+            addedAt: m.addedAt,
+          }))
+          .sort(
+            (a, b) =>
+              new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+          )
       : [];
-    // let answer1 = [];
-    // if (findSecondPlayer) {
-    //   answer1 = findSecondPlayer.answers.map((m) => ({
-    //     questionId: m.questionId.toString(),
-    //     answerStatus: m.answerStatus,
-    //     addedAt: m.addedAt,
-    //   }));
-    // }
     return {
       id: game.id.toString(),
       firstPlayerProgress: {

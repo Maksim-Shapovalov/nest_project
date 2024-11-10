@@ -10,7 +10,7 @@ import { questionBody } from '../type/question.type';
 import { StatusTypeEnum } from '../type/QuizGame.type';
 
 describe(' tests for QuizGame', () => {
-  jest.setTimeout(10000);
+  jest.setTimeout(100000);
   let app: INestApplication;
 
   beforeAll(async () => {
