@@ -70,13 +70,14 @@ export class QuizGameService {
     ).length;
 
     const sumScore = sumScoreWhereSecondPlayer + sumScoreWhereFirstPlayer;
-    const avgScores = (sumScore / quantityPair).toFixed();
+    const avgScore =
+      quantityPair !== 0 ? (sumScore / quantityPair).toFixed(2) : '0.00';
+
     const windCount = winsScoreWhereFirstPlayer + winsScoreWhereSecondPlayer;
     const loseCount = loseScoreWhereFirstPlayer + loseScoreWhereSecondPlayer;
-
     return {
       sumScore: sumScore,
-      avgScores: +avgScores,
+      avgScores: parseFloat(avgScore),
       gamesCount: sumScore,
       winsCount: windCount,
       lossesCount: loseCount,
@@ -138,7 +139,6 @@ export class QuizGameService {
       now,
       null,
       null,
-      now,
     );
     const newPair = await this.quizGameRepo.createNewPairWithNewSingleUser(
       newPlayer,

@@ -26,7 +26,6 @@ export class QuizGameClass1 {
     public pairCreatedDate: string,
     public startGameDate: string | null,
     public finishGameDate: string | null,
-    public createdAt,
   ) {}
 }
 

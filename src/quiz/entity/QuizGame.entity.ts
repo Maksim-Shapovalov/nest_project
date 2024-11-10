@@ -45,8 +45,6 @@ export class QuizGameEntityNotPlayerInfo {
   @ManyToMany(() => QuestionsEntity, (question) => question.quizGames)
   @JoinTable({ name: 'quiz_game_questions' })
   question: QuestionsEntity[] | null;
-  @Column({ default: null })
-  createdAt: string;
 }
 @Entity()
 export class AnswersEntity {

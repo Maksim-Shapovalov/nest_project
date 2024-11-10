@@ -4,3 +4,10 @@ export type QueryType = {
   pageSize: number;
   totalCount: number;
 };
+
+export type QueryType2 = {
+  sortBy: string;
+  sortDirection: 'ask' | 'desc';
+  pageNumber: number;
+  pageSize: number;
+};

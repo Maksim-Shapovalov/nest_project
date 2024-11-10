@@ -15,8 +15,8 @@ import { AnswerInput, AnswerType, OutputTypePair } from './type/QuizGame.type';
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { GameUserGuard } from './validatorToQuizGame/quizeGame.validator';
-import { QueryType } from '../Other/Query.Type';
-import { queryFilter } from '../qurey-repo/query-filter';
+import { QueryType, QueryType2 } from '../Other/Query.Type';
+import { queryFilter, queryFilterByQuizGame } from '../qurey-repo/query-filter';
 import { HTTP_STATUS } from '../app.module';
 
 @Controller('pair-game-quiz/pairs')
@@ -28,10 +28,11 @@ export class QuizGameController {
   @HttpCode(200)
   async getHistoryPlayer(
     @User() userModel: NewestPostLike,
-    @Query() query: QueryType,
+    @Query() query: QueryType2,
   ) {
-    console.log(userModel, 'NewestPostLike');
-    const filter = queryFilter(query);
+    console.log(query, 'query');
+    const filter = queryFilterByQuizGame(query);
+    console.log(filter, ';filter----');
     const findHistoryGameByPlayer =
       await this.quizGameService.getHistoryGameByPlayerService(
         userModel,
@@ -42,7 +43,7 @@ export class QuizGameController {
     return findHistoryGameByPlayer;
   }
   @UseGuards(BearerGuard)
-  @Get('my-statistic')
+  @Get('users/my-statistic')
   @HttpCode(200)
   async getStatisticPlayer(@User() userModel: NewestPostLike) {
     return this.quizGameService.getStatisticPlayer(userModel.userId);
