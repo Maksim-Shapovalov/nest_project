@@ -11,10 +11,78 @@ import {
 } from './type/QuizGame.type';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { QuizGameEntityNotPlayerInfo } from './entity/QuizGame.entity';
+import { PaginationQueryType } from '../qurey-repo/query-filter';
 
 @Injectable()
 export class QuizGameService {
   constructor(protected quizGameRepo: QuizGameTypeOrmRepo) {}
+
+  async getHistoryGameByPlayerService(
+    userModel: NewestPostLike,
+    query: PaginationQueryType,
+  ) {
+    const findPairToCurrentUser =
+      await this.quizGameRepo.getHistoryGameByPlayerRepository(
+        userModel,
+        query,
+      );
+    console.log(findPairToCurrentUser, 'findPairToCurrentUser ---------');
+    return findPairToCurrentUser;
+  }
+
+  async getStatisticPlayer(playerId: string) {
+    const findAllPairByPlayerId =
+      await this.quizGameRepo.getAllPairByPlayerId(playerId);
+    const quantityPair = findAllPairByPlayerId.length;
+    const pairWhereFirstPlayer = findAllPairByPlayerId.filter(
+      (p) => p.firstPlayerId === playerId,
+    );
+    const pairWhereSecondPlayer = findAllPairByPlayerId.filter(
+      (p) => p.secondPlayerId === playerId,
+    );
+    const sumScoreWhereSecondPlayer = pairWhereSecondPlayer.reduce(
+      (acc, pair) => {
+        return acc + pair.secondPlayer.score;
+      },
+      0,
+    );
+    const sumScoreWhereFirstPlayer = pairWhereFirstPlayer.reduce(
+      (acc, pair) => {
+        return acc + pair.firstPlayer.score;
+      },
+      0,
+    );
+
+    const winsScoreWhereFirstPlayer = pairWhereFirstPlayer.filter(
+      (p) => p.firstPlayer.score > p.secondPlayer.score,
+    ).length;
+    const winsScoreWhereSecondPlayer = pairWhereSecondPlayer.filter(
+      (p) => p.secondPlayer.score > p.firstPlayer.score,
+    ).length;
+    const loseScoreWhereFirstPlayer = pairWhereFirstPlayer.filter(
+      (p) => p.firstPlayer.score < p.secondPlayer.score,
+    ).length;
+    const loseScoreWhereSecondPlayer = pairWhereSecondPlayer.filter(
+      (p) => p.secondPlayer.score < p.firstPlayer.score,
+    ).length;
+    const drawsScore = findAllPairByPlayerId.filter(
+      (p) => p.secondPlayer.score === p.firstPlayer.score,
+    ).length;
+
+    const sumScore = sumScoreWhereSecondPlayer + sumScoreWhereFirstPlayer;
+    const avgScores = (sumScore / quantityPair).toFixed();
+    const windCount = winsScoreWhereFirstPlayer + winsScoreWhereSecondPlayer;
+    const loseCount = loseScoreWhereFirstPlayer + loseScoreWhereSecondPlayer;
+
+    return {
+      sumScore: sumScore,
+      avgScores: +avgScores,
+      gamesCount: sumScore,
+      winsCount: windCount,
+      lossesCount: loseCount,
+      drawsCount: drawsScore,
+    };
+  }
 
   async getUnfinishedCurrentGameService(
     userModel: NewestPostLike,
@@ -70,6 +138,7 @@ export class QuizGameService {
       now,
       null,
       null,
+      now,
     );
     const newPair = await this.quizGameRepo.createNewPairWithNewSingleUser(
       newPlayer,
@@ -108,26 +177,21 @@ export class QuizGameService {
   async quizGameMapperOnOutputTypePair(
     game: QuizGameInDB,
   ): Promise<OutputTypePair> {
+    console.log(1);
     const findPlayer = await this.quizGameRepo.findPlayer(game.firstPlayerId);
     let questions1 = [];
-    // console.log(game.question.length, 'game.question.length');
     if (game && game.question.length > 0) {
       questions1 = game.question.map((q) => ({
         id: q.id,
         body: q.body,
       }));
     }
-    // const questions = game.question.map((q) => ({
-    //   id: q.id,
-    //   body: q.body,
-    // }));
     let findSecondPlayer = null;
     if (game.secondPlayerId !== null) {
       findSecondPlayer = await this.quizGameRepo.findPlayer(
         game.secondPlayerId,
       );
     }
-
     const answer = findPlayer.answers.map((m) => ({
       questionId: m.questionId.toString(),
       answerStatus: m.answerStatus,
@@ -177,7 +241,6 @@ export class QuizGameService {
     game1: QuizGameEntityNotPlayerInfo,
   ): Promise<OutputTypePair> {
     const fiveQuestion = await this.quizGameRepo.choiceFiveQuestion(game.id);
-    console.log(fiveQuestion, 'fiveQuestion');
     const findSecondPlayer = await this.quizGameRepo.findPlayer(
       game1.secondPlayerId,
     );

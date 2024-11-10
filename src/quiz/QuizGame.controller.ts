@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { QuizGameService } from './QuizGame.service';
@@ -14,10 +15,38 @@ import { AnswerInput, AnswerType, OutputTypePair } from './type/QuizGame.type';
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { GameUserGuard } from './validatorToQuizGame/quizeGame.validator';
+import { QueryType } from '../Other/Query.Type';
+import { queryFilter } from '../qurey-repo/query-filter';
+import { HTTP_STATUS } from '../app.module';
 
 @Controller('pair-game-quiz/pairs')
 export class QuizGameController {
   constructor(protected quizGameService: QuizGameService) {}
+
+  @UseGuards(BearerGuard)
+  @Get('my')
+  @HttpCode(200)
+  async getHistoryPlayer(
+    @User() userModel: NewestPostLike,
+    @Query() query: QueryType,
+  ) {
+    console.log(userModel, 'NewestPostLike');
+    const filter = queryFilter(query);
+    const findHistoryGameByPlayer =
+      await this.quizGameService.getHistoryGameByPlayerService(
+        userModel,
+        filter,
+      );
+    console.log(findHistoryGameByPlayer, 'findHistoryGameByPlayer');
+
+    return findHistoryGameByPlayer;
+  }
+  @UseGuards(BearerGuard)
+  @Get('my-statistic')
+  @HttpCode(200)
+  async getStatisticPlayer(@User() userModel: NewestPostLike) {
+    return this.quizGameService.getStatisticPlayer(userModel.userId);
+  }
   @UseGuards(BearerGuard)
   @Get('my-current')
   @HttpCode(200)

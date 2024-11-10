@@ -19,6 +19,8 @@ import {
   StatusTypeEnumByAnswersToEndpoint,
 } from './entity/QuizGame.entity';
 import { questBodyToOutput, questBodyToOutput1 } from './type/question.type';
+import { PaginationQueryType } from '../qurey-repo/query-filter';
+import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 
 @Injectable()
 export class QuizGameTypeOrmRepo {
@@ -35,6 +37,52 @@ export class QuizGameTypeOrmRepo {
     @InjectDataSource() protected dataSource: DataSource,
   ) {}
 
+  async getHistoryGameByPlayerRepository(
+    userModel: NewestPostLike,
+    filter: PaginationQueryType,
+  ) {
+    const pageSizeInQuery: number = filter.pageSize;
+    const [pairs, totalCountPair] =
+      await this.quizGameEntityNotPlayerInfo.findAndCount({
+        where: [
+          {
+            firstPlayerId: userModel.userId,
+            status: In([StatusTypeEnum.Finished, StatusTypeEnum.Active]),
+            // status: In([StatusTypeEnum.Finished, StatusTypeEnum.Active]),
+          },
+          {
+            secondPlayerId: userModel.userId,
+            status: In([StatusTypeEnum.Finished, StatusTypeEnum.Active]),
+            // status: In([StatusTypeEnum.Finished, StatusTypeEnum.Active]),
+          },
+        ],
+        relations: {
+          question: true,
+        },
+        order: {
+          [filter.sortBy]: filter.sortDirection,
+        },
+        take: pageSizeInQuery,
+        skip: (filter.pageNumber - 1) * pageSizeInQuery,
+      });
+    const totalCount = parseInt(totalCountPair.toString());
+    const itemsPromises = pairs.map((pair) => this.pairHistoryMapper(pair));
+    const items = await Promise.all(itemsPromises);
+    return {
+      pagesCount: Math.ceil(totalCount / pageSizeInQuery),
+      page: filter.pageNumber,
+      pageSize: pageSizeInQuery,
+      totalCount: totalCount,
+      items: items,
+    };
+  }
+
+  async getAllPairByPlayerId(playerId: string) {
+    return this.quizGameEntityNotPlayerInfo.find({
+      where: [{ firstPlayerId: playerId }, { secondPlayerId: playerId }],
+      relations: { firstPlayer: true, secondPlayer: true },
+    });
+  }
   async getUnfinishedCurrentGameRepo(userModel: NewestPostLike) {
     const pairs = await this.quizGameEntityNotPlayerInfo.find({
       where: {
@@ -350,5 +398,73 @@ export class QuizGameTypeOrmRepo {
     game.question = getRandomFiveQuestion;
     await this.quizGameEntityNotPlayerInfo.save(game);
     return getRandomFiveQuestion;
+  }
+
+  async pairHistoryMapper(game: QuizGameInDB) {
+    const [findPlayer, findSecondPlayer] = await Promise.all([
+      this.findPlayer(game.firstPlayerId),
+      game.secondPlayerId !== null
+        ? this.findPlayer(game.secondPlayerId)
+        : Promise.resolve(null),
+    ]);
+    let questions1 = [];
+    if (game && game.question.length > 0) {
+      questions1 = game.question.map((q) => ({
+        id: q.id,
+        body: q.body,
+      }));
+    }
+    // let findSecondPlayer = null;
+    // if (game.secondPlayerId !== null) {
+    //   findSecondPlayer = await this.findPlayer(game.secondPlayerId);
+    // }
+    const answer = findPlayer.answers.map((m) => ({
+      questionId: m.questionId.toString(),
+      answerStatus: m.answerStatus,
+      addedAt: m.addedAt,
+    }));
+    const answer1 = findSecondPlayer
+      ? findSecondPlayer.answers.map((m) => ({
+          questionId: m.questionId.toString(),
+          answerStatus: m.answerStatus,
+          addedAt: m.addedAt,
+        }))
+      : [];
+    // let answer1 = [];
+    // if (findSecondPlayer) {
+    //   answer1 = findSecondPlayer.answers.map((m) => ({
+    //     questionId: m.questionId.toString(),
+    //     answerStatus: m.answerStatus,
+    //     addedAt: m.addedAt,
+    //   }));
+    // }
+    return {
+      id: game.id.toString(),
+      firstPlayerProgress: {
+        answers: answer,
+        player: {
+          id: findPlayer.id.toString(),
+          login: findPlayer.login,
+        },
+        score: findPlayer.score,
+      },
+      secondPlayerProgress:
+        findSecondPlayer !== null
+          ? {
+              answers: answer1,
+              player: {
+                id: findSecondPlayer.id,
+                login: findSecondPlayer.login,
+              },
+              score: findSecondPlayer.score,
+            }
+          : null,
+      questions: findSecondPlayer !== null ? questions1 : null,
+      status:
+        game.status !== null ? game.status : StatusTypeEnum.PendingSecondPlayer,
+      pairCreatedDate: game.pairCreatedDate,
+      startGameDate: game.startGameDate,
+      finishGameDate: game.finishGameDate,
+    };
   }
 }

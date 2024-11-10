@@ -29,11 +29,6 @@ export class PostsPostgresTypeOrmRepository {
   async getAllPosts(filter: PaginationQueryType, userId: string | null) {
     const pageSizeInQuery: number = filter.pageSize;
     const totalCountPosts = await this.postsEntityRepo.findAndCount();
-
-    // dataSource.query(
-    //   `SELECT COUNT(*) FROM "posts_entity"`,
-    // );
-
     const totalCount = parseInt(totalCountPosts[1].toString());
     const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
