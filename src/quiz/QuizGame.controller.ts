@@ -15,16 +15,15 @@ import { AnswerInput, AnswerType, OutputTypePair } from './type/QuizGame.type';
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { GameUserGuard } from './validatorToQuizGame/quizeGame.validator';
-import { QueryType, QueryType2 } from '../Other/Query.Type';
-import { queryFilter, queryFilterByQuizGame } from '../qurey-repo/query-filter';
-import { HTTP_STATUS } from '../app.module';
+import { QueryType2 } from '../Other/Query.Type';
+import { queryFilterByQuizGame } from '../qurey-repo/query-filter';
 
-@Controller('pair-game-quiz/pairs')
+@Controller('pair-game-quiz')
 export class QuizGameController {
   constructor(protected quizGameService: QuizGameService) {}
 
   @UseGuards(BearerGuard)
-  @Get('my')
+  @Get('pairs/my')
   @HttpCode(200)
   async getHistoryPlayer(
     @User() userModel: NewestPostLike,
@@ -49,7 +48,7 @@ export class QuizGameController {
     return this.quizGameService.getStatisticPlayer(userModel.userId);
   }
   @UseGuards(BearerGuard)
-  @Get('my-current')
+  @Get('pairs/my-current')
   @HttpCode(200)
   async getUnfinishedCurrentGame(
     @User() userModel: NewestPostLike,
@@ -62,7 +61,7 @@ export class QuizGameController {
     return findUnfinishedGameToCurrentUser;
   }
   @UseGuards(BearerGuard, GameUserGuard)
-  @Get(':id')
+  @Get('pairs/:id')
   @HttpCode(200)
   async getGameById(@Param('id') id: string): Promise<OutputTypePair> {
     const findQuizGameById: OutputTypePair | false =
@@ -71,7 +70,7 @@ export class QuizGameController {
     return findQuizGameById;
   }
   @UseGuards(BearerGuard)
-  @Post('connection')
+  @Post('pairs/connection')
   @HttpCode(200)
   async connectCurrentUser(
     @User() userModel: NewestPostLike,
@@ -83,7 +82,7 @@ export class QuizGameController {
   }
 
   @UseGuards(BearerGuard)
-  @Post('my-current/answers')
+  @Post('pairs/my-current/answers')
   @HttpCode(200)
   async sendAnswer(
     @Body() answer: AnswerInput,
