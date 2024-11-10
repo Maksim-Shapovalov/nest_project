@@ -108,7 +108,10 @@ export class QuizGameService {
     userModel: NewestPostLike,
   ): Promise<OutputTypePair | false> {
     const now = new Date().toISOString();
-    const findCurrencyPair = await this.quizGameRepo.findActivePair(
+    // const findCurrencyPair = await this.quizGameRepo.findActivePair(
+    //   userModel.userId,
+    // );
+    const findCurrencyPair = await this.quizGameRepo.findPendingStatusPair(
       userModel.userId,
     );
     if (findCurrencyPair === 'Active') return false;

@@ -242,6 +242,21 @@ export class QuizGameTypeOrmRepo {
     return activePair ? activePair : false;
   }
 
+  async findPendingStatusPair(
+    userId: string,
+  ): Promise<QuizGameEntityNotPlayerInfo | false | 'Active'> {
+    const activePair = await this.quizGameEntityNotPlayerInfo.findOne({
+      where: { status: StatusTypeEnum.PendingSecondPlayer },
+    });
+    if (
+      activePair &&
+      (activePair.firstPlayerId === userId ||
+        activePair.secondPlayerId === userId)
+    )
+      return 'Active';
+    return activePair ? activePair : false;
+  }
+
   async endGameAndCountingScore(player: findingPlayer) {
     const now = new Date().toISOString();
     const findPair_0 = await this.quizGameEntityNotPlayerInfo.findOne({
