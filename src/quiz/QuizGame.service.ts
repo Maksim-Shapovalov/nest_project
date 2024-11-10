@@ -195,18 +195,27 @@ export class QuizGameService {
         game.secondPlayerId,
       );
     }
-    const answer = findPlayer.answers.map((m) => ({
-      questionId: m.questionId.toString(),
-      answerStatus: m.answerStatus,
-      addedAt: m.addedAt,
-    }));
-    let answer1 = [];
-    if (findSecondPlayer) {
-      answer1 = findSecondPlayer.answers.map((m) => ({
+    const answer = findPlayer.answers
+      .map((m) => ({
         questionId: m.questionId.toString(),
         answerStatus: m.answerStatus,
         addedAt: m.addedAt,
-      }));
+      }))
+      .sort(
+        (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+      );
+    let answer1 = [];
+    if (findSecondPlayer) {
+      answer1 = findSecondPlayer.answers
+        .map((m) => ({
+          questionId: m.questionId.toString(),
+          answerStatus: m.answerStatus,
+          addedAt: m.addedAt,
+        }))
+        .sort(
+          (a, b) =>
+            new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+        );
     }
 
     return {
