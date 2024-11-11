@@ -9,8 +9,8 @@ import { QuizGameEntityNotPlayerInfo } from './QuizGame.entity';
 
 @Entity()
 export class QuestionsEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
   @Column()
   body: string;
   @Column('text', { array: true })

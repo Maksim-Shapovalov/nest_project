@@ -94,7 +94,7 @@ export type updateTypeOfQuestion = {
 };
 export type updateTypeOfQuestion1 = {
   id: number;
-  questionId: string;
+  questionId: number;
   playerId: string;
   answerStatus: StatusTypeEnumByAnswersToEndpoint;
   answer: string;

@@ -410,7 +410,7 @@ export class QuizGameTypeOrmRepo {
       .orderBy('RANDOM()')
       .take(5)
       .getMany();
-    game.question = getRandomFiveQuestion;
+    game.question = getRandomFiveQuestion.sort((a, b) => a.id - b.id);
     await this.quizGameEntityNotPlayerInfo.save(game);
     return getRandomFiveQuestion;
   }

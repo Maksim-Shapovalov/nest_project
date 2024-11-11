@@ -26,7 +26,6 @@ export class QuizGameService {
         userModel,
         query,
       );
-    console.log(findPairToCurrentUser, 'findPairToCurrentUser ---------');
     return findPairToCurrentUser;
   }
 
