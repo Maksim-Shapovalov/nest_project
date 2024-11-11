@@ -48,8 +48,8 @@ export class QuizGameControllerSuperAdmin {
   @UseGuards(BasicAuthGuard)
   @Delete('questions/:id')
   @HttpCode(204)
-  async sendAnswer(@Param('id') id: string) {
-    if (!id || typeof id !== 'string') throw new NotFoundException();
+  async sendAnswer(@Param('id') id: number) {
+    if (!id || typeof id !== 'number') throw new NotFoundException();
     const deleteQuestion =
       await this.quizGameSuperAdminService.deleteQuestionById(id);
     if (!deleteQuestion) throw new NotFoundException();
@@ -59,9 +59,9 @@ export class QuizGameControllerSuperAdmin {
   @HttpCode(204)
   async ChangeBodyQuestionAndAnswer(
     @Body() questionBody: requestBodyQuestionToCreate,
-    @Param('id') id: string,
+    @Param('id') id: number,
   ) {
-    if (!id || typeof id !== 'string') throw new NotFoundException();
+    if (!id || typeof id !== 'number') throw new NotFoundException();
     const findQuest =
       await this.quizGameSuperAdminService.updateQuestionBodyAndCorrectAnswer(
         questionBody,
@@ -74,9 +74,9 @@ export class QuizGameControllerSuperAdmin {
   @HttpCode(204)
   async changePublishedStatusToQuestion(
     @Body() body: PublishType,
-    @Param('id') id: string,
+    @Param('id') id: number,
   ) {
-    if (!id || typeof id !== 'string') throw new NotFoundException();
+    if (!id || typeof id !== 'number') throw new NotFoundException();
     // if (typeof body.published === 'string') {
     //   throw new BadRequestException();
     // }

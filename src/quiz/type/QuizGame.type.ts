@@ -1,7 +1,7 @@
 import { QuestionsEntity } from '../entity/Questions.Entity';
 import { PlayersEntity } from '../entity/Players.Entity';
 import { StatusTypeEnumByAnswersToEndpoint } from '../entity/QuizGame.entity';
-import { questBodyToOutput1 } from './question.type';
+import { questBodyToOutput1, questBodyToOutput12 } from './question.type';
 
 export class QuizGameClass {
   constructor(
@@ -30,7 +30,7 @@ export class QuizGameClass1 {
 }
 
 export type AnswerType = {
-  questionId: string;
+  questionId: number;
   answerStatus: string;
   addedAt: string;
 };
@@ -66,7 +66,7 @@ export type OutputTypePairToGetId = {
   firstPlayerId: string;
   secondPlayer: PlayersEntity | null;
   secondPlayerId: string | null;
-  question: questBodyToOutput1[] | [];
+  question: questBodyToOutput12[] | [];
   status: StatusTypeEnum;
   pairCreatedDate: string;
   startGameDate: string;
@@ -94,7 +94,7 @@ export type updateTypeOfQuestion = {
 };
 export type updateTypeOfQuestion1 = {
   id: number;
-  questionId: string;
+  questionId: number;
   playerId: string;
   answerStatus: StatusTypeEnumByAnswersToEndpoint;
   answer: string;
@@ -107,7 +107,7 @@ export type QuizGameInDB = {
   status: StatusTypeEnum;
   pairCreatedDate: string;
   startGameDate: string;
-  question: questBodyToOutput1[] | [];
+  question: questBodyToOutput12[] | [];
   finishGameDate: string;
 };
 export type AnswerInput = {
