@@ -165,6 +165,7 @@ export class QuizGameService {
     const findPlayerInGame: updateTypeOfQuestion1 | false =
       await this.quizGameRepo.updateAnswerToPlayerIdInGame(user.userId, answer);
     // if (!findPlayerInGame) return false;
+    console.log(1);
     return findPlayerInGame ? findPlayerInGame : false;
   }
 
