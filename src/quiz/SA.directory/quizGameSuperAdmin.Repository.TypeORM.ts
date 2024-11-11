@@ -79,6 +79,7 @@ export class QuizGameSuperAdminRepositoryTypeORM {
     const findQuestionInDB = await this.quizGameRepository.find({
       where: { id: id },
     });
+    console.log(findQuestionInDB[0], 'findQuestionInDB[0]');
     if (!findQuestionInDB[0]) return false;
     await this.quizGameRepository.update(id, {
       published: published,
