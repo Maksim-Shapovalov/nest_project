@@ -170,7 +170,7 @@ export class QuizGameService {
 
   async answerBodyMapper(answer: updateTypeOfQuestion1): Promise<AnswerType> {
     return {
-      questionId: answer.questionId.toString(),
+      questionId: answer.questionId,
       answerStatus: answer.answerStatus,
       addedAt: answer.addedAt,
     };
@@ -196,7 +196,7 @@ export class QuizGameService {
     }
     const answer = findPlayer.answers
       .map((m) => ({
-        questionId: m.questionId.toString(),
+        questionId: m.questionId,
         answerStatus: m.answerStatus,
         addedAt: m.addedAt,
       }))
@@ -207,7 +207,7 @@ export class QuizGameService {
     if (findSecondPlayer) {
       answer1 = findSecondPlayer.answers
         .map((m) => ({
-          questionId: m.questionId.toString(),
+          questionId: m.questionId,
           answerStatus: m.answerStatus,
           addedAt: m.addedAt,
         }))
@@ -257,7 +257,7 @@ export class QuizGameService {
     );
     const answer = findSecondPlayer.answers
       .map((m) => ({
-        questionId: m.questionId.toString(),
+        questionId: m.questionId,
         answerStatus: m.answerStatus,
         addedAt: m.addedAt,
       }))

@@ -30,7 +30,7 @@ export class QuizGameClass1 {
 }
 
 export type AnswerType = {
-  questionId: string;
+  questionId: number;
   answerStatus: string;
   addedAt: string;
 };
