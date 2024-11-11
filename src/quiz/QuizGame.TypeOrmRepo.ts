@@ -416,12 +416,16 @@ export class QuizGameTypeOrmRepo {
   }
 
   async pairHistoryMapper(game: QuizGameInDB) {
-    const [findPlayer, findSecondPlayer] = await Promise.all([
-      this.findPlayer(game.firstPlayerId),
-      game.secondPlayerId !== null
-        ? this.findPlayer(game.secondPlayerId)
-        : Promise.resolve(null),
-    ]);
+    // const [findPlayer, findSecondPlayer] = await Promise.all([
+    //   this.findPlayer(game.firstPlayerId),
+    //   game.secondPlayerId !== null
+    //     ? this.findPlayer(game.secondPlayerId)
+    //     : Promise.resolve(null),
+    // ]);
+    const findFirstPlayer = await this.findPlayer(game.firstPlayerId);
+    const findSecondPlayer = await this.findPlayer(game.secondPlayerId);
+    let answer = [];
+    let answer1 = [];
     let questions1 = [];
     if (game && game.question.length > 0) {
       questions1 = game.question.map((q) => ({
@@ -433,7 +437,7 @@ export class QuizGameTypeOrmRepo {
     // if (game.secondPlayerId !== null) {
     //   findSecondPlayer = await this.findPlayer(game.secondPlayerId);
     // }
-    const answer = findPlayer.answers
+    answer = findFirstPlayer.answers
       .map((m) => ({
         questionId: m.questionId.toString(),
         answerStatus: m.answerStatus,
@@ -442,7 +446,8 @@ export class QuizGameTypeOrmRepo {
       .sort(
         (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
       );
-    const answer1 = findSecondPlayer
+    console.log(answer, 'answer');
+    answer1 = findSecondPlayer
       ? findSecondPlayer.answers
           .map((m) => ({
             questionId: m.questionId.toString(),
@@ -454,15 +459,16 @@ export class QuizGameTypeOrmRepo {
               new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
           )
       : [];
+    console.log(answer1, 'answer1');
     return {
       id: game.id.toString(),
       firstPlayerProgress: {
         answers: answer,
         player: {
-          id: findPlayer.id.toString(),
-          login: findPlayer.login,
+          id: findFirstPlayer.id.toString(),
+          login: findFirstPlayer.login,
         },
-        score: findPlayer.score,
+        score: findFirstPlayer.score,
       },
       secondPlayerProgress:
         findSecondPlayer !== null
