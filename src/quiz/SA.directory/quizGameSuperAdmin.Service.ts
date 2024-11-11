@@ -28,20 +28,20 @@ export class QuizGameSuperAdminService {
       await this.quizGameSuperAdminRepository.createQuestion(createNewQuestion);
     return takeAllQuestions;
   }
-  async deleteQuestionById(id: number) {
+  async deleteQuestionById(id: string) {
     return this.quizGameSuperAdminRepository.deleteQuestionById(id);
   }
 
   async updateQuestionBodyAndCorrectAnswer(
     body: requestBodyQuestionToCreate,
-    id: number,
+    id: string,
   ) {
     return this.quizGameSuperAdminRepository.updateQuestionAndCorrectAnswerRepo(
       body,
       id,
     );
   }
-  async updateQuestionPublished(published: boolean, id: number) {
+  async updateQuestionPublished(published: boolean, id: string) {
     return this.quizGameSuperAdminRepository.updateQuestionPublishedRepo(
       published,
       id,

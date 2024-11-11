@@ -179,12 +179,11 @@ export class QuizGameService {
   async quizGameMapperOnOutputTypePair(
     game: QuizGameInDB,
   ): Promise<OutputTypePair> {
-    console.log(1);
     const findPlayer = await this.quizGameRepo.findPlayer(game.firstPlayerId);
     let questions1 = [];
     if (game && game.question.length > 0) {
       questions1 = game.question.map((q) => ({
-        id: q.id,
+        id: q.id.toString(),
         body: q.body,
       }));
     }
@@ -265,7 +264,7 @@ export class QuizGameService {
         (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
       );
     const fiveQuestionsMapper = fiveQuestion.map((m) => ({
-      id: m.id,
+      id: m.id.toString(),
       body: m.body,
     }));
     return {

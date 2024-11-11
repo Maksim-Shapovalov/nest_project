@@ -53,7 +53,7 @@ export class AnswersEntity {
   @OneToOne(() => QuestionsEntity)
   question: QuestionsEntity;
   @Column()
-  questionId: number;
+  questionId: string;
   @ManyToOne(() => PlayersEntity, (player) => player.answers, {
     onDelete: 'CASCADE',
   })

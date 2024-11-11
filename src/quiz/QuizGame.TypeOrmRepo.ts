@@ -410,7 +410,7 @@ export class QuizGameTypeOrmRepo {
       .orderBy('RANDOM()')
       .take(5)
       .getMany();
-    game.question = getRandomFiveQuestion.sort((a, b) => a.id - b.id);
+    game.question = getRandomFiveQuestion.sort((a, b) => +a.id - +b.id);
     await this.quizGameEntityNotPlayerInfo.save(game);
     return getRandomFiveQuestion;
   }
@@ -425,7 +425,7 @@ export class QuizGameTypeOrmRepo {
     let questions1 = [];
     if (game && game.question.length > 0) {
       questions1 = game.question.map((q) => ({
-        id: q.id,
+        id: q.id.toString(),
         body: q.body,
       }));
     }
