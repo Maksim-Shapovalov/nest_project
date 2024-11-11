@@ -16,7 +16,10 @@ import { BearerGuard, User } from '../auth/guard/authGuard';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { GameUserGuard } from './validatorToQuizGame/quizeGame.validator';
 import { QueryType2 } from '../Other/Query.Type';
-import { queryFilterByQuizGame } from '../qurey-repo/query-filter';
+import {
+  queryFilterByQuizGame,
+  sortQuizGames,
+} from '../qurey-repo/query-filter';
 
 @Controller('pair-game-quiz')
 export class QuizGameController {
@@ -35,8 +38,18 @@ export class QuizGameController {
         userModel,
         filter,
       );
-
-    return findHistoryGameByPlayer;
+    const sortedGames = sortQuizGames(
+      findHistoryGameByPlayer.items,
+      filter.sortBy,
+      filter.sortDirection,
+    );
+    return {
+      pagesCount: findHistoryGameByPlayer.pagesCount,
+      page: findHistoryGameByPlayer.page,
+      pageSize: findHistoryGameByPlayer.pageSize,
+      totalCount: findHistoryGameByPlayer.totalCount,
+      items: sortedGames,
+    };
   }
   @UseGuards(BearerGuard)
   @Get('users/my-statistic')
