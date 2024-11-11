@@ -314,84 +314,13 @@ describe(' tests for QuizGame', () => {
       );
     });
     expect(findPairById.body.finishGameDate).toEqual(expect.any(String));
+    const getPairByMy = await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/my`)
+      .set(
+        'Authorization',
+        `Bearer ${createResponseFirstUser.body.accessToken}`,
+      )
+      .expect(HTTP_STATUS.OK_200);
+    console.log(getPairByMy.body);
   });
 });
-
-/*
-expect(findPairById.body).toEqual({
-      id: expect.any(String),
-      firstPlayerProgress: {
-        answers: expect.arrayContaining([
-          expect.objectContaining({
-            questionId: createFirstAnswer1.questionId,
-            answerStatus: createFirstAnswer1.answerStatus,
-            addedAt: expect.any(String),
-          }),
-          expect.objectContaining({
-            questionId: createFirstAnswer2.questionId,
-            answerStatus: createFirstAnswer2.answerStatus,
-            addedAt: expect.any(String),
-          }),
-          expect.objectContaining({
-            questionId: createFirstAnswer3.questionId,
-            answerStatus: createFirstAnswer3.answerStatus,
-            addedAt: expect.any(String),
-          }),
-          expect.objectContaining({
-            questionId: createFirstAnswer4.questionId,
-            answerStatus: createFirstAnswer4.answerStatus,
-            addedAt: expect.any(String),
-          }),
-          expect.objectContaining({
-            questionId: createFirstAnswer5.questionId,
-            answerStatus: createFirstAnswer5.answerStatus,
-            addedAt: expect.any(String),
-          }),
-        ]),
-        player: {
-          id: expect.any(String),
-          login: expect.any(String),
-        },
-        score: 4,
-      },
-      secondPlayerProgress: {
-        answers: expect.arrayContaining([
-          expect.objectContaining({
-            questionId: createSecondAnswer1.questionId,
-            answerStatus: createSecondAnswer1.answerStatus,
-            addedAt: expect.any(String),
-          }),
-          expect.objectContaining({
-            questionId: createSecondAnswer2.questionId,
-            answerStatus: createSecondAnswer2.answerStatus,
-            addedAt: expect.any(String),
-          }),
-          expect.objectContaining({
-            questionId: createSecondAnswer3.questionId,
-            answerStatus: createSecondAnswer3.answerStatus,
-            addedAt: expect.any(String),
-          }),
-          expect.objectContaining({
-            questionId: createSecondAnswer4.questionId,
-            answerStatus: createSecondAnswer4.answerStatus,
-            addedAt: expect.any(String),
-          }),
-          expect.objectContaining({
-            questionId: createSecondAnswer5.questionId,
-            answerStatus: createSecondAnswer5.answerStatus,
-            addedAt: expect.any(String),
-          }),
-        ]),
-        player: {
-          id: expect.any(String),
-          login: expect.any(String),
-        },
-        score: 2,
-      },
-      questions: findPairById.body.questions,
-      status: StatusTypeEnum.Finished,
-      finishGameDate: expect.any(String),
-      startGameDate: expect.any(String),
-      pairCreatedDate: expect.any(String),
-    });
- */

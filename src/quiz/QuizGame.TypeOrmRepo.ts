@@ -212,11 +212,16 @@ export class QuizGameTypeOrmRepo {
     return findPair;
   }
   async findPlayer(id: string): Promise<findingPlayer | null> {
-    return this.playersEntity
-      .createQueryBuilder('q')
-      .leftJoinAndSelect('q.answers', 'a')
-      .where('q.id = :id', { id })
-      .getOne();
+    return this.playersEntity.findOne({
+      where: { id: id },
+      relations: { answers: true },
+    });
+
+    // return this.playersEntity
+    //   .createQueryBuilder('q')
+    //   .leftJoinAndSelect('q.answers', 'a')
+    //   .where('q.id = :id', { id })
+    //   .getOne();
   }
   async findActivePair(
     userId: string,
@@ -446,7 +451,6 @@ export class QuizGameTypeOrmRepo {
       .sort(
         (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
       );
-    console.log(answer, 'answer');
     answer1 = findSecondPlayer
       ? findSecondPlayer.answers
           .map((m) => ({
@@ -459,7 +463,6 @@ export class QuizGameTypeOrmRepo {
               new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
           )
       : [];
-    console.log(answer1, 'answer1');
     return {
       id: game.id.toString(),
       firstPlayerProgress: {
