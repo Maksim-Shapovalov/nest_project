@@ -168,13 +168,13 @@ export class QuizGameService {
     return findPlayerInGame ? findPlayerInGame : false;
   }
 
-  async answerBodyMapper(answer: updateTypeOfQuestion1): Promise<AnswerType> {
-    return {
-      questionId: answer.questionId,
-      answerStatus: answer.answerStatus,
-      addedAt: answer.addedAt,
-    };
-  }
+  // async answerBodyMapper(answer: updateTypeOfQuestion1): Promise<AnswerType> {
+  //   return {
+  //     questionId: answer.questionId,
+  //     answerStatus: answer.answerStatus,
+  //     addedAt: answer.addedAt,
+  //   };
+  // }
 
   async quizGameMapperOnOutputTypePair(
     game: QuizGameInDB,
@@ -195,7 +195,7 @@ export class QuizGameService {
     }
     const answer = findPlayer.answers
       .map((m) => ({
-        questionId: m.questionId,
+        questionId: m.questionId.toString(),
         answerStatus: m.answerStatus,
         addedAt: m.addedAt,
       }))
@@ -256,7 +256,7 @@ export class QuizGameService {
     );
     const answer = findSecondPlayer.answers
       .map((m) => ({
-        questionId: m.questionId,
+        questionId: m.questionId.toString(),
         answerStatus: m.answerStatus,
         addedAt: m.addedAt,
       }))

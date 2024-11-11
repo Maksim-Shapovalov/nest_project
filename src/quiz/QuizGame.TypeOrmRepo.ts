@@ -2,12 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import {
-  OutputTypePair,
   OutputTypePairToGetId,
   QuizGameClass1,
   QuizGameInDB,
   StatusTypeEnum,
-  updateTypeOfQuestion,
   updateTypeOfQuestion1,
 } from './type/QuizGame.type';
 import { NewestPostLike } from '../Users/Type/User.type';
@@ -18,9 +16,7 @@ import {
   QuizGameEntityNotPlayerInfo,
   StatusTypeEnumByAnswersToEndpoint,
 } from './entity/QuizGame.entity';
-import { questBodyToOutput, questBodyToOutput1 } from './type/question.type';
 import { PaginationQueryType } from '../qurey-repo/query-filter';
-import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
 
 @Injectable()
 export class QuizGameTypeOrmRepo {
@@ -153,9 +149,13 @@ export class QuizGameTypeOrmRepo {
         await this.addBonusPoint(verifyAnswerTwoPlayer);
       }
     }
-    return this.answersEntity.findOne({
+    const returnAnswer = await this.answersEntity.findOne({
       where: { id: savedAnswer.id },
     });
+    return {
+      ...returnAnswer,
+      questionId: returnAnswer.questionId.toString(),
+    };
   }
 
   async addBonusPoint(game: QuizGameEntityNotPlayerInfo) {

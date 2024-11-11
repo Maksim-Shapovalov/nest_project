@@ -30,7 +30,7 @@ export class QuizGameClass1 {
 }
 
 export type AnswerType = {
-  questionId: number;
+  questionId: string;
   answerStatus: string;
   addedAt: string;
 };
@@ -94,7 +94,7 @@ export type updateTypeOfQuestion = {
 };
 export type updateTypeOfQuestion1 = {
   id: number;
-  questionId: number;
+  questionId: string;
   playerId: string;
   answerStatus: StatusTypeEnumByAnswersToEndpoint;
   answer: string;
