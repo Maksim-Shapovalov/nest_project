@@ -323,7 +323,5 @@ describe(' tests for QuizGame', () => {
       .expect(HTTP_STATUS.OK_200);
     console.log(getPairByMy.body.items[0].firstPlayerProgress.answers);
     console.log(getPairByMy.body.items[0].secondPlayerProgress.answers);
-    console.log(getPairByMy.body.items.firstPlayerProgress);
-    console.log(getPairByMy.body.items.secondPlayerProgress);
   });
 });

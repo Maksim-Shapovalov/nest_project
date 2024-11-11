@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import {
+  OutputTypePair,
   OutputTypePairToGetId,
   QuizGameClass1,
   QuizGameInDB,
@@ -420,29 +421,14 @@ export class QuizGameTypeOrmRepo {
     return getRandomFiveQuestion;
   }
 
-  async pairHistoryMapper(game: QuizGameInDB) {
-    // const [findPlayer, findSecondPlayer] = await Promise.all([
-    //   this.findPlayer(game.firstPlayerId),
-    //   game.secondPlayerId !== null
-    //     ? this.findPlayer(game.secondPlayerId)
-    //     : Promise.resolve(null),
-    // ]);
+  async pairHistoryMapper(game: QuizGameInDB): Promise<OutputTypePair> {
     const findFirstPlayer = await this.findPlayer(game.firstPlayerId);
     const findSecondPlayer = await this.findPlayer(game.secondPlayerId);
-    let answer = [];
-    let answer1 = [];
-    let questions1 = [];
-    if (game && game.question.length > 0) {
-      questions1 = game.question.map((q) => ({
-        id: q.id.toString(),
-        body: q.body,
-      }));
-    }
-    // let findSecondPlayer = null;
-    // if (game.secondPlayerId !== null) {
-    //   findSecondPlayer = await this.findPlayer(game.secondPlayerId);
-    // }
-    answer = findFirstPlayer.answers
+    const questions1 = game.question.map((q) => ({
+      id: q.id.toString(),
+      body: q.body,
+    }));
+    const answer = findFirstPlayer.answers
       .map((m) => ({
         questionId: m.questionId.toString(),
         answerStatus: m.answerStatus,
@@ -451,7 +437,7 @@ export class QuizGameTypeOrmRepo {
       .sort(
         (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
       );
-    answer1 = findSecondPlayer
+    const answer1 = findSecondPlayer
       ? findSecondPlayer.answers
           .map((m) => ({
             questionId: m.questionId.toString(),
