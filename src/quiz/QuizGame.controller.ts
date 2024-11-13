@@ -32,7 +32,6 @@ export class QuizGameController {
     @User() userModel: NewestPostLike,
     @Query() query: QueryType2,
   ) {
-    console.log(1);
     const filter = queryFilterByQuizGame(query);
     const findHistoryGameByPlayer =
       await this.quizGameService.getHistoryGameByPlayerService(
