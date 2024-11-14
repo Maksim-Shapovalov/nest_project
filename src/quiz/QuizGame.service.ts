@@ -78,7 +78,7 @@ export class QuizGameService {
     return {
       sumScore: sumScore,
       avgScores: parseFloat(avgScore),
-      gamesCount: sumScore,
+      gamesCount: quantityPair,
       winsCount: windCount,
       lossesCount: loseCount,
       drawsCount: drawsScore,
