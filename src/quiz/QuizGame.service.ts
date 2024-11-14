@@ -35,10 +35,10 @@ export class QuizGameService {
       await this.quizGameRepo.getAllPairByPlayerId(playerId);
     const quantityPair = findAllPairByPlayerId.length;
     const pairWhereFirstPlayer = findAllPairByPlayerId.filter(
-      (p) => p.firstPlayerId === playerId,
+      (p) => p.firstPlayer.userId === playerId,
     );
     const pairWhereSecondPlayer = findAllPairByPlayerId.filter(
-      (p) => p.secondPlayerId === playerId,
+      (p) => p.secondPlayer.userId === playerId,
     );
     const sumScoreWhereSecondPlayer = pairWhereSecondPlayer.reduce(
       (acc, pair) => {
