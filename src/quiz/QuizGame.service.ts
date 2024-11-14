@@ -110,11 +110,11 @@ export class QuizGameService {
     // const findCurrencyPair = await this.quizGameRepo.findActivePair(
     //   userModel.userId,
     // );
-    const findCurrencyPair = await this.quizGameRepo.findPendingStatusPair(
+    const currentPair = await this.quizGameRepo.findPendingStatusPair(
       userModel.userId,
     );
-    if (findCurrencyPair === 'Active') return false;
-    if (!findCurrencyPair) {
+    if (currentPair === 'Active') return false;
+    else if (!currentPair) {
       return await this.createPair(userModel);
     }
     const updateBodyPairConnectSecondUser =
@@ -122,7 +122,7 @@ export class QuizGameService {
         userModel,
         now,
       );
-    const game = await this.getGameByIdInService(findCurrencyPair.id);
+    const game = await this.getGameByIdInService(currentPair.id);
     if (!game) return await this.createPair(userModel);
     return this.quizGameMapperAddSecondPlayer(
       game,
@@ -223,7 +223,7 @@ export class QuizGameService {
       firstPlayerProgress: {
         answers: answer,
         player: {
-          id: findPlayer.id.toString(),
+          id: findPlayer.userId.toString(),
           login: findPlayer.login,
         },
         score: findPlayer.score,
@@ -233,7 +233,7 @@ export class QuizGameService {
           ? {
               answers: answer1,
               player: {
-                id: findSecondPlayer.id,
+                id: findSecondPlayer.userId,
                 login: findSecondPlayer.login,
               },
               score: findSecondPlayer.score,

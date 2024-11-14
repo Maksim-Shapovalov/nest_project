@@ -24,11 +24,12 @@ export class GameUserGuard implements CanActivate {
       throw new BadRequestException();
 
     const isUserInGame = await this.quizGameRepo.getGameById(gameId);
+    console.log(isUserInGame);
     if (!isUserInGame) {
       throw new NotFoundException();
     } else if (
-      isUserInGame.firstPlayerId !== userModel &&
-      isUserInGame.secondPlayerId !== userModel
+      isUserInGame.firstPlayer.userId !== userModel &&
+      isUserInGame.secondPlayer.userId !== userModel
     ) {
       throw new ForbiddenException();
     }

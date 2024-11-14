@@ -216,7 +216,11 @@ export class QuizGameTypeOrmRepo {
       where: {
         id: id,
       },
-      relations: ['question'],
+      relations: {
+        question: true,
+        firstPlayer: true,
+        secondPlayer: true,
+      },
     });
     if (!findPair) return false;
     return findPair;
@@ -272,21 +276,22 @@ export class QuizGameTypeOrmRepo {
   async findPendingStatusPair(
     userId: string,
   ): Promise<QuizGameEntityNotPlayerInfo | false | 'Active'> {
-    const activePair = await this.quizGameEntityNotPlayerInfo.findOne({
+    const pendingPair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: { status: StatusTypeEnum.PendingSecondPlayer },
       relations: {
         firstPlayer: true,
         secondPlayer: true,
       },
     });
-    if (activePair && !activePair.secondPlayer) return activePair;
+
     if (
-      activePair &&
-      (activePair.firstPlayer.userId === userId ||
-        activePair.secondPlayer.userId === userId)
+      pendingPair &&
+      (pendingPair.firstPlayer?.userId === userId ||
+        pendingPair.secondPlayer?.userId === userId)
     )
       return 'Active';
-    return activePair ? activePair : false;
+    else if (pendingPair && !pendingPair.secondPlayer) return pendingPair;
+    return pendingPair ? pendingPair : false;
   }
 
   async endGameAndCountingScore(player: findingPlayer) {
