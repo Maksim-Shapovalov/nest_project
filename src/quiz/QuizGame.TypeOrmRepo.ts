@@ -43,12 +43,12 @@ export class QuizGameTypeOrmRepo {
       await this.quizGameEntityNotPlayerInfo.findAndCount({
         where: [
           {
-            firstPlayerId: userModel.userId,
+            firstPlayer: { userId: userModel.userId },
             status: In([StatusTypeEnum.Finished, StatusTypeEnum.Active]),
             // status: In([StatusTypeEnum.Finished, StatusTypeEnum.Active]),
           },
           {
-            secondPlayerId: userModel.userId,
+            secondPlayer: { userId: userModel.userId },
             status: In([StatusTypeEnum.Finished, StatusTypeEnum.Active]),
             // status: In([StatusTypeEnum.Finished, StatusTypeEnum.Active]),
           },
@@ -119,6 +119,7 @@ export class QuizGameTypeOrmRepo {
     if (!findPair) return false;
     const findPlayer_0 = await this.findPlayer(id, findPair.id);
     const numberOfResponse = findPlayer_0.answers.length;
+
     if (numberOfResponse === 5) {
       const verifyAnswerTwoPlayer =
         await this.endGameAndCountingScore(findPlayer_0);
@@ -161,11 +162,21 @@ export class QuizGameTypeOrmRepo {
 
   async addBonusPoint(game: QuizGameEntityNotPlayerInfo) {
     const [findPlayerFirst, findPlayerSecond] = await Promise.all([
-      this.findPlayer(game.firstPlayerId, game.id),
-      this.findPlayer(game.secondPlayerId, game.id),
+      this.findPlayerById(game.firstPlayerId),
+      this.findPlayerById(game.secondPlayerId),
     ]);
+    console.log(
+      findPlayerFirst,
+      findPlayerSecond,
+      '------------------findPlayerFirst, findPlayerSecond',
+    );
     const lastAnswerFirstPlayer = findPlayerFirst.answers.at(-1);
     const lastAnswerSecondPlayer = findPlayerSecond.answers.at(-1);
+    console.log(
+      lastAnswerFirstPlayer,
+      lastAnswerSecondPlayer,
+      'lastAnswerFirstPlayer, lastAnswerSecondPlayer-----------------',
+    );
     const fastestResponder =
       lastAnswerFirstPlayer.addedAt < lastAnswerSecondPlayer.addedAt
         ? findPlayerFirst
@@ -268,6 +279,7 @@ export class QuizGameTypeOrmRepo {
         secondPlayer: true,
       },
     });
+    if (activePair && !activePair.secondPlayer) return activePair;
     if (
       activePair &&
       (activePair.firstPlayer.userId === userId ||
@@ -279,6 +291,7 @@ export class QuizGameTypeOrmRepo {
 
   async endGameAndCountingScore(player: findingPlayer) {
     const now = new Date().toISOString();
+
     const findPair_0 = await this.quizGameEntityNotPlayerInfo.findOne({
       where: [{ firstPlayerId: player.id }, { secondPlayerId: player.id }],
       relations: {
