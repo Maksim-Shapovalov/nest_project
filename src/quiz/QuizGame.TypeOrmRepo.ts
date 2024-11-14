@@ -284,13 +284,8 @@ export class QuizGameTypeOrmRepo {
       },
     });
 
-    if (
-      pendingPair &&
-      (pendingPair.firstPlayer?.userId === userId ||
-        pendingPair.secondPlayer?.userId === userId)
-    )
+    if (pendingPair && pendingPair.firstPlayer.userId === userId)
       return 'Active';
-    else if (pendingPair && !pendingPair.secondPlayer) return pendingPair;
     return pendingPair ? pendingPair : false;
   }
 

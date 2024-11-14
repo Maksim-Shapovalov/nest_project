@@ -114,17 +114,22 @@ export class QuizGameService {
     const currentPair = await this.quizGameRepo.findPendingStatusPair(
       userModel.userId,
     );
+    console.log(1);
     if (currentPair === 'Active') return false;
     else if (!currentPair) {
       return await this.createPair(userModel);
     }
+    console.log(2);
     const updateBodyPairConnectSecondUser =
       await this.quizGameRepo.connectSecondUserWithFirstUserRepo(
         userModel,
         now,
       );
+    console.log(3);
     const game = await this.getGameByIdInService(currentPair.id);
+    console.log(4);
     if (!game) return await this.createPair(userModel);
+    console.log(5);
     return this.quizGameMapperAddSecondPlayer(
       game,
       updateBodyPairConnectSecondUser,
