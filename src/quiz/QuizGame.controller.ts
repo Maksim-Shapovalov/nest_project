@@ -38,18 +38,19 @@ export class QuizGameController {
         userModel,
         filter,
       );
-    const sortedGames = sortQuizGames(
-      findHistoryGameByPlayer.items,
-      filter.sortBy,
-      filter.sortDirection,
-    );
-    return {
-      pagesCount: findHistoryGameByPlayer.pagesCount,
-      page: findHistoryGameByPlayer.page,
-      pageSize: findHistoryGameByPlayer.pageSize,
-      totalCount: findHistoryGameByPlayer.totalCount,
-      items: sortedGames,
-    };
+    return findHistoryGameByPlayer;
+    // const sortedGames = sortQuizGames(
+    //   findHistoryGameByPlayer.items,
+    //   filter.sortBy,
+    //   filter.sortDirection,
+    // );
+    // return {
+    //   pagesCount: findHistoryGameByPlayer.pagesCount,
+    //   page: findHistoryGameByPlayer.page,
+    //   pageSize: findHistoryGameByPlayer.pageSize,
+    //   totalCount: findHistoryGameByPlayer.totalCount,
+    //   items: sortedGames,
+    // };
   }
   @UseGuards(BearerGuard)
   @Get('users/my-statistic')

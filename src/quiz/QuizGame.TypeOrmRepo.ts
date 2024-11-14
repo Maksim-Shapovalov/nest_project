@@ -58,6 +58,7 @@ export class QuizGameTypeOrmRepo {
         },
         order: {
           [filter.sortBy]: filter.sortDirection,
+          pairCreatedDate: filter.sortDirection,
         },
         take: pageSizeInQuery,
         skip: (filter.pageNumber - 1) * pageSizeInQuery,
