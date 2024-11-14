@@ -166,18 +166,8 @@ export class QuizGameTypeOrmRepo {
       this.findPlayerById(game.firstPlayerId),
       this.findPlayerById(game.secondPlayerId),
     ]);
-    console.log(
-      findPlayerFirst,
-      findPlayerSecond,
-      '------------------findPlayerFirst, findPlayerSecond',
-    );
     const lastAnswerFirstPlayer = findPlayerFirst.answers.at(-1);
     const lastAnswerSecondPlayer = findPlayerSecond.answers.at(-1);
-    console.log(
-      lastAnswerFirstPlayer,
-      lastAnswerSecondPlayer,
-      'lastAnswerFirstPlayer, lastAnswerSecondPlayer-----------------',
-    );
     const fastestResponder =
       lastAnswerFirstPlayer.addedAt < lastAnswerSecondPlayer.addedAt
         ? findPlayerFirst
