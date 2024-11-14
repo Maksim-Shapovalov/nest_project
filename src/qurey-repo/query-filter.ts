@@ -105,28 +105,66 @@ export function queryFilterByQuizGame(query: any): PaginationQueryType {
 
   return defaultFilter;
 }
+// export function sortQuizGames(
+//   games: any[],
+//   sortBy: string,
+//   sortDirection: 'asc' | 'desc',
+// ) {
+//   return games.sort((a, b) => {
+//     let comparison = 0;
+//
+//     // Сравнение по статусу
+//     if (a[sortBy] < b[sortBy]) {
+//       comparison = -1;
+//     } else if (a[sortBy] > b[sortBy]) {
+//       comparison = 1;
+//     }
+//
+//     // Если статусы равны, сортируем по pairCreatedDate
+//     if (comparison === 0) {
+//       const dateA = new Date(a.pairCreatedDate);
+//       const dateB = new Date(b.pairCreatedDate);
+//       comparison = dateB.getTime() - dateA.getTime(); // Сортировка по убыванию
+//     }
+//
+//     return sortDirection === 'asc' ? comparison : -comparison; // Учитываем направление сортировки
+//   });
+// }
 export function sortQuizGames(
   games: any[],
   sortBy: string,
   sortDirection: 'asc' | 'desc',
 ) {
+  const statusOrder = ['Active', 'Finished', 'PendingSecondPlayer'];
+
   return games.sort((a, b) => {
     let comparison = 0;
 
-    // Сравнение по статусу
-    if (a[sortBy] < b[sortBy]) {
-      comparison = 1;
-    } else if (a[sortBy] > b[sortBy]) {
-      comparison = -1;
-    }
+    if (sortBy === 'status') {
+      // Сравнение по статусу
+      const statusAIndex = statusOrder.indexOf(a[sortBy]);
+      const statusBIndex = statusOrder.indexOf(b[sortBy]);
 
-    // Если статусы равны, сортируем по pairCreatedDate
-    if (comparison === 0) {
-      const dateA = new Date(a.pairCreatedDate);
-      const dateB = new Date(b.pairCreatedDate);
-      comparison = dateB.getTime() - dateA.getTime(); // Сортировка по убыванию
-    }
+      if (statusAIndex < statusBIndex) {
+        comparison = -1;
+      } else if (statusAIndex > statusBIndex) {
+        comparison = 1;
+      }
 
+      // Если статусы равны, сортируем по pairCreatedAt
+      if (comparison === 0) {
+        const dateA = new Date(a.pairCreatedAt);
+        const dateB = new Date(b.pairCreatedAt);
+        comparison = dateA.getTime() - dateB.getTime(); // Сортировка по возрастанию
+      }
+    } else {
+      // Сортировка по любому другому полю
+      if (a[sortBy] < b[sortBy]) {
+        comparison = -1;
+      } else if (a[sortBy] > b[sortBy]) {
+        comparison = 1;
+      }
+    }
     return sortDirection === 'asc' ? comparison : -comparison; // Учитываем направление сортировки
   });
 }
