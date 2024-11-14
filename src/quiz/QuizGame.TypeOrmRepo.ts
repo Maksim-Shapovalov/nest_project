@@ -455,10 +455,12 @@ export class QuizGameTypeOrmRepo {
   async pairHistoryMapper(game: QuizGameInDB): Promise<OutputTypePair> {
     const findFirstPlayer = await this.findPlayerById(game.firstPlayerId);
     const findSecondPlayer = await this.findPlayerById(game.secondPlayerId);
-    const questions1 = game.question.map((q) => ({
-      id: q.id.toString(),
-      body: q.body,
-    }));
+    const questions1 = game.question
+      .map((q) => ({
+        id: q.id.toString(),
+        body: q.body,
+      }))
+      .sort((a, b) => a.id - b.id);
     const answer = findFirstPlayer.answers
       .map((m) => ({
         questionId: m.questionId.toString(),

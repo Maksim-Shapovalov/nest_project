@@ -16,10 +16,7 @@ import { BearerGuard, User } from '../auth/guard/authGuard';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { GameUserGuard } from './validatorToQuizGame/quizeGame.validator';
 import { QueryType2 } from '../Other/Query.Type';
-import {
-  queryFilterByQuizGame,
-  sortQuizGames,
-} from '../qurey-repo/query-filter';
+import { queryFilterByQuizGame } from '../qurey-repo/query-filter';
 
 @Controller('pair-game-quiz')
 export class QuizGameController {
