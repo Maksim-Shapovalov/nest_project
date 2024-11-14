@@ -283,8 +283,28 @@ export class QuizGameTypeOrmRepo {
         secondPlayer: true,
       },
     });
-
-    if (pendingPair && pendingPair.firstPlayer.userId === userId)
+    const activePair = await this.quizGameEntityNotPlayerInfo.findOne({
+      where: [
+        {
+          firstPlayer: { userId: userId },
+          status: StatusTypeEnum.Active,
+        },
+        {
+          secondPlayer: { userId: userId },
+          status: StatusTypeEnum.Active,
+        },
+      ],
+      relations: {
+        firstPlayer: true,
+        secondPlayer: true,
+      },
+    });
+    if (activePair) return 'Active';
+    else if (
+      pendingPair &&
+      (pendingPair.firstPlayer.userId === userId ||
+        pendingPair.secondPlayer?.userId === userId)
+    )
       return 'Active';
     return pendingPair ? pendingPair : false;
   }

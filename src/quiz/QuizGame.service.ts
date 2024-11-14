@@ -115,6 +115,7 @@ export class QuizGameService {
       userModel.userId,
     );
     console.log(1);
+    console.log(currentPair, 'currentPair');
     if (currentPair === 'Active') return false;
     else if (!currentPair) {
       return await this.createPair(userModel);
