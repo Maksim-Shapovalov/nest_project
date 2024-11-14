@@ -16,7 +16,7 @@ export class PlayersEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @OneToOne(() => UserEntity)
-  @JoinColumn({ referencedColumnName: 'userId' })
+  @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   user: UserEntity;
   @Column()
   userId: string;
