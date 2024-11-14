@@ -77,7 +77,10 @@ export class QuizGameTypeOrmRepo {
 
   async getAllPairByPlayerId(playerId: string) {
     return this.quizGameEntityNotPlayerInfo.find({
-      where: [{ firstPlayerId: playerId }, { secondPlayerId: playerId }],
+      where: [
+        { firstPlayer: { userId: playerId } },
+        { secondPlayer: { userId: playerId } },
+      ],
       relations: { firstPlayer: true, secondPlayer: true },
     });
   }
