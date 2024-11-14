@@ -115,9 +115,9 @@ export function sortQuizGames(
 
     // Сравнение по статусу
     if (a[sortBy] < b[sortBy]) {
-      comparison = -1;
-    } else if (a[sortBy] > b[sortBy]) {
       comparison = 1;
+    } else if (a[sortBy] > b[sortBy]) {
+      comparison = -1;
     }
 
     // Если статусы равны, сортируем по pairCreatedDate
