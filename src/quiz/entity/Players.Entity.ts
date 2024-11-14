@@ -15,7 +15,7 @@ import { UserEntity } from '../../Users/Type/User.entity';
 export class PlayersEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   user: UserEntity;
   @Column()
