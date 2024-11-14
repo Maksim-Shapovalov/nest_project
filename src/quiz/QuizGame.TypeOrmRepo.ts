@@ -469,7 +469,7 @@ export class QuizGameTypeOrmRepo {
       firstPlayerProgress: {
         answers: answer,
         player: {
-          id: findFirstPlayer.id.toString(),
+          id: findFirstPlayer.userId.toString(),
           login: findFirstPlayer.login,
         },
         score: findFirstPlayer.score,
@@ -479,7 +479,7 @@ export class QuizGameTypeOrmRepo {
           ? {
               answers: answer1,
               player: {
-                id: findSecondPlayer.id,
+                id: findSecondPlayer.userId,
                 login: findSecondPlayer.login,
               },
               score: findSecondPlayer.score,

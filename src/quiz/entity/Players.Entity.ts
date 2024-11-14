@@ -30,6 +30,8 @@ export class PlayersEntity {
     onDelete: 'CASCADE',
   })
   answers: AnswersEntity[];
+
+  // static getViewModel(game: GameEntity): GameViewModel {}
 }
 
 export type findingPlayer = {

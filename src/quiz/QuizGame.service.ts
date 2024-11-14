@@ -12,6 +12,7 @@ import {
 import { NewestPostLike } from '../Users/Type/User.type';
 import { QuizGameEntityNotPlayerInfo } from './entity/QuizGame.entity';
 import { PaginationQueryType } from '../qurey-repo/query-filter';
+import { PlayersEntity } from './entity/Players.Entity';
 
 @Injectable()
 export class QuizGameService {
@@ -285,7 +286,7 @@ export class QuizGameService {
       secondPlayerProgress: {
         answers: answer,
         player: {
-          id: findSecondPlayer.id.toString(),
+          id: findSecondPlayer.userId.toString(),
           login: findSecondPlayer.login,
         },
         score: findSecondPlayer.score,
@@ -339,7 +340,7 @@ export class QuizGameService {
       firstPlayerProgress: {
         answers: answer,
         player: {
-          id: game.firstPlayerId.toString(),
+          id: game.firstPlayer.userId.toString(),
           login: findFirstPlayer.login,
         },
         score: findFirstPlayer.score,
@@ -349,7 +350,7 @@ export class QuizGameService {
           ? {
               answers: answer1,
               player: {
-                id: game.secondPlayerId.toString(),
+                id: game.secondPlayer.userId.toString(),
                 login: findSecondPlayer.login,
               },
               score: findSecondPlayer.score,
