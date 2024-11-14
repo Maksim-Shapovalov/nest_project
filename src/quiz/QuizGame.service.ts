@@ -132,7 +132,7 @@ export class QuizGameService {
 
   async createPair(userModel: NewestPostLike): Promise<OutputTypePair> {
     const now = new Date().toISOString();
-    await this.quizGameRepo.deleteAnswerPlayer(userModel.userId);
+    // await this.quizGameRepo.deleteAnswerPlayer(userModel.userId);
     const newPlayer = await this.quizGameRepo.newPlayerOnQuizGame(userModel);
     const newActivePair = new QuizGameClass1(
       newPlayer.id,
@@ -165,7 +165,6 @@ export class QuizGameService {
     const findPlayerInGame: updateTypeOfQuestion1 | false =
       await this.quizGameRepo.updateAnswerToPlayerIdInGame(user.userId, answer);
     // if (!findPlayerInGame) return false;
-    console.log(1);
     return findPlayerInGame ? findPlayerInGame : false;
   }
 
@@ -180,7 +179,9 @@ export class QuizGameService {
   async quizGameMapperOnOutputTypePair(
     game: QuizGameInDB,
   ): Promise<OutputTypePair> {
-    const findPlayer = await this.quizGameRepo.findPlayer(game.firstPlayerId);
+    const findPlayer = await this.quizGameRepo.findPlayerById(
+      game.firstPlayerId,
+    );
     let questions1 = [];
     if (game && game.question.length > 0) {
       questions1 = game.question.map((q) => ({
@@ -190,7 +191,7 @@ export class QuizGameService {
     }
     let findSecondPlayer = null;
     if (game.secondPlayerId !== null) {
-      findSecondPlayer = await this.quizGameRepo.findPlayer(
+      findSecondPlayer = await this.quizGameRepo.findPlayerById(
         game.secondPlayerId,
       );
     }
@@ -252,7 +253,7 @@ export class QuizGameService {
     game1: QuizGameEntityNotPlayerInfo,
   ): Promise<OutputTypePair> {
     const fiveQuestion = await this.quizGameRepo.choiceFiveQuestion(game.id);
-    const findSecondPlayer = await this.quizGameRepo.findPlayer(
+    const findSecondPlayer = await this.quizGameRepo.findPlayerById(
       game1.secondPlayerId,
     );
     const answer = findSecondPlayer.answers
@@ -299,10 +300,10 @@ export class QuizGameService {
   async returnMapperByGameId(
     game: OutputTypePairToGetId,
   ): Promise<OutputTypePair> {
-    const findFirstPlayer = await this.quizGameRepo.findPlayer(
+    const findFirstPlayer = await this.quizGameRepo.findPlayerById(
       game.firstPlayerId,
     );
-    const findSecondPlayer = await this.quizGameRepo.findPlayer(
+    const findSecondPlayer = await this.quizGameRepo.findPlayerById(
       game.secondPlayerId,
     );
     let answer = [];

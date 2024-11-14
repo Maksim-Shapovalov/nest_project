@@ -13,10 +13,12 @@ import { UserEntity } from '../../Users/Type/User.entity';
 
 @Entity()
 export class PlayersEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
   @OneToOne(() => UserEntity)
   user: UserEntity;
+  @Column()
+  userId: string;
   @ManyToOne(() => QuizGameEntityNotPlayerInfo, { onDelete: 'CASCADE' })
   game: QuizGameEntityNotPlayerInfo;
   @Column()
