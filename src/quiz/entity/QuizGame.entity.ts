@@ -56,16 +56,16 @@ export class QuizGameEntityNotPlayerInfo {
     player1: PlayersEntity,
     player2: PlayersEntity | null,
   ): OutputTypePair {
-    let questions1 = [];
+    let questions = [];
     if (game && game.question === null) {
-      questions1 = [];
-      console.log(1);
+      questions = [];
     } else if (game && game.question.length > 0) {
-      console.log(2);
-      questions1 = game.question.map((q) => ({
-        id: q.id.toString(),
-        body: q.body,
-      }));
+      questions = game.question
+        .map((q) => ({
+          id: q.id.toString(),
+          body: q.body,
+        }))
+        .sort((a, b) => a.id - b.id);
     }
 
     const answer = player1.answers
@@ -112,7 +112,7 @@ export class QuizGameEntityNotPlayerInfo {
               score: player2.score,
             }
           : null,
-      questions: player2 !== null ? questions1 : null,
+      questions: player2 !== null ? questions : null,
       status:
         game.status !== null ? game.status : StatusTypeEnum.PendingSecondPlayer,
       pairCreatedDate: game.pairCreatedDate,
