@@ -57,9 +57,11 @@ export class QuizGameEntityNotPlayerInfo {
     player2: PlayersEntity | null,
   ): OutputTypePair {
     let questions1 = [];
-    if (game || !game.question) {
+    if (game && game.question === null) {
       questions1 = [];
+      console.log(1);
     } else if (game && game.question.length > 0) {
+      console.log(2);
       questions1 = game.question.map((q) => ({
         id: q.id.toString(),
         body: q.body,

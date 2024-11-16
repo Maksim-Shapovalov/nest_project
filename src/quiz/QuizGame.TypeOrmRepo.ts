@@ -402,21 +402,30 @@ export class QuizGameTypeOrmRepo {
     await this.playersEntity.update(newPlayerInGame.id, {
       game: findActivePair,
     });
-    const createFiveQuestions = await this.choiceFiveQuestion(
-      findActivePair.id,
-    );
     await this.quizGameEntityNotPlayerInfo.update(findActivePair.id, {
       secondPlayer: newPlayerInGame,
       secondPlayerId: newPlayerInGame.id,
       status: StatusTypeEnum.Active,
       startGameDate: now,
-      question: createFiveQuestions,
     });
+    const fiveQuestions = await this.choiceFiveQuestion(findActivePair.id);
+    console.log(fiveQuestions);
+    const pairFind = await this.quizGameEntityNotPlayerInfo.findOne({
+      where: { id: findActivePair.id },
+      relations: {
+        secondPlayer: true,
+        firstPlayer: true,
+        question: true,
+      },
+    });
+    console.log(pairFind, 'pairFind-------------');
 
     return this.quizGameEntityNotPlayerInfo.findOne({
       where: { id: findActivePair.id },
       relations: {
         secondPlayer: true,
+        firstPlayer: true,
+        question: true,
       },
     });
   }
