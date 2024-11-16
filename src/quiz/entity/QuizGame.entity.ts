@@ -70,9 +70,9 @@ export class QuizGameEntityNotPlayerInfo {
 
     const answer = player1.answers
       .map((m) => ({
-        questionId: m.questionId.toString(),
-        answerStatus: m.answerStatus,
         addedAt: m.addedAt,
+        answerStatus: m.answerStatus,
+        questionId: m.questionId.toString(),
       }))
       .sort(
         (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
@@ -81,9 +81,9 @@ export class QuizGameEntityNotPlayerInfo {
     if (player2) {
       answer1 = player2.answers
         .map((m) => ({
-          questionId: m.questionId,
-          answerStatus: m.answerStatus,
           addedAt: m.addedAt,
+          answerStatus: m.answerStatus,
+          questionId: m.questionId.toString(),
         }))
         .sort(
           (a, b) =>
