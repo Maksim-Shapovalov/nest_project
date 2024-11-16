@@ -55,6 +55,8 @@ export class QuizGameTypeOrmRepo {
         ],
         relations: {
           question: true,
+          firstPlayer: true,
+          secondPlayer: true,
         },
         order: {
           [filter.sortBy]: filter.sortDirection,
@@ -64,7 +66,17 @@ export class QuizGameTypeOrmRepo {
         skip: (filter.pageNumber - 1) * pageSizeInQuery,
       });
     const totalCount = parseInt(totalCountPair.toString());
-    const itemsPromises = pairs.map((pair) => this.pairHistoryMapper(pair));
+    const itemsPromises = await Promise.all(
+      pairs.map(async (pair: OutputTypePairToGetId) => {
+        const findFirstPlayer = await this.findPlayerById(pair.firstPlayerId);
+        const findSecondPlayer = await this.findPlayerById(pair.secondPlayerId);
+        return QuizGameEntityNotPlayerInfo.getViewModel(
+          pair,
+          findFirstPlayer,
+          findSecondPlayer,
+        );
+      }),
+    );
     const items = await Promise.all(itemsPromises);
     return {
       pagesCount: Math.ceil(totalCount / pageSizeInQuery),
@@ -84,19 +96,23 @@ export class QuizGameTypeOrmRepo {
       relations: { firstPlayer: true, secondPlayer: true },
     });
   }
-  async getUnfinishedCurrentGameRepo(userModel: NewestPostLike) {
+  async getUnfinishedCurrentGameRepo(
+    userModel: NewestPostLike,
+  ): Promise<OutputTypePairToGetId | false> {
     const pairs = await this.quizGameEntityNotPlayerInfo.find({
       where: {
         status: In([StatusTypeEnum.Active, StatusTypeEnum.PendingSecondPlayer]),
       },
       relations: {
         question: true,
+        firstPlayer: true,
+        secondPlayer: true,
       },
     });
     const findPair = pairs.find(
       (pair) =>
-        pair.firstPlayerId === userModel.userId ||
-        pair.secondPlayerId === userModel.userId,
+        pair.firstPlayer.userId === userModel.userId ||
+        pair.secondPlayer.userId === userModel.userId,
     );
     if (!findPair || findPair.status === StatusTypeEnum.Finished) return false;
     return findPair;
@@ -231,7 +247,8 @@ export class QuizGameTypeOrmRepo {
     //   .where('q.id = :id', { id })
     //   .getOne();
   }
-  async findPlayerById(id: string): Promise<findingPlayer | null> {
+  async findPlayerById(id: string | null): Promise<PlayersEntity | null> {
+    if (id === null) return null;
     return this.playersEntity.findOne({
       where: { id: id },
       relations: { answers: true },
@@ -243,29 +260,29 @@ export class QuizGameTypeOrmRepo {
     //   .where('q.id = :id', { id })
     //   .getOne();
   }
-  async findActivePair(
-    userId: string,
-  ): Promise<QuizGameEntityNotPlayerInfo | false | 'Active'> {
-    const activePairs = await this.quizGameEntityNotPlayerInfo.find({
-      where: [
-        { status: StatusTypeEnum.Active },
-        { status: StatusTypeEnum.PendingSecondPlayer },
-      ],
-    });
-
-    const userPairs = activePairs.map((pair) => {
-      return {
-        pair,
-        isUserInPair:
-          pair.firstPlayerId === userId || pair.secondPlayerId === userId,
-      };
-    });
-    if (userPairs.length > 0 && userPairs[0].isUserInPair) return 'Active';
-    const activePair = await this.quizGameEntityNotPlayerInfo.findOne({
-      where: { status: StatusTypeEnum.PendingSecondPlayer },
-    });
-    return activePair ? activePair : false;
-  }
+  // async findActivePair(
+  //   userId: string,
+  // ): Promise<QuizGameEntityNotPlayerInfo | false | 'Active'> {
+  //   const activePairs = await this.quizGameEntityNotPlayerInfo.find({
+  //     where: [
+  //       { status: StatusTypeEnum.Active },
+  //       { status: StatusTypeEnum.PendingSecondPlayer },
+  //     ],
+  //   });
+  //
+  //   const userPairs = activePairs.map((pair) => {
+  //     return {
+  //       pair,
+  //       isUserInPair:
+  //         pair.firstPlayerId === userId || pair.secondPlayerId === userId,
+  //     };
+  //   });
+  //   if (userPairs.length > 0 && userPairs[0].isUserInPair) return 'Active';
+  //   const activePair = await this.quizGameEntityNotPlayerInfo.findOne({
+  //     where: { status: StatusTypeEnum.PendingSecondPlayer },
+  //   });
+  //   return activePair ? activePair : false;
+  // }
 
   async findPendingStatusPair(
     userId: string,
@@ -337,7 +354,7 @@ export class QuizGameTypeOrmRepo {
     newPlayer: PlayersEntity,
     newPair: QuizGameClass1,
     newPlayerId: string,
-  ): Promise<QuizGameInDB> {
+  ): Promise<OutputTypePairToGetId> {
     // const randomId = Math.floor(Math.random() * 1000000);
 
     const newPairWithSingleUser = await this.quizGameEntityNotPlayerInfo.create(
@@ -359,6 +376,8 @@ export class QuizGameTypeOrmRepo {
       where: { id: savePair.id },
       relations: {
         question: true,
+        firstPlayer: true,
+        secondPlayer: true,
       },
     });
   }
@@ -366,23 +385,32 @@ export class QuizGameTypeOrmRepo {
   async connectSecondUserWithFirstUserRepo(
     userModel: NewestPostLike,
     now: string,
-  ) {
+  ): Promise<OutputTypePairToGetId> {
     // await this.deleteAnswerPlayer(userModel.userId);
     const findActivePair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: {
         secondPlayerId: null,
         status: StatusTypeEnum.PendingSecondPlayer,
       },
+      relations: {
+        question: true,
+        firstPlayer: true,
+        secondPlayer: true,
+      },
     });
     const newPlayerInGame = await this.newPlayerOnQuizGame(userModel);
     await this.playersEntity.update(newPlayerInGame.id, {
       game: findActivePair,
     });
+    const createFiveQuestions = await this.choiceFiveQuestion(
+      findActivePair.id,
+    );
     await this.quizGameEntityNotPlayerInfo.update(findActivePair.id, {
       secondPlayer: newPlayerInGame,
       secondPlayerId: newPlayerInGame.id,
       status: StatusTypeEnum.Active,
       startGameDate: now,
+      question: createFiveQuestions,
     });
 
     return this.quizGameEntityNotPlayerInfo.findOne({

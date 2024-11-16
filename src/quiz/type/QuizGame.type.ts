@@ -29,6 +29,31 @@ export class QuizGameClass1 {
   ) {}
 }
 
+export class QuizGameClass3 {
+  public firstPlayerId: string;
+  public secondPlayerId: string | null;
+  public status: StatusTypeEnum;
+  public pairCreatedDate: string;
+  public startGameDate: string | null;
+  public finishGameDate: string | null;
+
+  constructor({
+    firstPlayerId,
+    secondPlayerId,
+    status,
+    pairCreatedDate,
+    startGameDate,
+    finishGameDate,
+  }) {
+    this.firstPlayerId = firstPlayerId;
+    this.secondPlayerId = secondPlayerId;
+    this.status = status;
+    this.pairCreatedDate = pairCreatedDate;
+    this.startGameDate = startGameDate;
+    this.finishGameDate = finishGameDate;
+  }
+}
+
 export type AnswerType = {
   questionId: string;
   answerStatus: string;
@@ -84,14 +109,6 @@ export enum StatusTypeEnum {
   Finished = 'Finished',
 }
 
-export type updateTypeOfQuestion = {
-  id: number;
-  question: QuestionsEntity;
-  player: PlayersEntity;
-  answerStatus: StatusTypeEnumByAnswersToEndpoint;
-  answer: string;
-  addedAt: string;
-};
 export type updateTypeOfQuestion1 = {
   id: number;
   questionId: string;

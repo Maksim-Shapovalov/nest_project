@@ -5,6 +5,7 @@ import {
   OutputTypePair,
   OutputTypePairToGetId,
   QuizGameClass1,
+  QuizGameClass3,
   QuizGameInDB,
   StatusTypeEnum,
   updateTypeOfQuestion1,
@@ -12,22 +13,22 @@ import {
 import { NewestPostLike } from '../Users/Type/User.type';
 import { QuizGameEntityNotPlayerInfo } from './entity/QuizGame.entity';
 import { PaginationQueryType } from '../qurey-repo/query-filter';
-import { PlayersEntity } from './entity/Players.Entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class QuizGameService {
-  constructor(protected quizGameRepo: QuizGameTypeOrmRepo) {}
+  constructor(
+    protected quizGameRepo: QuizGameTypeOrmRepo,
+    @InjectRepository(QuizGameEntityNotPlayerInfo)
+    protected quizGameEntityNotPlayerInfo: Repository<QuizGameEntityNotPlayerInfo>,
+  ) {}
 
   async getHistoryGameByPlayerService(
     userModel: NewestPostLike,
     query: PaginationQueryType,
   ) {
-    const findPairToCurrentUser =
-      await this.quizGameRepo.getHistoryGameByPlayerRepository(
-        userModel,
-        query,
-      );
-    return findPairToCurrentUser;
+    return this.quizGameRepo.getHistoryGameByPlayerRepository(userModel, query);
   }
 
   async getStatisticPlayer(playerId: string) {
@@ -90,72 +91,113 @@ export class QuizGameService {
   ): Promise<OutputTypePair | false> {
     const findPairToCurrentUser =
       await this.quizGameRepo.getUnfinishedCurrentGameRepo(userModel);
-    // if (findPairToCurrentUser.firstPlayerId !== userModel.userId) return null;
     if (!findPairToCurrentUser) return false;
-    return this.quizGameMapperOnOutputTypePair(findPairToCurrentUser);
+    const findFirstPlayer = await this.quizGameRepo.findPlayerById(
+      findPairToCurrentUser.firstPlayerId,
+    );
+    const findSecondPlayer = await this.quizGameRepo.findPlayerById(
+      findPairToCurrentUser.secondPlayerId,
+    );
+    return QuizGameEntityNotPlayerInfo.getViewModel(
+      findPairToCurrentUser,
+      findFirstPlayer,
+      findSecondPlayer,
+    );
   }
   async getGameById(id: string): Promise<OutputTypePair | false> {
     const findGame = await this.quizGameRepo.getGameById(id);
     if (!findGame) return false;
-    return this.returnMapperByGameId(findGame);
+    const findFirstPlayer = await this.quizGameRepo.findPlayerById(
+      findGame.firstPlayerId,
+    );
+    const findSecondPlayer = await this.quizGameRepo.findPlayerById(
+      findGame.secondPlayerId,
+    );
+    return QuizGameEntityNotPlayerInfo.getViewModel(
+      findGame,
+      findFirstPlayer,
+      findSecondPlayer,
+    );
   }
-  async getGameByIdInService(id: string): Promise<OutputTypePair | false> {
-    const findGame = await this.quizGameRepo.getGameById(id);
-    if (!findGame) return false;
-    return this.quizGameMapperOnOutputTypePair(findGame);
-  }
+  // async getGameByIdInService(id: string): Promise<OutputTypePair | false> {
+  //   const findGame = await this.quizGameRepo.getGameById(id);
+  //   if (!findGame) return false;
+  //   const findFirstPlayer = await this.quizGameRepo.findPlayerById(
+  //     findGame.firstPlayerId,
+  //   );
+  //   const findSecondPlayer = await this.quizGameRepo.findPlayerById(
+  //     findGame.secondPlayerId,
+  //   );
+  //   return QuizGameEntityNotPlayerInfo.getViewModel(
+  //     findGame,
+  //     findFirstPlayer,
+  //     findSecondPlayer,
+  //   );
+  // }
   async findActivePairInService(
     userModel: NewestPostLike,
   ): Promise<OutputTypePair | false> {
     const now = new Date().toISOString();
-    // const findCurrencyPair = await this.quizGameRepo.findActivePair(
-    //   userModel.userId,
-    // );
     const currentPair = await this.quizGameRepo.findPendingStatusPair(
       userModel.userId,
     );
-    console.log(1);
-    console.log(currentPair, 'currentPair');
     if (currentPair === 'Active') return false;
     else if (!currentPair) {
       return await this.createPair(userModel);
     }
-    console.log(2);
     const updateBodyPairConnectSecondUser =
       await this.quizGameRepo.connectSecondUserWithFirstUserRepo(
         userModel,
         now,
       );
-    console.log(3);
-    const game = await this.getGameByIdInService(currentPair.id);
-    console.log(4);
+    const game = await this.getGameById(currentPair.id);
     if (!game) return await this.createPair(userModel);
-    console.log(5);
-    return this.quizGameMapperAddSecondPlayer(
-      game,
-      updateBodyPairConnectSecondUser,
+    const findFirstPlayer = await this.quizGameRepo.findPlayerById(
+      updateBodyPairConnectSecondUser.firstPlayerId,
     );
+    const findSecondPlayer = await this.quizGameRepo.findPlayerById(
+      updateBodyPairConnectSecondUser.secondPlayerId,
+    );
+    return QuizGameEntityNotPlayerInfo.getViewModel(
+      updateBodyPairConnectSecondUser,
+      findFirstPlayer,
+      findSecondPlayer,
+    );
+    // return this.quizGameMapperAddSecondPlayer(
+    //   game,
+    //   updateBodyPairConnectSecondUser,
+    // );
   }
 
   async createPair(userModel: NewestPostLike): Promise<OutputTypePair> {
     const now = new Date().toISOString();
     // await this.quizGameRepo.deleteAnswerPlayer(userModel.userId);
     const newPlayer = await this.quizGameRepo.newPlayerOnQuizGame(userModel);
-    const newActivePair = new QuizGameClass1(
-      newPlayer.id,
-      null,
-      StatusTypeEnum.PendingSecondPlayer,
-      now,
-      null,
-      null,
-    );
+    const newActivePair = new QuizGameClass3({
+      firstPlayerId: newPlayer.id,
+      secondPlayerId: null,
+      status: StatusTypeEnum.PendingSecondPlayer,
+      pairCreatedDate: now,
+      startGameDate: null,
+      finishGameDate: null,
+    });
     const newPair = await this.quizGameRepo.createNewPairWithNewSingleUser(
       newPlayer,
       newActivePair,
       newPlayer.id,
     );
     await this.quizGameRepo.newPlayerOnQuizGameUpdateInfo(newPlayer, newPair);
-    return this.quizGameMapperOnOutputTypePair(newPair);
+    const findFirstPlayer = await this.quizGameRepo.findPlayerById(
+      newPair.firstPlayerId,
+    );
+    const findSecondPlayer = await this.quizGameRepo.findPlayerById(
+      newPair.secondPlayerId,
+    );
+    return QuizGameEntityNotPlayerInfo.getViewModel(
+      newPair,
+      findFirstPlayer,
+      findSecondPlayer,
+    );
   }
 
   // async connectCurrentUserService(
@@ -183,190 +225,190 @@ export class QuizGameService {
   //   };
   // }
 
-  async quizGameMapperOnOutputTypePair(
-    game: QuizGameInDB,
-  ): Promise<OutputTypePair> {
-    const findPlayer = await this.quizGameRepo.findPlayerById(
-      game.firstPlayerId,
-    );
-    let questions1 = [];
-    if (game && game.question.length > 0) {
-      questions1 = game.question.map((q) => ({
-        id: q.id.toString(),
-        body: q.body,
-      }));
-    }
-    let findSecondPlayer = null;
-    if (game.secondPlayerId !== null) {
-      findSecondPlayer = await this.quizGameRepo.findPlayerById(
-        game.secondPlayerId,
-      );
-    }
-    const answer = findPlayer.answers
-      .map((m) => ({
-        questionId: m.questionId.toString(),
-        answerStatus: m.answerStatus,
-        addedAt: m.addedAt,
-      }))
-      .sort(
-        (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
-      );
-    let answer1 = [];
-    if (findSecondPlayer) {
-      answer1 = findSecondPlayer.answers
-        .map((m) => ({
-          questionId: m.questionId,
-          answerStatus: m.answerStatus,
-          addedAt: m.addedAt,
-        }))
-        .sort(
-          (a, b) =>
-            new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
-        );
-    }
-
-    return {
-      id: game.id.toString(),
-      firstPlayerProgress: {
-        answers: answer,
-        player: {
-          id: findPlayer.userId.toString(),
-          login: findPlayer.login,
-        },
-        score: findPlayer.score,
-      },
-      secondPlayerProgress:
-        findSecondPlayer !== null
-          ? {
-              answers: answer1,
-              player: {
-                id: findSecondPlayer.userId,
-                login: findSecondPlayer.login,
-              },
-              score: findSecondPlayer.score,
-            }
-          : null,
-      questions: findSecondPlayer !== null ? questions1 : null,
-      status:
-        game.status !== null ? game.status : StatusTypeEnum.PendingSecondPlayer,
-      pairCreatedDate: game.pairCreatedDate,
-      startGameDate: game.startGameDate,
-      finishGameDate: game.finishGameDate,
-    };
-  }
-
-  async quizGameMapperAddSecondPlayer(
-    game: OutputTypePair,
-    game1: QuizGameEntityNotPlayerInfo,
-  ): Promise<OutputTypePair> {
-    const fiveQuestion = await this.quizGameRepo.choiceFiveQuestion(game.id);
-    const findSecondPlayer = await this.quizGameRepo.findPlayerById(
-      game1.secondPlayerId,
-    );
-    const answer = findSecondPlayer.answers
-      .map((m) => ({
-        questionId: m.questionId.toString(),
-        answerStatus: m.answerStatus,
-        addedAt: m.addedAt,
-      }))
-      .sort(
-        (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
-      );
-    const fiveQuestionsMapper = fiveQuestion.map((m) => ({
-      id: m.id.toString(),
-      body: m.body,
-    }));
-    return {
-      id: game.id,
-      firstPlayerProgress: {
-        answers: game.firstPlayerProgress.answers.sort(
-          (a, b) =>
-            new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
-        ),
-        player: {
-          id: game.firstPlayerProgress.player.id,
-          login: game.firstPlayerProgress.player.login,
-        },
-        score: game.firstPlayerProgress.score,
-      },
-      secondPlayerProgress: {
-        answers: answer,
-        player: {
-          id: findSecondPlayer.userId.toString(),
-          login: findSecondPlayer.login,
-        },
-        score: findSecondPlayer.score,
-      },
-      questions: fiveQuestionsMapper,
-      status: game.status,
-      pairCreatedDate: game.pairCreatedDate,
-      startGameDate: game.startGameDate,
-      finishGameDate: game.finishGameDate,
-    };
-  }
-  async returnMapperByGameId(
-    game: OutputTypePairToGetId,
-  ): Promise<OutputTypePair> {
-    const findFirstPlayer = await this.quizGameRepo.findPlayerById(
-      game.firstPlayerId,
-    );
-    const findSecondPlayer = await this.quizGameRepo.findPlayerById(
-      game.secondPlayerId,
-    );
-    let answer = [];
-    let answer1 = [];
-    answer = findFirstPlayer.answers
-      .map((m) => ({
-        questionId: m.questionId.toString(),
-        answerStatus: m.answerStatus,
-        addedAt: m.addedAt,
-      }))
-      .sort(
-        (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
-      );
-    answer1 = findSecondPlayer
-      ? findSecondPlayer.answers
-          .map((m) => ({
-            questionId: m.questionId.toString(),
-            answerStatus: m.answerStatus,
-            addedAt: m.addedAt,
-          }))
-          .sort(
-            (a, b) =>
-              new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
-          )
-      : [];
-
-    const questions = game.question.map((m) => ({
-      id: m.id.toString(),
-      body: m.body,
-    }));
-    return {
-      id: game.id.toString(),
-      firstPlayerProgress: {
-        answers: answer,
-        player: {
-          id: game.firstPlayer.userId.toString(),
-          login: findFirstPlayer.login,
-        },
-        score: findFirstPlayer.score,
-      },
-      secondPlayerProgress:
-        game.secondPlayerId !== null
-          ? {
-              answers: answer1,
-              player: {
-                id: game.secondPlayer.userId.toString(),
-                login: findSecondPlayer.login,
-              },
-              score: findSecondPlayer.score,
-            }
-          : null,
-      questions: game.secondPlayerId !== null ? questions : null,
-      status: game.status,
-      pairCreatedDate: game.pairCreatedDate,
-      startGameDate: game.secondPlayerId !== null ? game.startGameDate : null,
-      finishGameDate: game.secondPlayerId !== null ? game.finishGameDate : null,
-    };
-  }
+  // async quizGameMapperOnOutputTypePair(
+  //   game: QuizGameInDB,
+  // ): Promise<OutputTypePair> {
+  //   const findPlayer = await this.quizGameRepo.findPlayerById(
+  //     game.firstPlayerId,
+  //   );
+  //   let questions1 = [];
+  //   if (game && game.question.length > 0) {
+  //     questions1 = game.question.map((q) => ({
+  //       id: q.id.toString(),
+  //       body: q.body,
+  //     }));
+  //   }
+  //   let findSecondPlayer = null;
+  //   if (game.secondPlayerId !== null) {
+  //     findSecondPlayer = await this.quizGameRepo.findPlayerById(
+  //       game.secondPlayerId,
+  //     );
+  //   }
+  //   const answer = findPlayer.answers
+  //     .map((m) => ({
+  //       questionId: m.questionId.toString(),
+  //       answerStatus: m.answerStatus,
+  //       addedAt: m.addedAt,
+  //     }))
+  //     .sort(
+  //       (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+  //     );
+  //   let answer1 = [];
+  //   if (findSecondPlayer) {
+  //     answer1 = findSecondPlayer.answers
+  //       .map((m) => ({
+  //         questionId: m.questionId,
+  //         answerStatus: m.answerStatus,
+  //         addedAt: m.addedAt,
+  //       }))
+  //       .sort(
+  //         (a, b) =>
+  //           new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+  //       );
+  //   }
+  //
+  //   return {
+  //     id: game.id.toString(),
+  //     firstPlayerProgress: {
+  //       answers: answer,
+  //       player: {
+  //         id: findPlayer.userId.toString(),
+  //         login: findPlayer.login,
+  //       },
+  //       score: findPlayer.score,
+  //     },
+  //     secondPlayerProgress:
+  //       findSecondPlayer !== null
+  //         ? {
+  //             answers: answer1,
+  //             player: {
+  //               id: findSecondPlayer.userId,
+  //               login: findSecondPlayer.login,
+  //             },
+  //             score: findSecondPlayer.score,
+  //           }
+  //         : null,
+  //     questions: findSecondPlayer !== null ? questions1 : null,
+  //     status:
+  //       game.status !== null ? game.status : StatusTypeEnum.PendingSecondPlayer,
+  //     pairCreatedDate: game.pairCreatedDate,
+  //     startGameDate: game.startGameDate,
+  //     finishGameDate: game.finishGameDate,
+  //   };
+  // }
+  //
+  // async quizGameMapperAddSecondPlayer(
+  //   game: OutputTypePair,
+  //   game1: QuizGameEntityNotPlayerInfo,
+  // ): Promise<OutputTypePair> {
+  //   const fiveQuestion = await this.quizGameRepo.choiceFiveQuestion(game.id);
+  //   const findSecondPlayer = await this.quizGameRepo.findPlayerById(
+  //     game1.secondPlayerId,
+  //   );
+  //   const answer = findSecondPlayer.answers
+  //     .map((m) => ({
+  //       questionId: m.questionId.toString(),
+  //       answerStatus: m.answerStatus,
+  //       addedAt: m.addedAt,
+  //     }))
+  //     .sort(
+  //       (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+  //     );
+  //   const fiveQuestionsMapper = fiveQuestion.map((m) => ({
+  //     id: m.id.toString(),
+  //     body: m.body,
+  //   }));
+  //   return {
+  //     id: game.id,
+  //     firstPlayerProgress: {
+  //       answers: game.firstPlayerProgress.answers.sort(
+  //         (a, b) =>
+  //           new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+  //       ),
+  //       player: {
+  //         id: game.firstPlayerProgress.player.id,
+  //         login: game.firstPlayerProgress.player.login,
+  //       },
+  //       score: game.firstPlayerProgress.score,
+  //     },
+  //     secondPlayerProgress: {
+  //       answers: answer,
+  //       player: {
+  //         id: findSecondPlayer.userId.toString(),
+  //         login: findSecondPlayer.login,
+  //       },
+  //       score: findSecondPlayer.score,
+  //     },
+  //     questions: fiveQuestionsMapper,
+  //     status: game.status,
+  //     pairCreatedDate: game.pairCreatedDate,
+  //     startGameDate: game.startGameDate,
+  //     finishGameDate: game.finishGameDate,
+  //   };
+  // }
+  // async returnMapperByGameId(
+  //   game: OutputTypePairToGetId,
+  // ): Promise<OutputTypePair> {
+  //   const findFirstPlayer = await this.quizGameRepo.findPlayerById(
+  //     game.firstPlayerId,
+  //   );
+  //   const findSecondPlayer = await this.quizGameRepo.findPlayerById(
+  //     game.secondPlayerId,
+  //   );
+  //   let answer = [];
+  //   let answer1 = [];
+  //   answer = findFirstPlayer.answers
+  //     .map((m) => ({
+  //       questionId: m.questionId.toString(),
+  //       answerStatus: m.answerStatus,
+  //       addedAt: m.addedAt,
+  //     }))
+  //     .sort(
+  //       (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+  //     );
+  //   answer1 = findSecondPlayer
+  //     ? findSecondPlayer.answers
+  //         .map((m) => ({
+  //           questionId: m.questionId.toString(),
+  //           answerStatus: m.answerStatus,
+  //           addedAt: m.addedAt,
+  //         }))
+  //         .sort(
+  //           (a, b) =>
+  //             new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+  //         )
+  //     : [];
+  //
+  //   const questions = game.question.map((m) => ({
+  //     id: m.id.toString(),
+  //     body: m.body,
+  //   }));
+  //   return {
+  //     id: game.id.toString(),
+  //     firstPlayerProgress: {
+  //       answers: answer,
+  //       player: {
+  //         id: game.firstPlayer.userId.toString(),
+  //         login: findFirstPlayer.login,
+  //       },
+  //       score: findFirstPlayer.score,
+  //     },
+  //     secondPlayerProgress:
+  //       game.secondPlayerId !== null
+  //         ? {
+  //             answers: answer1,
+  //             player: {
+  //               id: game.secondPlayer.userId.toString(),
+  //               login: findSecondPlayer.login,
+  //             },
+  //             score: findSecondPlayer.score,
+  //           }
+  //         : null,
+  //     questions: game.secondPlayerId !== null ? questions : null,
+  //     status: game.status,
+  //     pairCreatedDate: game.pairCreatedDate,
+  //     startGameDate: game.secondPlayerId !== null ? game.startGameDate : null,
+  //     finishGameDate: game.secondPlayerId !== null ? game.finishGameDate : null,
+  //   };
+  // }
 }
