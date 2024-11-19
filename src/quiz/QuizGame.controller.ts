@@ -15,39 +15,30 @@ import { AnswerInput, AnswerType, OutputTypePair } from './type/QuizGame.type';
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { GameUserGuard } from './validatorToQuizGame/quizeGame.validator';
-import { QueryType2 } from '../Other/Query.Type';
-import { queryFilterByQuizGame } from '../qurey-repo/query-filter';
+import { QueryTypeToQuizGame } from '../Other/Query.Type';
+import { queryFilterByQuizGame1 } from '../qurey-repo/query-filter';
 
 @Controller('pair-game-quiz')
 export class QuizGameController {
   constructor(protected quizGameService: QuizGameService) {}
 
+  // @Get('users/top')
+  // @HttpCode(200)
+  // async getTopPlayer(@Query() query: QueryTypeToTopPlayers) {
+  //   return topPlayers;
+  // }
   @UseGuards(BearerGuard)
   @Get('pairs/my')
   @HttpCode(200)
   async getHistoryPlayer(
     @User() userModel: NewestPostLike,
-    @Query() query: QueryType2,
+    @Query() query: QueryTypeToQuizGame,
   ) {
-    const filter = queryFilterByQuizGame(query);
-    const findHistoryGameByPlayer =
-      await this.quizGameService.getHistoryGameByPlayerService(
-        userModel,
-        filter,
-      );
-    return findHistoryGameByPlayer;
-    // const sortedGames = sortQuizGames(
-    //   findHistoryGameByPlayer.items,
-    //   filter.sortBy,
-    //   filter.sortDirection,
-    // );
-    // return {
-    //   pagesCount: findHistoryGameByPlayer.pagesCount,
-    //   page: findHistoryGameByPlayer.page,
-    //   pageSize: findHistoryGameByPlayer.pageSize,
-    //   totalCount: findHistoryGameByPlayer.totalCount,
-    //   items: sortedGames,
-    // };
+    const filter = queryFilterByQuizGame1(query);
+    return this.quizGameService.getHistoryGameByPlayerService(
+      userModel,
+      filter,
+    );
   }
   @UseGuards(BearerGuard)
   @Get('users/my-statistic')

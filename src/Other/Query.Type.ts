@@ -5,9 +5,15 @@ export type QueryType = {
   totalCount: number;
 };
 
-export type QueryType2 = {
+export type QueryTypeToQuizGame = {
   sortBy: string;
   sortDirection: 'ask' | 'desc';
+  pageNumber: number;
+  pageSize: number;
+};
+
+export type QueryTypeToTopPlayers = {
+  sortBy: string[];
   pageNumber: number;
   pageSize: number;
 };
