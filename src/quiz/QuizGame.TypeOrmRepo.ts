@@ -408,17 +408,7 @@ export class QuizGameTypeOrmRepo {
       status: StatusTypeEnum.Active,
       startGameDate: now,
     });
-    const fiveQuestions = await this.choiceFiveQuestion(findActivePair.id);
-    console.log(fiveQuestions);
-    const pairFind = await this.quizGameEntityNotPlayerInfo.findOne({
-      where: { id: findActivePair.id },
-      relations: {
-        secondPlayer: true,
-        firstPlayer: true,
-        question: true,
-      },
-    });
-    console.log(pairFind, 'pairFind-------------');
+    await this.choiceFiveQuestion(findActivePair.id);
 
     return this.quizGameEntityNotPlayerInfo.findOne({
       where: { id: findActivePair.id },

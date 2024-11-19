@@ -35,6 +35,7 @@ export class QuizGameController {
     @Query() query: QueryTypeToQuizGame,
   ) {
     const filter = queryFilterByQuizGame1(query);
+    console.log(filter, 'filter');
     return this.quizGameService.getHistoryGameByPlayerService(
       userModel,
       filter,
