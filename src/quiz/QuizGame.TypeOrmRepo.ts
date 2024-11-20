@@ -18,6 +18,7 @@ import {
   StatusTypeEnumByAnswersToEndpoint,
 } from './entity/QuizGame.entity';
 import { PaginationQueryType } from '../qurey-repo/query-filter';
+import { QueryTypeToTopPlayers } from '../Other/Query.Type';
 
 @Injectable()
 export class QuizGameTypeOrmRepo {
@@ -33,6 +34,30 @@ export class QuizGameTypeOrmRepo {
 
     @InjectDataSource() protected dataSource: DataSource,
   ) {}
+
+  async getTopPlayers() {
+    return this.playersEntity.find({});
+
+    // const [allPlayers, countPlayer] = await this.playersEntity.findAndCount({
+    //   order: {
+    //     ...optionsSorted,
+    //   },
+    // });
+    // const itemsPromises = allPlayers.map((player) => {
+    //   return {
+    //     id: player.userId,
+    //     login: player.login,
+    //   };
+    // });
+    // const items = await Promise.all(itemsPromises);
+    // return {
+    //   pagesCount: Math.ceil(countPlayer / query.pageSize),
+    //   page: query.pageNumber,
+    //   pageSize: query.pageSize,
+    //   totalCount: countPlayer,
+    //   items: items,
+    // };
+  }
 
   async getHistoryGameByPlayerRepository(
     userModel: NewestPostLike,

@@ -15,18 +15,26 @@ import { AnswerInput, AnswerType, OutputTypePair } from './type/QuizGame.type';
 import { BearerGuard, User } from '../auth/guard/authGuard';
 import { NewestPostLike } from '../Users/Type/User.type';
 import { GameUserGuard } from './validatorToQuizGame/quizeGame.validator';
-import { QueryTypeToQuizGame } from '../Other/Query.Type';
-import { queryFilterByQuizGame1 } from '../qurey-repo/query-filter';
+import {
+  QueryTypeToQuizGame,
+  QueryTypeToTopPlayers,
+} from '../Other/Query.Type';
+import {
+  queryFilterByQuizGame,
+  queryFilterByTopPlayer,
+} from '../qurey-repo/query-filter';
 
 @Controller('pair-game-quiz')
 export class QuizGameController {
   constructor(protected quizGameService: QuizGameService) {}
 
-  // @Get('users/top')
-  // @HttpCode(200)
-  // async getTopPlayer(@Query() query: QueryTypeToTopPlayers) {
-  //   return topPlayers;
-  // }
+  @Get('users/top')
+  @HttpCode(200)
+  async getTopPlayer(@Query() query: QueryTypeToTopPlayers) {
+    const filter = queryFilterByTopPlayer(query);
+    const topPlayers = await this.quizGameService.getTopPlayers(filter);
+    return topPlayers;
+  }
   @UseGuards(BearerGuard)
   @Get('pairs/my')
   @HttpCode(200)
@@ -34,8 +42,7 @@ export class QuizGameController {
     @User() userModel: NewestPostLike,
     @Query() query: QueryTypeToQuizGame,
   ) {
-    const filter = queryFilterByQuizGame1(query);
-    console.log(filter, 'filter');
+    const filter = queryFilterByQuizGame(query);
     return this.quizGameService.getHistoryGameByPlayerService(
       userModel,
       filter,
