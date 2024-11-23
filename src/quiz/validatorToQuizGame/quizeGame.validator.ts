@@ -6,7 +6,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { QuizGameTypeOrmRepo } from '../QuizGame.TypeOrmRepo';
+import { QuizGameTypeOrmRepo } from '../quizeGame/QuizGame.TypeOrmRepo';
 import { CustomUUIDValidation } from '../../Other/validator.validateUUID';
 
 @Injectable()

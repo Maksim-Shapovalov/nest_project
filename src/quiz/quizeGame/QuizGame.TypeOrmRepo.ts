@@ -2,23 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import {
-  OutputTypePair,
-  OutputTypePairToGetId,
-  QuizGameClass1,
+  BaseTypeQuizGame,
+  QuizGameClass3,
   QuizGameInDB,
   StatusTypeEnum,
   updateTypeOfQuestion1,
-} from './type/QuizGame.type';
-import { NewestPostLike } from '../Users/Type/User.type';
-import { findingPlayer, PlayersEntity } from './entity/Players.Entity';
-import { QuestionsEntity } from './entity/Questions.Entity';
+} from '../type/QuizGame.type';
+import { NewestPostLike } from '../../Users/Type/User.type';
+import { findingPlayer, PlayersEntity } from '../entity/Players.Entity';
+import { QuestionsEntity } from '../entity/Questions.Entity';
 import {
   AnswersEntity,
   QuizGameEntityNotPlayerInfo,
   StatusTypeEnumByAnswersToEndpoint,
-} from './entity/QuizGame.entity';
-import { PaginationQueryType } from '../qurey-repo/query-filter';
-import { QueryTypeToTopPlayers } from '../Other/Query.Type';
+} from '../entity/QuizGame.entity';
+import { PaginationQueryType } from '../../qurey-repo/query-filter';
 
 @Injectable()
 export class QuizGameTypeOrmRepo {
@@ -92,7 +90,7 @@ export class QuizGameTypeOrmRepo {
       });
     const totalCount = parseInt(totalCountPair.toString());
     const itemsPromises = await Promise.all(
-      pairs.map(async (pair: OutputTypePairToGetId) => {
+      pairs.map(async (pair: BaseTypeQuizGame) => {
         const findFirstPlayer = await this.findPlayerById(pair.firstPlayerId);
         const findSecondPlayer = await this.findPlayerById(pair.secondPlayerId);
         return QuizGameEntityNotPlayerInfo.getViewModel(
@@ -123,7 +121,7 @@ export class QuizGameTypeOrmRepo {
   }
   async getUnfinishedCurrentGameRepo(
     userModel: NewestPostLike,
-  ): Promise<OutputTypePairToGetId | false> {
+  ): Promise<BaseTypeQuizGame | false> {
     const pairs = await this.quizGameEntityNotPlayerInfo.find({
       where: {
         status: In([StatusTypeEnum.Active, StatusTypeEnum.PendingSecondPlayer]),
@@ -246,7 +244,7 @@ export class QuizGameTypeOrmRepo {
       relations: ['answers'],
     });
   }
-  async getGameById(id: string): Promise<OutputTypePairToGetId | false> {
+  async getGameById(id: string): Promise<BaseTypeQuizGame | false> {
     const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: {
         id: id,
@@ -278,36 +276,7 @@ export class QuizGameTypeOrmRepo {
       where: { id: id },
       relations: { answers: true },
     });
-
-    // return this.playersEntity
-    //   .createQueryBuilder('q')
-    //   .leftJoinAndSelect('q.answers', 'a')
-    //   .where('q.id = :id', { id })
-    //   .getOne();
   }
-  // async findActivePair(
-  //   userId: string,
-  // ): Promise<QuizGameEntityNotPlayerInfo | false | 'Active'> {
-  //   const activePairs = await this.quizGameEntityNotPlayerInfo.find({
-  //     where: [
-  //       { status: StatusTypeEnum.Active },
-  //       { status: StatusTypeEnum.PendingSecondPlayer },
-  //     ],
-  //   });
-  //
-  //   const userPairs = activePairs.map((pair) => {
-  //     return {
-  //       pair,
-  //       isUserInPair:
-  //         pair.firstPlayerId === userId || pair.secondPlayerId === userId,
-  //     };
-  //   });
-  //   if (userPairs.length > 0 && userPairs[0].isUserInPair) return 'Active';
-  //   const activePair = await this.quizGameEntityNotPlayerInfo.findOne({
-  //     where: { status: StatusTypeEnum.PendingSecondPlayer },
-  //   });
-  //   return activePair ? activePair : false;
-  // }
 
   async findPendingStatusPair(
     userId: string,
@@ -368,18 +337,14 @@ export class QuizGameTypeOrmRepo {
       await this.quizGameEntityNotPlayerInfo.save(findPair_0);
       return findPair_0;
     }
-    if (player1Completed || player2Completed) {
-      return true;
-    }
-
-    return false;
+    return player1Completed || player2Completed;
   }
 
   async createNewPairWithNewSingleUser(
     newPlayer: PlayersEntity,
-    newPair: QuizGameClass1,
+    newPair: QuizGameClass3,
     newPlayerId: string,
-  ): Promise<OutputTypePairToGetId> {
+  ): Promise<BaseTypeQuizGame> {
     // const randomId = Math.floor(Math.random() * 1000000);
 
     const newPairWithSingleUser = await this.quizGameEntityNotPlayerInfo.create(
@@ -410,7 +375,7 @@ export class QuizGameTypeOrmRepo {
   async connectSecondUserWithFirstUserRepo(
     userModel: NewestPostLike,
     now: string,
-  ): Promise<OutputTypePairToGetId> {
+  ): Promise<BaseTypeQuizGame> {
     // await this.deleteAnswerPlayer(userModel.userId);
     const findActivePair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: {
@@ -465,19 +430,6 @@ export class QuizGameTypeOrmRepo {
     });
     return true;
   }
-  async deleteAnswerPlayer(playerId: string): Promise<boolean> {
-    const findPlayer = await this.playersEntity.findOne({
-      where: { id: playerId },
-    });
-    await this.answersEntity.delete({
-      playerId: playerId,
-    });
-    if (!findPlayer) return true;
-    findPlayer.answers = [];
-    await this.playersEntity.save(findPlayer);
-    return true;
-  }
-
   async choiceFiveQuestion(gameId: string) {
     const game = await this.quizGameEntityNotPlayerInfo.findOne({
       where: { id: gameId },
@@ -495,65 +447,5 @@ export class QuizGameTypeOrmRepo {
     game.question = getRandomFiveQuestion.sort((a, b) => +a.id - +b.id);
     await this.quizGameEntityNotPlayerInfo.save(game);
     return getRandomFiveQuestion;
-  }
-
-  async pairHistoryMapper(game: QuizGameInDB): Promise<OutputTypePair> {
-    const findFirstPlayer = await this.findPlayerById(game.firstPlayerId);
-    const findSecondPlayer = await this.findPlayerById(game.secondPlayerId);
-    const questions1 = game.question
-      .map((q) => ({
-        id: q.id.toString(),
-        body: q.body,
-      }))
-      .sort((a, b) => a.id - b.id);
-    const answer = findFirstPlayer.answers
-      .map((m) => ({
-        questionId: m.questionId.toString(),
-        answerStatus: m.answerStatus,
-        addedAt: m.addedAt,
-      }))
-      .sort(
-        (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
-      );
-    const answer1 = findSecondPlayer
-      ? findSecondPlayer.answers
-          .map((m) => ({
-            questionId: m.questionId.toString(),
-            answerStatus: m.answerStatus,
-            addedAt: m.addedAt,
-          }))
-          .sort(
-            (a, b) =>
-              new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
-          )
-      : [];
-    return {
-      id: game.id.toString(),
-      firstPlayerProgress: {
-        answers: answer,
-        player: {
-          id: findFirstPlayer.userId.toString(),
-          login: findFirstPlayer.login,
-        },
-        score: findFirstPlayer.score,
-      },
-      secondPlayerProgress:
-        findSecondPlayer !== null
-          ? {
-              answers: answer1,
-              player: {
-                id: findSecondPlayer.userId,
-                login: findSecondPlayer.login,
-              },
-              score: findSecondPlayer.score,
-            }
-          : null,
-      questions: findSecondPlayer !== null ? questions1 : null,
-      status:
-        game.status !== null ? game.status : StatusTypeEnum.PendingSecondPlayer,
-      pairCreatedDate: game.pairCreatedDate,
-      startGameDate: game.startGameDate,
-      finishGameDate: game.finishGameDate,
-    };
   }
 }

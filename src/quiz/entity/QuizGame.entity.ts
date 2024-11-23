@@ -5,17 +5,12 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PlayersEntity } from './Players.Entity';
 import { QuestionsEntity } from './Questions.Entity';
-import {
-  OutputTypePair,
-  OutputTypePairToGetId,
-  QuizGameInDB,
-} from '../type/QuizGame.type';
+import { ViewModelPairToOutput, BaseTypeQuizGame } from '../type/QuizGame.type';
 
 enum StatusTypeEnum {
   Active = 'Active',
@@ -52,10 +47,10 @@ export class QuizGameEntityNotPlayerInfo {
   question: QuestionsEntity[] | null;
 
   static getViewModel(
-    game: OutputTypePairToGetId,
+    game: BaseTypeQuizGame,
     player1: PlayersEntity,
     player2: PlayersEntity | null,
-  ): OutputTypePair {
+  ): ViewModelPairToOutput {
     let questions = [];
     if (game && game.question === null) {
       questions = [];
@@ -143,11 +138,7 @@ export class AnswersEntity {
   addedAt: string;
 }
 
-export type StatusTypeEnumByAnswers = 'Correct, Incorrect';
 export enum StatusTypeEnumByAnswersToEndpoint {
   correct = 'Correct',
   incorrect = 'Incorrect',
 }
-/*
-
- */

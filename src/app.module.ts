@@ -65,15 +65,21 @@ import {
   AnswersEntity,
   QuizGameEntityNotPlayerInfo,
 } from './quiz/entity/QuizGame.entity';
-import { QuizGameTypeOrmRepo } from './quiz/QuizGame.TypeOrmRepo';
-import { QuizGameService } from './quiz/QuizGame.service';
-import { QuizGameController } from './quiz/QuizGame.controller';
+import { QuizGameTypeOrmRepo } from './quiz/quizeGame/QuizGame.TypeOrmRepo';
+import { QuizGameService } from './quiz/quizeGame/QuizGame.service';
+import { QuizGameController } from './quiz/quizeGame/QuizGame.controller';
 import { QuizGameControllerSuperAdmin } from './quiz/SA.directory/quizGameSuperAdmin.Controller';
 import { QuizGameSuperAdminService } from './quiz/SA.directory/quizGameSuperAdmin.Service';
 import { QuestionsEntity } from './quiz/entity/Questions.Entity';
 import { PlayersEntity } from './quiz/entity/Players.Entity';
 import { QuizGameSuperAdminRepositoryTypeORM } from './quiz/SA.directory/quizGameSuperAdmin.Repository.TypeORM';
 import { CustomUUIDValidation } from './Other/validator.validateUUID';
+import { GetTopPlayersUseCase } from './quiz/quizeGame/useCase/GetTopPlayersUseCase';
+import { GetHistoryGameByPlayerUseCase } from './quiz/quizeGame/useCase/GetHistoryGameByPlayerUseCase';
+import { GetUnfinishedCurrentGameUseCase } from './quiz/quizeGame/useCase/GetUnfinishedCurrentGameUseCase';
+import { FindActivePairUseCase } from './quiz/quizeGame/useCase/FindActivePairUseCase';
+import { SendAnswerUseCase } from './quiz/quizeGame/useCase/SendAnswerUseCase';
+import { CqrsModule } from '@nestjs/cqrs';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -86,6 +92,37 @@ export const HTTP_STATUS = {
   TOO_MANY_REQUESTS_429: 429,
 };
 const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
+const repository = [
+  CommentSqlTypeOrmRepository,
+  CommentSqlRepository,
+  BlogsRepository,
+  PostsRepository,
+  AllDataClearRepo,
+  RefreshTokenRepo,
+  UserSQLRepository,
+  SecurityDevicesSQLTypeOrmRepository,
+  QuizGameSuperAdminRepositoryTypeORM,
+  QuizGameTypeOrmRepo,
+  UserSQLTypeOrmRepository,
+  PostsPostgresTypeOrmRepository,
+  PostsPostgresRepository,
+  BlogsSQLTypeOrmRepository,
+];
+const useCases = [
+  GetTopPlayersUseCase,
+  GetHistoryGameByPlayerUseCase,
+  GetUnfinishedCurrentGameUseCase,
+  FindActivePairUseCase,
+  SendAnswerUseCase,
+];
+const service = [
+  BlogsService,
+  PostsService,
+  AppService,
+  QuizGameService,
+  QuizGameSuperAdminService,
+  CommentsService,
+];
 
 @Module({
   imports: [
@@ -121,6 +158,7 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
         limit: 5,
       },
     ]),
+    CqrsModule,
     MongooseModule.forRoot(
       process.env.MONGO_URL || 'mongodb://localhost:27017',
     ),
@@ -153,30 +191,13 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
     QuizGameControllerSuperAdmin,
   ],
   providers: [
-    CommentSqlRepository,
-    CommentSqlTypeOrmRepository,
-    BlogsRepository,
-    BlogsService,
-    CommentsService,
-    PostsRepository,
-    PostsService,
-    AllDataClearRepo,
     EmailManager,
     EmailAdapter,
-    AppService,
-    RefreshTokenRepo,
     CustomBlogIdValidation,
     CustomUUIDValidation,
-    UserSQLRepository,
-    SecurityDevicesSQLTypeOrmRepository,
-    BlogsSQLTypeOrmRepository,
-    PostsPostgresRepository,
-    PostsPostgresTypeOrmRepository,
-    UserSQLTypeOrmRepository,
-    QuizGameService,
-    QuizGameTypeOrmRepo,
-    QuizGameSuperAdminService,
-    QuizGameSuperAdminRepositoryTypeORM,
+    ...service,
+    ...repository,
+    ...useCases,
   ],
 })
 export class AppModule {}

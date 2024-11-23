@@ -11,29 +11,41 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { QuizGameService } from './QuizGame.service';
-import { AnswerInput, AnswerType, OutputTypePair } from './type/QuizGame.type';
-import { BearerGuard, User } from '../auth/guard/authGuard';
-import { NewestPostLike } from '../Users/Type/User.type';
-import { GameUserGuard } from './validatorToQuizGame/quizeGame.validator';
+import {
+  AnswerInput,
+  AnswerType,
+  ViewModelPairToOutput,
+} from '../type/QuizGame.type';
+import { BearerGuard, User } from '../../auth/guard/authGuard';
+import { NewestPostLike } from '../../Users/Type/User.type';
+import { GameUserGuard } from '../validatorToQuizGame/quizeGame.validator';
 import {
   QueryTypeToQuizGame,
   QueryTypeToTopPlayers,
-} from '../Other/Query.Type';
+} from '../../Other/Query.Type';
 import {
   queryFilterByQuizGame,
   queryFilterByTopPlayer,
-} from '../qurey-repo/query-filter';
+} from '../../qurey-repo/query-filter';
+import { FindActivePairCommand } from './useCase/FindActivePairUseCase';
+import { SendAnswerCommand } from './useCase/SendAnswerUseCase';
+import { CommandBus } from '@nestjs/cqrs';
+import { GetHistoryGameByPlayerCommand } from './useCase/GetHistoryGameByPlayerUseCase';
+import { GetTopPlayersCommand } from './useCase/GetTopPlayersUseCase';
+import { GetUnfinishedCurrentGameCommand } from './useCase/GetUnfinishedCurrentGameUseCase';
 
 @Controller('pair-game-quiz')
 export class QuizGameController {
-  constructor(protected quizGameService: QuizGameService) {}
+  constructor(
+    private commandBus: CommandBus,
+    protected quizGameService: QuizGameService,
+  ) {}
 
   @Get('users/top')
   @HttpCode(200)
   async getTopPlayer(@Query() query: QueryTypeToTopPlayers) {
     const filter = queryFilterByTopPlayer(query);
-    const topPlayers = await this.quizGameService.getTopPlayers(filter);
-    return topPlayers;
+    return this.commandBus.execute(new GetTopPlayersCommand(filter));
   }
   @UseGuards(BearerGuard)
   @Get('pairs/my')
@@ -43,9 +55,8 @@ export class QuizGameController {
     @Query() query: QueryTypeToQuizGame,
   ) {
     const filter = queryFilterByQuizGame(query);
-    return this.quizGameService.getHistoryGameByPlayerService(
-      userModel,
-      filter,
+    return this.commandBus.execute(
+      new GetHistoryGameByPlayerCommand(userModel, filter),
     );
   }
   @UseGuards(BearerGuard)
@@ -59,9 +70,11 @@ export class QuizGameController {
   @HttpCode(200)
   async getUnfinishedCurrentGame(
     @User() userModel: NewestPostLike,
-  ): Promise<OutputTypePair> {
-    const findUnfinishedGameToCurrentUser: OutputTypePair | false =
-      await this.quizGameService.getUnfinishedCurrentGameService(userModel);
+  ): Promise<ViewModelPairToOutput> {
+    const findUnfinishedGameToCurrentUser: ViewModelPairToOutput | false =
+      await this.commandBus.execute(
+        new GetUnfinishedCurrentGameCommand(userModel),
+      );
     if (findUnfinishedGameToCurrentUser === false)
       throw new NotFoundException();
 
@@ -70,8 +83,8 @@ export class QuizGameController {
   @UseGuards(BearerGuard, GameUserGuard)
   @Get('pairs/:id')
   @HttpCode(200)
-  async getGameById(@Param('id') id: string): Promise<OutputTypePair> {
-    const findQuizGameById: OutputTypePair | false =
+  async getGameById(@Param('id') id: string): Promise<ViewModelPairToOutput> {
+    const findQuizGameById: ViewModelPairToOutput | false =
       await this.quizGameService.getGameById(id);
     if (!findQuizGameById) throw new NotFoundException();
     return findQuizGameById;
@@ -81,9 +94,9 @@ export class QuizGameController {
   @HttpCode(200)
   async connectCurrentUser(
     @User() userModel: NewestPostLike,
-  ): Promise<OutputTypePair> {
-    const findPairWithOneUser: OutputTypePair | false =
-      await this.quizGameService.findActivePairInService(userModel);
+  ): Promise<ViewModelPairToOutput> {
+    const findPairWithOneUser: ViewModelPairToOutput | false =
+      await this.commandBus.execute(new FindActivePairCommand(userModel));
     if (!findPairWithOneUser) throw new ForbiddenException();
     return findPairWithOneUser;
   }
@@ -96,11 +109,10 @@ export class QuizGameController {
     @User() userModel: NewestPostLike,
   ) {
     const sendAnswer: AnswerType | false | string =
-      await this.quizGameService.sendAnswerService(answer.answer, userModel);
+      await this.commandBus.execute(
+        new SendAnswerCommand(answer.answer, userModel),
+      );
     if (!sendAnswer) throw new ForbiddenException();
     return sendAnswer;
-    // if (!sendAnswer || sendAnswer === 'await') throw new ForbiddenException();
-    // if (sendAnswer === 'end') throw new UnauthorizedException();
-    // return sendAnswer;
   }
 }

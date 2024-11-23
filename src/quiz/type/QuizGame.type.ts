@@ -1,34 +1,6 @@
-import { QuestionsEntity } from '../entity/Questions.Entity';
 import { PlayersEntity } from '../entity/Players.Entity';
 import { StatusTypeEnumByAnswersToEndpoint } from '../entity/QuizGame.entity';
 import { questBodyToOutput1, questBodyToOutput12 } from './question.type';
-
-export class QuizGameClass {
-  constructor(
-    public firstPlayerId: number,
-    public firstPlayerLogin: string,
-    public scoreFirstPlayer: number,
-    public secondPlayerId: number | null,
-    public secondPlayerLogin: string | null,
-    public scoreSecondPlayer: number,
-    public status: StatusTypeEnumToObject,
-    public pairCreatedDate: string,
-    public startGameDate: string,
-    public finishGameDate: string,
-  ) {}
-}
-
-export class QuizGameClass1 {
-  constructor(
-    public firstPlayerId: string,
-    public secondPlayerId: string | null,
-    public status: StatusTypeEnum,
-    public pairCreatedDate: string,
-    public startGameDate: string | null,
-    public finishGameDate: string | null,
-  ) {}
-}
-
 export class QuizGameClass3 {
   public firstPlayerId: string;
   public secondPlayerId: string | null;
@@ -60,7 +32,7 @@ export type AnswerType = {
   addedAt: string;
 };
 
-export type OutputTypePair = {
+export type ViewModelPairToOutput = {
   id: string;
   firstPlayerProgress: {
     answers: Array<AnswerType>;
@@ -83,9 +55,8 @@ export type OutputTypePair = {
   pairCreatedDate: string;
   startGameDate: string;
   finishGameDate: string;
-  //  Array<{ id: string; body: string }> | null;
 };
-export type OutputTypePairToGetId = {
+export type BaseTypeQuizGame = {
   id: string;
   firstPlayer: PlayersEntity;
   firstPlayerId: string;
@@ -96,7 +67,6 @@ export type OutputTypePairToGetId = {
   pairCreatedDate: string;
   startGameDate: string;
   finishGameDate: string;
-  //  Array<{ id: string; body: string }> | null;
 };
 export enum StatusTypeEnumToObject {
   PendingSecondPlayer = 'PendingSecondPlayer',
@@ -130,7 +100,3 @@ export type QuizGameInDB = {
 export type AnswerInput = {
   answer: string;
 };
-//firstPlayerLogin: string;
-//   scoreFirstPlayer: number;
-// secondPlayerLogin: string | null;
-//   scoreSecondPlayer: number;
