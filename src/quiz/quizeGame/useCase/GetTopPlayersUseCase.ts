@@ -53,6 +53,7 @@ export class GetTopPlayersUseCase {
       if (field && direction) {
         optionsSorted[field] = direction as 'asc' | 'desc';
       }
+      console.log(1);
     });
     const sortedItems = filteredPlayers.sort((a, b) => {
       for (const param of querySort) {
