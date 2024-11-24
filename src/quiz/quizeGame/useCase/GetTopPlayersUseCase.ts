@@ -24,7 +24,6 @@ export class GetTopPlayersUseCase
 
   async execute(command: GetTopPlayersCommand) {
     const findPlayer = await this.quizGameRepo.getTopPlayers();
-    const countPlayer = findPlayer.length;
     const uniqueUserIds = new Set<string>();
     const findAllPairByPlayerId = await Promise.all(
       findPlayer.map(async (player) => {
@@ -49,8 +48,8 @@ export class GetTopPlayersUseCase
     const filteredPlayers = findAllPairByPlayerId.filter(
       (player) => player !== null,
     );
+    const countPlayer = filteredPlayers.length;
     const querySort = command.query.sortBy;
-    console.log(querySort, 'querySort-------');
     const optionsSorted = {};
     querySort.forEach((param) => {
       const [field, direction] = param.split(' ');
@@ -58,13 +57,11 @@ export class GetTopPlayersUseCase
         optionsSorted[field] = direction as 'asc' | 'desc';
       }
     });
-    console.log(querySort, 'querySort-------');
     const sortedItems = filteredPlayers.sort((a, b) => {
       for (const param of querySort) {
         const [field, direction] = param.split(' ');
         const aValue = a[field];
         const bValue = b[field];
-        console.log(aValue, bValue, 'value-----------');
 
         if (aValue > bValue) return direction === 'desc' ? -1 : 1;
         if (aValue < bValue) return direction === 'desc' ? 1 : -1;
@@ -75,25 +72,6 @@ export class GetTopPlayersUseCase
     const endIndex = startIndex + command.query.pageSize;
     const paginatedItems = sortedItems.slice(startIndex, endIndex);
 
-    // const sortedItems_1 = filteredPlayers.sort((a, b) => {
-    //   for (const param of querySort) {
-    //     const [field, direction] = param.split(' ');
-    //     const aValue = a[field];
-    //     const bValue = b[field];
-    //
-    //     // Преобразуем значения в числа, если это возможно
-    //     const aNum = typeof aValue === 'number' ? aValue : parseFloat(aValue);
-    //     const bNum = typeof bValue === 'number' ? bValue : parseFloat(bValue);
-    //
-    //     if (aNum < bNum) {
-    //       return direction === 'desk' ? -1 : 1;
-    //     }
-    //     if (aNum > bNum) {
-    //       return direction === 'desk' ? 1 : -1;
-    //     }
-    //   }
-    //   return 0; // Все поля равны
-    // });
     return {
       pagesCount: Math.ceil(countPlayer / command.query.pageSize),
       page: command.query.pageNumber,
