@@ -36,7 +36,7 @@ export class GetTopPlayersUseCase
 
           return {
             ...staticPlayer,
-            players: {
+            player: {
               id: player.userId,
               login: player.login,
             },
