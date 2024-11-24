@@ -57,33 +57,42 @@ export class GetTopPlayersUseCase
         optionsSorted[field] = direction as 'asc' | 'desc';
       }
     });
+    console.log(querySort, 'querySort-------');
+    // const [field, direction] = querySort.split(' ');
     const sortedItems = filteredPlayers.sort((a, b) => {
       for (const param of querySort) {
         const [field, direction] = param.split(' ');
+        console.log(field, direction, 'field, direction---------------');
+
         const aValue = a[field];
         const bValue = b[field];
+        console.log(aValue, bValue, 'value-----------');
 
-        if (typeof aValue === 'string' && typeof bValue === 'string') {
-          if (aValue < bValue) {
-            return direction === 'asc' ? -1 : 1;
-          }
-          if (aValue > bValue) {
-            return direction === 'asc' ? 1 : -1;
-          }
-        } else {
-          // Предполагаем, что это числа
-          const aNum = parseFloat(aValue);
-          const bNum = parseFloat(bValue);
-          if (aNum < bNum) {
-            return direction === 'asc' ? -1 : 1;
-          }
-          if (aNum > bNum) {
-            return direction === 'asc' ? 1 : -1;
-          }
-        }
+        if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return direction === 'asc' ? 1 : -1;
       }
-      return 0; // Если все поля равны
+      return 0;
     });
+
+    // const sortedItems_1 = filteredPlayers.sort((a, b) => {
+    //   for (const param of querySort) {
+    //     const [field, direction] = param.split(' ');
+    //     const aValue = a[field];
+    //     const bValue = b[field];
+    //
+    //     // Преобразуем значения в числа, если это возможно
+    //     const aNum = typeof aValue === 'number' ? aValue : parseFloat(aValue);
+    //     const bNum = typeof bValue === 'number' ? bValue : parseFloat(bValue);
+    //
+    //     if (aNum < bNum) {
+    //       return direction === 'desk' ? -1 : 1;
+    //     }
+    //     if (aNum > bNum) {
+    //       return direction === 'desk' ? 1 : -1;
+    //     }
+    //   }
+    //   return 0; // Все поля равны
+    // });
     return {
       pagesCount: Math.ceil(countPlayer / command.query.pageSize),
       page: command.query.pageNumber,

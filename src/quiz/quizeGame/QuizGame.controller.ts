@@ -44,7 +44,9 @@ export class QuizGameController {
   @Get('users/top')
   @HttpCode(200)
   async getTopPlayer(@Query() query: QueryTypeToTopPlayers) {
+    console.log(query, 'query');
     const filter = queryFilterByTopPlayer(query);
+    console.log(filter, 'filter-----------');
     return this.commandBus.execute(new GetTopPlayersCommand(filter));
   }
   @UseGuards(BearerGuard)
