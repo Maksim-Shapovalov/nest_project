@@ -23,6 +23,7 @@ export class GetTopPlayersUseCase
   ) {}
 
   async execute(command: GetTopPlayersCommand) {
+    console.log(command.query, 'query------------');
     const findPlayer = await this.quizGameRepo.getTopPlayers();
     const uniqueUserIds = new Set<string>();
     const findAllPairByPlayerId = await Promise.all(

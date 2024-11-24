@@ -91,8 +91,10 @@ function handlerQueryFilter<T extends BaseQueryType>(
   defaultFilter: T,
   query: any,
 ): T {
-  if (query.sortBy) {
-    defaultFilter.sortBy = query.sortBy;
+  console.log(query, 'query------------');
+  console.log(defaultFilter, 'defaultFilter------------');
+  if (query.sort) {
+    defaultFilter.sortBy = query.sort;
   }
   if ('sortDirection' in defaultFilter) {
     if (query.sortDirection && query.sortDirection === 'asc') {
@@ -113,7 +115,7 @@ function handlerQueryFilter<T extends BaseQueryType>(
   ) {
     defaultFilter.pageNumber = Number(query.pageNumber);
   }
-
+  console.log(defaultFilter, 'defaultFilter ====================');
   return defaultFilter;
 }
 export function queryFilterByQuizGame(query: any): PaginationQueryType {
