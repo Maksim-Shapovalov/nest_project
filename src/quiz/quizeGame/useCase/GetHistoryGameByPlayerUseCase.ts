@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { QuizGameTypeOrmRepo } from '../QuizGame.TypeOrmRepo';
 import { NewestPostLike } from '../../../Users/Type/User.type';
 import { PaginationQueryType } from '../../../qurey-repo/query-filter';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class GetHistoryGameByPlayerCommand {
   constructor(
@@ -10,11 +11,16 @@ export class GetHistoryGameByPlayerCommand {
   ) {}
 }
 
-@Injectable()
-export class GetHistoryGameByPlayerUseCase {
+@CommandHandler(GetHistoryGameByPlayerCommand)
+export class GetHistoryGameByPlayerUseCase
+  implements ICommandHandler<GetHistoryGameByPlayerCommand>
+{
   constructor(protected quizGameRepo: QuizGameTypeOrmRepo) {}
 
-  async execute(userModel: NewestPostLike, query: PaginationQueryType) {
-    return this.quizGameRepo.getHistoryGameByPlayerRepository(userModel, query);
+  async execute(command: GetHistoryGameByPlayerCommand) {
+    return this.quizGameRepo.getHistoryGameByPlayerRepository(
+      command.userModel,
+      command.query,
+    );
   }
 }

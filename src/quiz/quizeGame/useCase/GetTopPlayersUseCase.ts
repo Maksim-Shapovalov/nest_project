@@ -5,13 +5,16 @@ import { QuizGameEntityNotPlayerInfo } from '../../entity/QuizGame.entity';
 import { Repository } from 'typeorm';
 import { QueryTypeToTopPlayers } from '../../../Other/Query.Type';
 import { QuizGameService } from '../QuizGame.service';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class GetTopPlayersCommand {
   constructor(public query: QueryTypeToTopPlayers) {}
 }
 
-@Injectable()
-export class GetTopPlayersUseCase {
+@CommandHandler(GetTopPlayersCommand)
+export class GetTopPlayersUseCase
+  implements ICommandHandler<GetTopPlayersCommand>
+{
   constructor(
     protected quizGameRepo: QuizGameTypeOrmRepo,
     @InjectRepository(QuizGameEntityNotPlayerInfo)
@@ -19,7 +22,7 @@ export class GetTopPlayersUseCase {
     protected quizGameService: QuizGameService,
   ) {}
 
-  async execute(query: QueryTypeToTopPlayers) {
+  async execute(command: GetTopPlayersCommand) {
     const findPlayer = await this.quizGameRepo.getTopPlayers();
     const countPlayer = findPlayer.length;
     const uniqueUserIds = new Set<string>();
@@ -46,14 +49,13 @@ export class GetTopPlayersUseCase {
     const filteredPlayers = findAllPairByPlayerId.filter(
       (player) => player !== null,
     );
-    const querySort = query.sortBy;
+    const querySort = command.query.sortBy;
     const optionsSorted = {};
     querySort.forEach((param) => {
       const [field, direction] = param.split(' ');
       if (field && direction) {
         optionsSorted[field] = direction as 'asc' | 'desc';
       }
-      console.log(1);
     });
     const sortedItems = filteredPlayers.sort((a, b) => {
       for (const param of querySort) {
@@ -83,9 +85,9 @@ export class GetTopPlayersUseCase {
       return 0; // Если все поля равны
     });
     return {
-      pagesCount: Math.ceil(countPlayer / query.pageSize),
-      page: query.pageNumber,
-      pageSize: query.pageSize,
+      pagesCount: Math.ceil(countPlayer / command.query.pageSize),
+      page: command.query.pageNumber,
+      pageSize: command.query.pageSize,
       totalCount: countPlayer,
       items: sortedItems,
     };

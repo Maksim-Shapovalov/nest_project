@@ -10,13 +10,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NewestPostLike } from '../../../Users/Type/User.type';
 import { QuizGameService } from '../QuizGame.service';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class FindActivePairCommand {
   constructor(public userModel: NewestPostLike) {}
 }
 
-@Injectable()
-export class FindActivePairUseCase {
+@CommandHandler(FindActivePairCommand)
+export class FindActivePairUseCase
+  implements ICommandHandler<FindActivePairCommand>
+{
   constructor(
     protected quizGameRepo: QuizGameTypeOrmRepo,
     @InjectRepository(QuizGameEntityNotPlayerInfo)
@@ -25,23 +28,24 @@ export class FindActivePairUseCase {
   ) {}
 
   async execute(
-    userModel: NewestPostLike,
+    command: FindActivePairCommand,
+    // userModel: NewestPostLike,
   ): Promise<ViewModelPairToOutput | false> {
     const now = new Date().toISOString();
     const currentPair = await this.quizGameRepo.findPendingStatusPair(
-      userModel.userId,
+      command.userModel.userId,
     );
     if (currentPair === 'Active') return false;
     else if (!currentPair) {
-      return await this.createPair(userModel);
+      return await this.createPair(command.userModel);
     }
     const updateBodyPairConnectSecondUser =
       await this.quizGameRepo.connectSecondUserWithFirstUserRepo(
-        userModel,
+        command.userModel,
         now,
       );
     const game = await this.quizGameService.getGameById(currentPair.id);
-    if (!game) return await this.createPair(userModel);
+    if (!game) return await this.createPair(command.userModel);
     const findFirstPlayer = await this.quizGameRepo.findPlayerById(
       updateBodyPairConnectSecondUser.firstPlayerId,
     );
