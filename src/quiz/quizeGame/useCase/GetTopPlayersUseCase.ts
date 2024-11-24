@@ -55,19 +55,31 @@ export class GetTopPlayersUseCase {
       }
     });
     const sortedItems = filteredPlayers.sort((a, b) => {
-      for (const field in optionsSorted) {
-        const direction = optionsSorted[field];
+      for (const param of querySort) {
+        const [field, direction] = param.split(' ');
         const aValue = a[field];
         const bValue = b[field];
 
-        if (aValue < bValue) {
-          return direction === 'asc' ? -1 : 1;
-        }
-        if (aValue > bValue) {
-          return direction === 'asc' ? 1 : -1;
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          if (aValue < bValue) {
+            return direction === 'asc' ? -1 : 1;
+          }
+          if (aValue > bValue) {
+            return direction === 'asc' ? 1 : -1;
+          }
+        } else {
+          // Предполагаем, что это числа
+          const aNum = parseFloat(aValue);
+          const bNum = parseFloat(bValue);
+          if (aNum < bNum) {
+            return direction === 'asc' ? -1 : 1;
+          }
+          if (aNum > bNum) {
+            return direction === 'asc' ? 1 : -1;
+          }
         }
       }
-      return 0;
+      return 0; // Если все поля равны
     });
     return {
       pagesCount: Math.ceil(countPlayer / query.pageSize),
