@@ -164,8 +164,10 @@ export class QuizGameTypeOrmRepo {
     const numberOfResponse = findPlayer_0.answers.length;
 
     if (numberOfResponse === 5) {
-      const verifyAnswerTwoPlayer =
-        await this.endGameAndCountingScore(findPlayer_0);
+      const verifyAnswerTwoPlayer = await this.endGameAndCountingScore(
+        findPlayer_0,
+        findPair.id,
+      );
       if (!verifyAnswerTwoPlayer) return false;
     }
     const num = findPair.question.slice(numberOfResponse)[0];
@@ -187,8 +189,10 @@ export class QuizGameTypeOrmRepo {
     await this.changeScoreToPlayer(scoreChange, findPlayer_0.id, savedAnswer);
     const findPlayer = await this.findPlayer(id, findPair.id);
     if (findPlayer.answers.length === 5) {
-      const verifyAnswerTwoPlayer =
-        await this.endGameAndCountingScore(findPlayer_0);
+      const verifyAnswerTwoPlayer = await this.endGameAndCountingScore(
+        findPlayer_0,
+        findPair.id,
+      );
       if (!verifyAnswerTwoPlayer) return false;
       if (typeof verifyAnswerTwoPlayer !== 'boolean') {
         await this.addBonusPoint(verifyAnswerTwoPlayer);
@@ -314,11 +318,12 @@ export class QuizGameTypeOrmRepo {
     return pendingPair ? pendingPair : false;
   }
 
-  async endGameAndCountingScore(player: findingPlayer) {
+  async endGameAndCountingScore(player: findingPlayer, gameId: string) {
     const now = new Date().toISOString();
 
     const findPair_0 = await this.quizGameEntityNotPlayerInfo.findOne({
-      where: [{ firstPlayerId: player.id }, { secondPlayerId: player.id }],
+      // where: [{ firstPlayerId: player.id }, { secondPlayerId: player.id }],
+      where: { id: gameId },
       relations: {
         question: true,
       },
