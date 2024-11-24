@@ -129,7 +129,7 @@ export function queryFilterByTopPlayer(
   query: QueryTypeToTopPlayers,
 ): QueryTypeToTopPlayers {
   const defaultFilter: QueryTypeToTopPlayers = {
-    sortBy: ['avgScores desc', 'sumScore desc'],
+    sortBy: ['sumScore desc', 'avgScores desc'],
     pageNumber: 1,
     pageSize: 10,
   };

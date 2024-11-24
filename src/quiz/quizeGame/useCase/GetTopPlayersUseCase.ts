@@ -50,6 +50,7 @@ export class GetTopPlayersUseCase
       (player) => player !== null,
     );
     const querySort = command.query.sortBy;
+    console.log(querySort, 'querySort-------');
     const optionsSorted = {};
     querySort.forEach((param) => {
       const [field, direction] = param.split(' ');
@@ -58,21 +59,21 @@ export class GetTopPlayersUseCase
       }
     });
     console.log(querySort, 'querySort-------');
-    // const [field, direction] = querySort.split(' ');
     const sortedItems = filteredPlayers.sort((a, b) => {
       for (const param of querySort) {
         const [field, direction] = param.split(' ');
-        console.log(field, direction, 'field, direction---------------');
-
         const aValue = a[field];
         const bValue = b[field];
         console.log(aValue, bValue, 'value-----------');
 
-        if (aValue < bValue) return direction === 'asc' ? -1 : 1;
-        if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+        if (aValue > bValue) return direction === 'desc' ? -1 : 1;
+        if (aValue < bValue) return direction === 'desc' ? 1 : -1;
       }
       return 0;
     });
+    const startIndex = (command.query.pageNumber - 1) * command.query.pageSize;
+    const endIndex = startIndex + command.query.pageSize;
+    const paginatedItems = sortedItems.slice(startIndex, endIndex);
 
     // const sortedItems_1 = filteredPlayers.sort((a, b) => {
     //   for (const param of querySort) {
@@ -98,7 +99,7 @@ export class GetTopPlayersUseCase
       page: command.query.pageNumber,
       pageSize: command.query.pageSize,
       totalCount: countPlayer,
-      items: sortedItems,
+      items: paginatedItems,
     };
   }
 }
