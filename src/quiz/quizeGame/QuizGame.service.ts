@@ -31,7 +31,9 @@ export class QuizGameService {
   async getStatisticPlayer(playerId: string) {
     const findAllPairByPlayerId =
       await this.quizGameRepo.getAllPairByPlayerId(playerId);
+    console.log(findAllPairByPlayerId);
     const quantityPair = findAllPairByPlayerId.length;
+    console.log(quantityPair);
     const pairWhereFirstPlayer = findAllPairByPlayerId.filter(
       (p) => p.firstPlayer.userId === playerId,
     );

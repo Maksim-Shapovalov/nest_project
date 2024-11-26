@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In, Not, Repository } from 'typeorm';
 import {
   BaseTypeQuizGame,
   QuizGameClass3,
@@ -89,12 +89,18 @@ export class QuizGameTypeOrmRepo {
       items: items,
     };
   }
-
+  // {status: In([StatusTypeEnum.Active, StatusTypeEnum.PendingSecondPlayer])}
   async getAllPairByPlayerId(playerId: string) {
     return this.quizGameEntityNotPlayerInfo.find({
       where: [
-        { firstPlayer: { userId: playerId } },
-        { secondPlayer: { userId: playerId } },
+        {
+          firstPlayer: { userId: playerId },
+          status: Not(StatusTypeEnum.PendingSecondPlayer),
+        },
+        {
+          secondPlayer: { userId: playerId },
+          status: Not(StatusTypeEnum.PendingSecondPlayer),
+        },
       ],
       relations: { firstPlayer: true, secondPlayer: true },
     });
@@ -260,7 +266,7 @@ export class QuizGameTypeOrmRepo {
   }
   async findPlayerByUserId(id: string): Promise<PlayersEntity> {
     return this.playersEntity.findOne({
-      where: { userId: id },
+      where: { userId: id, game: { status: StatusTypeEnum.Active } },
       relations: { answers: true },
     });
   }
