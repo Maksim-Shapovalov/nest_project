@@ -238,8 +238,8 @@ export class QuizGameTypeOrmRepo {
       },
       relations: {
         question: true,
-        firstPlayer: true,
-        secondPlayer: true,
+        firstPlayer: { answers: true },
+        secondPlayer: { answers: true },
       },
     });
     if (!findPair) return false;
