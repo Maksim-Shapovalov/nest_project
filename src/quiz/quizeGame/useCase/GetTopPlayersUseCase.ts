@@ -23,13 +23,12 @@ export class GetTopPlayersUseCase
   ) {}
 
   async execute(command: GetTopPlayersCommand) {
-    console.log(command.query, 'query------------');
     const findPlayer = await this.quizGameRepo.getTopPlayers();
     const uniqueUserIds = new Set<string>();
     const findAllPairByPlayerId = await Promise.all(
       findPlayer.map(async (player) => {
         if (!uniqueUserIds.has(player.userId)) {
-          uniqueUserIds.add(player.userId); // Добавляем userId в Set
+          uniqueUserIds.add(player.userId);
 
           const staticPlayer = await this.quizGameService.getStatisticPlayer(
             player.userId,
@@ -50,8 +49,7 @@ export class GetTopPlayersUseCase
       (player) => player !== null,
     );
     const countPlayer = filteredPlayers.length;
-    const querySort = command.query.sortBy;
-    console.log(querySort, 'querySort----------');
+    let querySort = command.query.sortBy;
     const optionsSorted = {};
     if (Array.isArray(command.query.sortBy)) {
       querySort.forEach((param) => {
@@ -61,13 +59,16 @@ export class GetTopPlayersUseCase
         }
       });
     }
+    if (typeof querySort === 'string') {
+      querySort = [querySort];
+    }
     // querySort.forEach((param) => {
     //   const [field, direction] = param.split(' ');
     //   if (field && direction) {
     //     optionsSorted[field] = direction as 'asc' | 'desc';
     //   }
     // });
-
+    // console.log(filteredPlayers, 'filteredPlayers-----------');
     const sortedItems = filteredPlayers.sort((a, b) => {
       for (const param of querySort) {
         const [field, direction] = param.split(' ');
