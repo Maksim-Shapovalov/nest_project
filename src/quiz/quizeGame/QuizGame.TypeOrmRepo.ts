@@ -35,26 +35,6 @@ export class QuizGameTypeOrmRepo {
 
   async getTopPlayers() {
     return this.playersEntity.find({});
-
-    // const [allPlayers, countPlayer] = await this.playersEntity.findAndCount({
-    //   order: {
-    //     ...optionsSorted,
-    //   },
-    // });
-    // const itemsPromises = allPlayers.map((player) => {
-    //   return {
-    //     id: player.userId,
-    //     login: player.login,
-    //   };
-    // });
-    // const items = await Promise.all(itemsPromises);
-    // return {
-    //   pagesCount: Math.ceil(countPlayer / query.pageSize),
-    //   page: query.pageNumber,
-    //   pageSize: query.pageSize,
-    //   totalCount: countPlayer,
-    //   items: items,
-    // };
   }
 
   async getHistoryGameByPlayerRepository(
@@ -143,9 +123,8 @@ export class QuizGameTypeOrmRepo {
   async updateAnswerToPlayerIdInGame(
     id: string,
     answer: string,
-  ): Promise<updateTypeOfQuestion1 | false> {
+  ): Promise<updateTypeOfQuestion1> {
     const now = new Date().toISOString();
-    // await this.endGameAndCountingScore1(id);
     const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: [
         {
@@ -159,19 +138,9 @@ export class QuizGameTypeOrmRepo {
       ],
       relations: ['question'],
     });
-    if (!findPair) return false;
-    const findPlayer_0 = await this.findPlayer(id, findPair.id);
-    const numberOfResponse = findPlayer_0.answers.length;
-
-    if (numberOfResponse === 5) {
-      const verifyAnswerTwoPlayer = await this.endGameAndCountingScore(
-        findPlayer_0,
-        findPair.id,
-      );
-      if (!verifyAnswerTwoPlayer) return false;
-    }
+    const findPlayer = await this.findPlayer(id, findPair.id);
+    const numberOfResponse = findPlayer.answers.length;
     const num = findPair.question.slice(numberOfResponse)[0];
-    if (!num) return false;
     const findQuestion = await this.questionsEntity.findOne({
       where: { id: num.id },
     });
@@ -182,22 +151,33 @@ export class QuizGameTypeOrmRepo {
       answerStatus: findQuestion.correctAnswers.includes(answer)
         ? StatusTypeEnumByAnswersToEndpoint.correct
         : StatusTypeEnumByAnswersToEndpoint.incorrect,
-      playerId: findPlayer_0.id,
+      playerId: findPlayer.id,
     });
     const savedAnswer = await this.answersEntity.save(addAnswer);
     const scoreChange = findQuestion.correctAnswers.includes(answer) ? 1 : 0;
-    await this.changeScoreToPlayer(scoreChange, findPlayer_0.id, savedAnswer);
-    const findPlayer = await this.findPlayer(id, findPair.id);
-    if (findPlayer.answers.length === 5) {
-      const verifyAnswerTwoPlayer = await this.endGameAndCountingScore(
-        findPlayer_0,
-        findPair.id,
-      );
-      if (!verifyAnswerTwoPlayer) return false;
-      if (typeof verifyAnswerTwoPlayer !== 'boolean') {
-        await this.addBonusPoint(verifyAnswerTwoPlayer);
-      }
+    await this.changeScoreToPlayer(scoreChange, findPlayer.id, savedAnswer);
+    const pair = await this.getGameById(findPair.id);
+    if (
+      pair &&
+      pair.firstPlayer.answers.length === 5 &&
+      pair.secondPlayer.answers.length === 5
+    ) {
+      pair.finishGameDate = new Date().toISOString();
+      pair.status = StatusTypeEnum.Finished;
+      const savePair = await this.quizGameEntityNotPlayerInfo.save(pair);
+      await this.addBonusPoint(savePair);
     }
+
+    // const findPlayer = await this.findPlayer(id, findPair.id);
+    // if (findPlayer.answers.length === 5) {
+    //   const verifyAnswerTwoPlayer = await this.endGameAndCountingScore(
+    //     findPlayer,
+    //     findPair.id,
+    //   );
+    //   if (typeof verifyAnswerTwoPlayer !== 'boolean') {
+    //     await this.addBonusPoint(verifyAnswerTwoPlayer);
+    //   }
+    // }
     const returnAnswer = await this.answersEntity.findOne({
       where: { id: savedAnswer.id },
     });
@@ -243,10 +223,7 @@ export class QuizGameTypeOrmRepo {
     player.score = player.score + point;
     player.answers.push(addAnswer);
     await this.playersEntity.save(player);
-    return this.playersEntity.findOne({
-      where: { id: idPlayer },
-      relations: ['answers'],
-    });
+    return true;
   }
   async getGameById(id: string): Promise<BaseTypeQuizGame | false> {
     const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
@@ -278,6 +255,12 @@ export class QuizGameTypeOrmRepo {
     if (id === null) return null;
     return this.playersEntity.findOne({
       where: { id: id },
+      relations: { answers: true },
+    });
+  }
+  async findPlayerByUserId(id: string): Promise<PlayersEntity> {
+    return this.playersEntity.findOne({
+      where: { userId: id },
       relations: { answers: true },
     });
   }

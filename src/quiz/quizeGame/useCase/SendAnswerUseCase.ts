@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
 import { QuizGameTypeOrmRepo } from '../QuizGame.TypeOrmRepo';
-import { AnswerType, updateTypeOfQuestion1 } from '../../type/QuizGame.type';
+import { AnswerType } from '../../type/QuizGame.type';
 import { QuizGameEntityNotPlayerInfo } from '../../entity/QuizGame.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -21,12 +20,10 @@ export class SendAnswerUseCase implements ICommandHandler<SendAnswerCommand> {
     protected quizGameEntityNotPlayerInfo: Repository<QuizGameEntityNotPlayerInfo>,
   ) {}
 
-  async execute(command: SendAnswerCommand): Promise<AnswerType | false> {
-    const findPlayerInGame: updateTypeOfQuestion1 | false =
-      await this.quizGameRepo.updateAnswerToPlayerIdInGame(
-        command.user.userId,
-        command.answer,
-      );
-    return findPlayerInGame ? findPlayerInGame : false;
+  async execute(command: SendAnswerCommand): Promise<AnswerType> {
+    return this.quizGameRepo.updateAnswerToPlayerIdInGame(
+      command.user.userId,
+      command.answer,
+    );
   }
 }

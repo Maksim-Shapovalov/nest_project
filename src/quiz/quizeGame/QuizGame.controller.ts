@@ -33,6 +33,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { GetHistoryGameByPlayerCommand } from './useCase/GetHistoryGameByPlayerUseCase';
 import { GetTopPlayersCommand } from './useCase/GetTopPlayersUseCase';
 import { GetUnfinishedCurrentGameCommand } from './useCase/GetUnfinishedCurrentGameUseCase';
+import { NoMoreFiveAnswersGuard } from '../middleware/NoMoreFiveAnswersGuard';
 
 @Controller('pair-game-quiz')
 export class QuizGameController {
@@ -103,18 +104,16 @@ export class QuizGameController {
     return findPairWithOneUser;
   }
 
-  @UseGuards(BearerGuard)
+  @UseGuards(BearerGuard, NoMoreFiveAnswersGuard)
   @Post('pairs/my-current/answers')
   @HttpCode(200)
   async sendAnswer(
     @Body() answer: AnswerInput,
     @User() userModel: NewestPostLike,
   ) {
-    const sendAnswer: AnswerType | false | string =
-      await this.commandBus.execute(
-        new SendAnswerCommand(answer.answer, userModel),
-      );
-    if (!sendAnswer) throw new ForbiddenException();
+    const sendAnswer: AnswerType = await this.commandBus.execute(
+      new SendAnswerCommand(answer.answer, userModel),
+    );
     return sendAnswer;
   }
 }
