@@ -51,13 +51,23 @@ export class GetTopPlayersUseCase
     );
     const countPlayer = filteredPlayers.length;
     const querySort = command.query.sortBy;
+    console.log(querySort, 'querySort----------');
     const optionsSorted = {};
-    querySort.forEach((param) => {
-      const [field, direction] = param.split(' ');
-      if (field && direction) {
-        optionsSorted[field] = direction as 'asc' | 'desc';
-      }
-    });
+    if (Array.isArray(command.query.sortBy)) {
+      querySort.forEach((param) => {
+        const [field, direction] = param.split(' ');
+        if (field && direction) {
+          optionsSorted[field] = direction as 'asc' | 'desc';
+        }
+      });
+    }
+    // querySort.forEach((param) => {
+    //   const [field, direction] = param.split(' ');
+    //   if (field && direction) {
+    //     optionsSorted[field] = direction as 'asc' | 'desc';
+    //   }
+    // });
+
     const sortedItems = filteredPlayers.sort((a, b) => {
       for (const param of querySort) {
         const [field, direction] = param.split(' ');
