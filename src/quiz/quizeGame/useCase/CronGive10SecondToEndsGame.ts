@@ -39,6 +39,7 @@ export class Gives10SecondToEndsGameCase
       foundActivePairWith5ResponseOnePlayer &&
       foundActivePairWith5ResponseOnePlayer.length > 0
     ) {
+      console.log('----');
       for (let i = 0; i < foundActivePairWith5ResponseOnePlayer.length; i++) {
         const playerWhere5Answers =
           foundActivePairWith5ResponseOnePlayer[i].firstPlayer.answers
@@ -114,22 +115,16 @@ export class Gives10SecondToEndsGameCase
     const now = new Date();
     if (this.scheduledCommands.length > 0) {
       for (const scheduled of [...this.scheduledCommands]) {
-        // if (scheduled.date <= now) {
         if (new Date(scheduled.command.executionTime) <= now) {
-          console.log(scheduled.command.executionTime);
-          console.log(now);
-          console.log(new Date(scheduled.command.executionTime) <= now);
           const resultToAddIncorrectAnswers = await this.AddNewIncorrectAnswer(
             scheduled.pair,
             new Date(scheduled.command.executionTime),
           );
-          if (resultToAddIncorrectAnswers)
+          if (resultToAddIncorrectAnswers) {
             await this.clearDataScheduleCommand();
+          }
         }
       }
     }
   }
 }
-/*
-
- */
