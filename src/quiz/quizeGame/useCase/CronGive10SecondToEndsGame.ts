@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 
 import { QuizGameTypeOrmRepo } from '../QuizGame.TypeOrmRepo';
 import { Cron } from '@nestjs/schedule';
-import { scheduled } from 'rxjs';
 
 export class Gives10SecondToEndsGameCommand {
   constructor(public executionTime: string) {}
@@ -67,7 +66,7 @@ export class Gives10SecondToEndsGameCase
     expirationDate: Date,
   ) {
     const now = new Date();
-    if (expirationDate >= now) {
+    if (expirationDate > now) {
       console.log('Command execution time has not arrived yet');
     } else {
       for (const pair of AllPairWhere1PlayerGiveAllAnswers) {
@@ -117,9 +116,12 @@ export class Gives10SecondToEndsGameCase
       for (const scheduled of [...this.scheduledCommands]) {
         // if (scheduled.date <= now) {
         if (new Date(scheduled.command.executionTime) <= now) {
+          console.log(scheduled.command.executionTime);
+          console.log(now);
+          console.log(new Date(scheduled.command.executionTime) <= now);
           const resultToAddIncorrectAnswers = await this.AddNewIncorrectAnswer(
             scheduled.pair,
-            scheduled.date,
+            new Date(scheduled.command.executionTime),
           );
           if (resultToAddIncorrectAnswers)
             await this.clearDataScheduleCommand();

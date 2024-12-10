@@ -127,8 +127,6 @@ export class QuizGameController {
     const expirationDate = new Date(
       new Date(sendAnswer.addedAt).getTime() + 9000,
     ).toISOString();
-    // const expirationDate = new Date(Date.now() + 9000).toISOString();
-    // const expirationDate = new Date().toISOString();
 
     await this.commandBus.execute(
       new Gives10SecondToEndsGameCommand(expirationDate),
