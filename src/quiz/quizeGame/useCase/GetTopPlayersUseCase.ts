@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { QuizGameTypeOrmRepo } from '../QuizGame.TypeOrmRepo';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QuizGameEntityNotPlayerInfo } from '../../entity/QuizGame.entity';
@@ -62,13 +61,6 @@ export class GetTopPlayersUseCase
     if (typeof querySort === 'string') {
       querySort = [querySort];
     }
-    // querySort.forEach((param) => {
-    //   const [field, direction] = param.split(' ');
-    //   if (field && direction) {
-    //     optionsSorted[field] = direction as 'asc' | 'desc';
-    //   }
-    // });
-    // console.log(filteredPlayers, 'filteredPlayers-----------');
     const sortedItems = filteredPlayers.sort((a, b) => {
       for (const param of querySort) {
         const [field, direction] = param.split(' ');

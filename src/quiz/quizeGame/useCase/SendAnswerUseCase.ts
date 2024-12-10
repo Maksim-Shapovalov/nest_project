@@ -20,7 +20,7 @@ export class SendAnswerUseCase implements ICommandHandler<SendAnswerCommand> {
     protected quizGameEntityNotPlayerInfo: Repository<QuizGameEntityNotPlayerInfo>,
   ) {}
 
-  async execute(command: SendAnswerCommand): Promise<AnswerType> {
+  async execute(command: SendAnswerCommand): Promise<AnswerType | false> {
     return this.quizGameRepo.updateAnswerToPlayerIdInGame(
       command.user.userId,
       command.answer,

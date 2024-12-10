@@ -34,20 +34,29 @@ import { GetHistoryGameByPlayerCommand } from './useCase/GetHistoryGameByPlayerU
 import { GetTopPlayersCommand } from './useCase/GetTopPlayersUseCase';
 import { GetUnfinishedCurrentGameCommand } from './useCase/GetUnfinishedCurrentGameUseCase';
 import { NoMoreFiveAnswersGuard } from '../middleware/NoMoreFiveAnswersGuard';
+import {
+  Gives10SecondToEndsGameCase,
+  Gives10SecondToEndsGameCommand,
+} from './useCase/CronGive10SecondToEndsGame';
+import {
+  Cron,
+  CronExpression,
+  Interval,
+  SchedulerRegistry,
+} from '@nestjs/schedule';
 
 @Controller('pair-game-quiz')
 export class QuizGameController {
   constructor(
     private commandBus: CommandBus,
     protected quizGameService: QuizGameService,
+    private gives10SecondsToEndsGameCase: Gives10SecondToEndsGameCase,
   ) {}
 
   @Get('users/top')
   @HttpCode(200)
   async getTopPlayer(@Query() query: QueryTypeToTopPlayers) {
-    console.log(query, 'query');
     const filter = queryFilterByTopPlayer(query);
-    console.log(filter, 'filter-----------');
     return this.commandBus.execute(new GetTopPlayersCommand(filter));
   }
   @UseGuards(BearerGuard)
@@ -103,7 +112,6 @@ export class QuizGameController {
     if (!findPairWithOneUser) throw new ForbiddenException();
     return findPairWithOneUser;
   }
-
   @UseGuards(BearerGuard, NoMoreFiveAnswersGuard)
   @Post('pairs/my-current/answers')
   @HttpCode(200)
@@ -111,8 +119,19 @@ export class QuizGameController {
     @Body() answer: AnswerInput,
     @User() userModel: NewestPostLike,
   ) {
-    const sendAnswer: AnswerType = await this.commandBus.execute(
+    const sendAnswer: AnswerType | false = await this.commandBus.execute(
       new SendAnswerCommand(answer.answer, userModel),
+    );
+    if (!sendAnswer) throw new ForbiddenException();
+
+    const expirationDate = new Date(
+      new Date(sendAnswer.addedAt).getTime() + 9000,
+    ).toISOString();
+    // const expirationDate = new Date(Date.now() + 9000).toISOString();
+    // const expirationDate = new Date().toISOString();
+
+    await this.commandBus.execute(
+      new Gives10SecondToEndsGameCommand(expirationDate),
     );
     return sendAnswer;
   }

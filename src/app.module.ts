@@ -80,6 +80,8 @@ import { GetUnfinishedCurrentGameUseCase } from './quiz/quizeGame/useCase/GetUnf
 import { FindActivePairUseCase } from './quiz/quizeGame/useCase/FindActivePairUseCase';
 import { SendAnswerUseCase } from './quiz/quizeGame/useCase/SendAnswerUseCase';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ScheduleModule } from '@nestjs/schedule';
+import { Gives10SecondToEndsGameCase } from './quiz/quizeGame/useCase/CronGive10SecondToEndsGame';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -114,6 +116,7 @@ const useCases = [
   GetUnfinishedCurrentGameUseCase,
   FindActivePairUseCase,
   SendAnswerUseCase,
+  Gives10SecondToEndsGameCase,
 ];
 const service = [
   BlogsService,
@@ -152,6 +155,7 @@ const service = [
       QuestionsEntity,
       PlayersEntity,
     ]),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         ttl: 10000,
