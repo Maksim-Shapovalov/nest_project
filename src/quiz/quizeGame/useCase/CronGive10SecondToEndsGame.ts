@@ -185,15 +185,36 @@ export class Gives10SecondToEndsGameCase
   private async clearDataScheduleCommand() {
     this.scheduledCommands1.slice();
   }
+  // @Cron('* * * * * *')
+  // async handleCron() {
+  //   const now = new Date();
+  //   if (this.scheduledCommands1.length > 0) {
+  //     for (const scheduled of [...this.scheduledCommands1]) {
+  //       if (new Date(scheduled.command) <= now) {
+  //         const resultToAddIncorrectAnswers = await this.AddNewIncorrectAnswer1(
+  //           scheduled.pair,
+  //           new Date(scheduled.command),
+  //         );
+  //         if (resultToAddIncorrectAnswers) {
+  //           await this.clearDataScheduleCommand();
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
   @Cron('* * * * * *')
   async handleCron() {
     const now = new Date();
     if (this.scheduledCommands1.length > 0) {
-      for (const scheduled of [...this.scheduledCommands1]) {
-        if (new Date(scheduled.command) <= now) {
+      for (
+        let scheduled = 0;
+        scheduled < this.scheduledCommands1.length;
+        scheduled++
+      ) {
+        if (new Date(this.scheduledCommands1[scheduled].command) <= now) {
           const resultToAddIncorrectAnswers = await this.AddNewIncorrectAnswer1(
-            scheduled.pair,
-            new Date(scheduled.command),
+            this.scheduledCommands1[scheduled].pair,
+            new Date(this.scheduledCommands1[scheduled].command),
           );
           if (resultToAddIncorrectAnswers) {
             await this.clearDataScheduleCommand();
