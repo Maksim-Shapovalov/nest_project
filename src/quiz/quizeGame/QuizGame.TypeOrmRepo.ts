@@ -17,6 +17,7 @@ import {
   StatusTypeEnumByAnswersToEndpoint,
 } from '../entity/QuizGame.entity';
 import { PaginationQueryType } from '../../qurey-repo/query-filter';
+import { not } from 'rxjs/internal/util/not';
 
 @Injectable()
 export class QuizGameTypeOrmRepo {
@@ -165,12 +166,28 @@ export class QuizGameTypeOrmRepo {
     });
     if (!findPair) return false;
     const findPlayer = await this.findPlayer(id, findPair.id);
+    console.log(2);
     if (findPlayer.answers.length === 5) return false;
+    console.log(3);
     const num = findPair.question.slice(findPlayer.answers.length)[0];
+    console.log(4);
     if (!num) return false;
+    console.log(5);
     const findQuestion = await this.questionsEntity.findOne({
       where: { id: num.id },
     });
+    const findAllAnswersWherePlayerAlreadyAnswered =
+      await this.answersEntity.find({
+        where: {
+          questionId: findQuestion.id,
+          playerId: findPlayer.id,
+          player: { game: { id: findPair.id } },
+        },
+      });
+    console.log(6);
+    console.log(findAllAnswersWherePlayerAlreadyAnswered);
+    if (findAllAnswersWherePlayerAlreadyAnswered.length > 0) return false;
+    console.log(7);
     const scoreChange = findQuestion.correctAnswers.includes(answer) ? 1 : 0;
     const addAnswer = await this.answersEntity.create({
       questionId: num.id,
@@ -185,6 +202,7 @@ export class QuizGameTypeOrmRepo {
     const savedAnswer = await this.answersEntity.save(addAnswer);
     await this.changeScoreToPlayer(scoreChange, findPlayer.id, savedAnswer);
     const pair = await this.getGameById(findPair.id);
+    console.log(8);
     if (!pair) return false;
     if (
       pair &&
@@ -196,6 +214,7 @@ export class QuizGameTypeOrmRepo {
       const savePair = await this.quizGameEntityNotPlayerInfo.save(pair);
       await this.addBonusPoint(savePair);
     }
+    console.log(9);
     // else if (
     //   pair &&
     //   (pair.firstPlayer.answers.length === 6 ||
@@ -218,7 +237,9 @@ export class QuizGameTypeOrmRepo {
     const returnAnswer = await this.answersEntity.findOne({
       where: { id: savedAnswer.id },
     });
+    console.log(10);
     if (!returnAnswer) return false;
+    console.log(11);
     return {
       ...returnAnswer,
       questionId: returnAnswer.questionId.toString(),
@@ -248,10 +269,12 @@ export class QuizGameTypeOrmRepo {
     });
   }
   async findPlayerByUserId(id: string): Promise<PlayersEntity> {
-    return this.playersEntity.findOne({
+    const user = await this.playersEntity.findOne({
       where: { userId: id, game: { status: StatusTypeEnum.Active } },
       relations: { answers: true },
     });
+    console.log(user, 'user');
+    return user;
   }
 
   async findPendingStatusPair(

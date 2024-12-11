@@ -13,8 +13,11 @@ export class NoMoreFiveAnswersGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const userModel = request.user.userId;
+    console.log(userModel);
+    console.log(request.user, 'request.user');
     const playerWithUserId =
       await this.quizGameRepo.findPlayerByUserId(userModel);
+    console.log(playerWithUserId, 'playerWithUserId');
     if (playerWithUserId.answers.length === 5) {
       throw new ForbiddenException();
     }
