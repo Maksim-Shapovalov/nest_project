@@ -25,7 +25,7 @@ export class Gives10SecondToEndsGameCase
     protected quizGameRepo: QuizGameTypeOrmRepo,
   ) {}
   async execute(command: Gives10SecondToEndsGameCommand) {
-    const expirationDate = new Date(command.executionTime);
+    // const expirationDate = new Date(command.executionTime);
     // const now = new Date();
     const foundActivePairWith5ResponseOnePlayer =
       await this.quizGameRepo.getActivePairWhereOnePlayerAnsweredAllQuestions();
@@ -39,22 +39,26 @@ export class Gives10SecondToEndsGameCase
       foundActivePairWith5ResponseOnePlayer &&
       foundActivePairWith5ResponseOnePlayer.length > 0
     ) {
-      console.log('----');
       for (let i = 0; i < foundActivePairWith5ResponseOnePlayer.length; i++) {
         const playerWhere5Answers =
           foundActivePairWith5ResponseOnePlayer[i].firstPlayer.answers
             .length === 5
             ? foundActivePairWith5ResponseOnePlayer[i].firstPlayer
             : foundActivePairWith5ResponseOnePlayer[i].secondPlayer;
-        const timeTheLastAnswers = playerWhere5Answers.answers.at(-1);
-        this.scheduleCommand(
-          new Date(timeTheLastAnswers.addedAt),
-          foundActivePairWith5ResponseOnePlayer,
-        );
-        await this.AddNewIncorrectAnswer(
-          foundActivePairWith5ResponseOnePlayer,
-          expirationDate,
-        );
+        console.log(foundActivePairWith5ResponseOnePlayer.length);
+        if (playerWhere5Answers.answers.length === 5) {
+          const timeTheLastAnswers = playerWhere5Answers.answers.at(-1);
+          console.log(timeTheLastAnswers);
+          this.scheduleCommand(
+            new Date(timeTheLastAnswers.addedAt),
+            foundActivePairWith5ResponseOnePlayer,
+          );
+          // await this.AddNewIncorrectAnswer(
+          //   foundActivePairWith5ResponseOnePlayer,
+          //   expirationDate,
+          // );
+        }
+
         // await this.AddNewIncorrectAnswer(
         //   foundActivePairWith5ResponseOnePlayer,
         //   expirationDate,
@@ -72,7 +76,7 @@ export class Gives10SecondToEndsGameCase
     } else {
       for (const pair of AllPairWhere1PlayerGiveAllAnswers) {
         if (!pair.firstPlayer || !pair.secondPlayer) {
-          console.log('One of the players is missing in the pair:', pair);
+          console.log('One of the players is missing in the pair:');
           continue;
         }
         const playerWhoDoesntHave5Answers =
@@ -98,7 +102,7 @@ export class Gives10SecondToEndsGameCase
     needingPair: QuizGameEntityNotPlayerInfo[],
   ) {
     const command = new Gives10SecondToEndsGameCommand(
-      new Date(answerDate.getTime() + 9500).toISOString(),
+      new Date(answerDate.getTime() + 9300).toISOString(),
     );
     this.scheduledCommands.push({
       date: answerDate,

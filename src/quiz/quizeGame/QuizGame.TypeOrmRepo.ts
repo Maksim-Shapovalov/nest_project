@@ -168,6 +168,7 @@ export class QuizGameTypeOrmRepo {
     const numberOfResponse = findPlayer.answers.length;
     if (numberOfResponse === 5) return false;
     const num = findPair.question.slice(numberOfResponse)[0];
+    if (!num) return false;
     const findQuestion = await this.questionsEntity.findOne({
       where: { id: num.id },
     });
