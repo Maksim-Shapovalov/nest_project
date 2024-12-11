@@ -74,7 +74,6 @@ export class Gives10SecondToEndsGameCase
     if (expirationDate > now) {
       console.log('Command execution time has not arrived yet');
     } else {
-      const updatePromises = [];
       for (const pair of AllPairWhere1PlayerGiveAllAnswers) {
         if (!pair.firstPlayer || !pair.secondPlayer) {
           console.log('One of the players is missing in the pair:');
@@ -91,14 +90,8 @@ export class Gives10SecondToEndsGameCase
               playerWhoDoesntHave5Answers.userId,
               'incorrect',
             );
-          updatePromises.push(updateStatusGameAndAnswers);
+          if (!updateStatusGameAndAnswers) console.log('Not Found Pair');
         }
-        const results = await Promise.all(updatePromises);
-        results.forEach((updateStatusGameAndAnswers) => {
-          if (!updateStatusGameAndAnswers) {
-            console.log('Not Found Pair');
-          }
-        });
       }
       return true;
     }
@@ -109,7 +102,7 @@ export class Gives10SecondToEndsGameCase
     needingPair: QuizGameEntityNotPlayerInfo[],
   ) {
     const command = new Gives10SecondToEndsGameCommand(
-      new Date(answerDate.getTime() + 8800).toISOString(),
+      new Date(answerDate.getTime() + 9000).toISOString(),
     );
     this.scheduledCommands.push({
       date: answerDate,

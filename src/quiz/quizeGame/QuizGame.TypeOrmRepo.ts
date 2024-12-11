@@ -169,18 +169,17 @@ export class QuizGameTypeOrmRepo {
     if (findPlayer.answers.length === 5) return false;
     const num = findPair.question.slice(findPlayer.answers.length)[0];
     if (!num) return false;
-    const [findQuestion, findAllAnswersWherePlayerAlreadyAnswered] =
-      await Promise.all([
-        this.questionsEntity.findOne({ where: { id: num.id } }),
-        await this.answersEntity.find({
-          where: {
-            questionId: num.id,
-            playerId: findPlayer.id,
-            player: { game: { id: findPair.id } },
-          },
-        }),
-      ]);
-
+    const findQuestion = await this.questionsEntity.findOne({
+      where: { id: num.id },
+    });
+    const findAllAnswersWherePlayerAlreadyAnswered =
+      await this.answersEntity.find({
+        where: {
+          questionId: findQuestion.id,
+          playerId: findPlayer.id,
+          player: { game: { id: findPair.id } },
+        },
+      });
     if (findAllAnswersWherePlayerAlreadyAnswered.length > 0) return false;
     const scoreChange = findQuestion.correctAnswers.includes(answer) ? 1 : 0;
     const addAnswer = await this.answersEntity.create({

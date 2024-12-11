@@ -126,7 +126,7 @@ export class QuizGameController {
     if (!sendAnswer) throw new ForbiddenException();
 
     const expirationDate = new Date(
-      new Date(sendAnswer.addedAt).getTime() + 8800,
+      new Date(sendAnswer.addedAt).getTime() + 9000,
     ).toISOString();
 
     await this.commandBus.execute(
