@@ -165,26 +165,27 @@ export class QuizGameTypeOrmRepo {
     });
     if (!findPair) return false;
     const findPlayer = await this.findPlayer(id, findPair.id);
-    const numberOfResponse = findPlayer.answers.length;
-    if (numberOfResponse === 5) return false;
-    const num = findPair.question.slice(numberOfResponse)[0];
+    if (findPlayer.answers.length === 5) return false;
+    const num = findPair.question.slice(findPlayer.answers.length)[0];
     if (!num) return false;
     const findQuestion = await this.questionsEntity.findOne({
       where: { id: num.id },
     });
+    const scoreChange = findQuestion.correctAnswers.includes(answer) ? 1 : 0;
     const addAnswer = await this.answersEntity.create({
       questionId: num.id,
       answer: answer,
       addedAt: now,
-      answerStatus: findQuestion.correctAnswers.includes(answer)
-        ? StatusTypeEnumByAnswersToEndpoint.correct
-        : StatusTypeEnumByAnswersToEndpoint.incorrect,
+      answerStatus:
+        scoreChange === 1
+          ? StatusTypeEnumByAnswersToEndpoint.correct
+          : StatusTypeEnumByAnswersToEndpoint.incorrect,
       playerId: findPlayer.id,
     });
     const savedAnswer = await this.answersEntity.save(addAnswer);
-    const scoreChange = findQuestion.correctAnswers.includes(answer) ? 1 : 0;
     await this.changeScoreToPlayer(scoreChange, findPlayer.id, savedAnswer);
     const pair = await this.getGameById(findPair.id);
+    if (!pair) return false;
     if (
       pair &&
       pair.firstPlayer.answers.length === 5 &&
@@ -194,25 +195,26 @@ export class QuizGameTypeOrmRepo {
       pair.status = StatusTypeEnum.Finished;
       const savePair = await this.quizGameEntityNotPlayerInfo.save(pair);
       await this.addBonusPoint(savePair);
-    } else if (
-      pair &&
-      (pair.firstPlayer.answers.length === 6 ||
-        pair.secondPlayer.answers.length === 6)
-    ) {
-      const incorrectQuantityAnswers =
-        pair.firstPlayer.answers.length > 5
-          ? pair.firstPlayer.answers
-          : pair.secondPlayer.answers;
-      const questionIds = new Set();
-      const duplicateAnswers = incorrectQuantityAnswers.filter((answer) => {
-        if (questionIds.has(answer.questionId)) return true;
-        questionIds.add(answer.questionId);
-        return false;
-      });
-      for (let i = 0; i < duplicateAnswers.length; i++) {
-        await this.answersEntity.delete(duplicateAnswers[i]);
-      }
     }
+    // else if (
+    //   pair &&
+    //   (pair.firstPlayer.answers.length === 6 ||
+    //     pair.secondPlayer.answers.length === 6)
+    // ) {
+    //   const incorrectQuantityAnswers =
+    //     pair.firstPlayer.answers.length > 5
+    //       ? pair.firstPlayer.answers
+    //       : pair.secondPlayer.answers;
+    //   const questionIds = new Set();
+    //   const duplicateAnswers = incorrectQuantityAnswers.filter((answer) => {
+    //     if (questionIds.has(answer.questionId)) return true;
+    //     questionIds.add(answer.questionId);
+    //     return false;
+    //   });
+    //   for (let i = 0; i < duplicateAnswers.length; i++) {
+    //     await this.answersEntity.delete(duplicateAnswers[i]);
+    //   }
+    // }
     const returnAnswer = await this.answersEntity.findOne({
       where: { id: savedAnswer.id },
     });
@@ -279,7 +281,7 @@ export class QuizGameTypeOrmRepo {
       },
     });
     if (activePair) return 'Active';
-    else if (
+    if (
       pendingPair &&
       (pendingPair.firstPlayer.userId === userId ||
         pendingPair.secondPlayer?.userId === userId)
