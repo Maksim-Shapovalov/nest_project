@@ -127,6 +127,7 @@ export class Gives10SecondToEndsGameCase
           if (resultToAddIncorrectAnswers) {
             await this.clearDataScheduleCommand();
           }
+          return false;
         }
       }
     }
