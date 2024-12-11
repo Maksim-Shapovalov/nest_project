@@ -102,7 +102,7 @@ export class Gives10SecondToEndsGameCase
     needingPair: QuizGameEntityNotPlayerInfo[],
   ) {
     const command = new Gives10SecondToEndsGameCommand(
-      new Date(answerDate.getTime() + 9000).toISOString(),
+      new Date(answerDate.getTime() + 8000).toISOString(),
     );
     this.scheduledCommands.push({
       date: answerDate,
