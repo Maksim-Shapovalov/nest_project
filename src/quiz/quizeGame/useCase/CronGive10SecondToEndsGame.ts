@@ -131,5 +131,6 @@ export class Gives10SecondToEndsGameCase
         }
       }
     }
+    return false;
   }
 }
