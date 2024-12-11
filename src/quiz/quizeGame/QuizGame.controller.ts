@@ -135,7 +135,7 @@ export class QuizGameController {
         findPairWherePlayerGiveAnswer.secondPlayerProgress.answers.length === 5)
     ) {
       const expirationDate = new Date(
-        new Date(sendAnswer.addedAt).getTime() + 9000,
+        new Date(sendAnswer.addedAt).getTime() + 8000,
       ).toISOString();
       await this.commandBus.execute(
         new Gives10SecondToEndsGameCommand1(
