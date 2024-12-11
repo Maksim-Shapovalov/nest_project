@@ -37,6 +37,7 @@ import { NoMoreFiveAnswersGuard } from '../middleware/NoMoreFiveAnswersGuard';
 import {
   Gives10SecondToEndsGameCase,
   Gives10SecondToEndsGameCommand,
+  Gives10SecondToEndsGameCommand1,
 } from './useCase/CronGive10SecondToEndsGame';
 import {
   Cron,
@@ -124,14 +125,26 @@ export class QuizGameController {
     );
     console.log(1);
     if (!sendAnswer) throw new ForbiddenException();
+    const findPairWherePlayerGiveAnswer: ViewModelPairToOutput | false =
+      await this.commandBus.execute(
+        new GetUnfinishedCurrentGameCommand(userModel),
+      );
+    if (
+      findPairWherePlayerGiveAnswer &&
+      (findPairWherePlayerGiveAnswer.firstPlayerProgress.answers.length === 5 ||
+        findPairWherePlayerGiveAnswer.secondPlayerProgress.answers.length === 5)
+    ) {
+      const expirationDate = new Date(
+        new Date(sendAnswer.addedAt).getTime() + 9000,
+      ).toISOString();
+      await this.commandBus.execute(
+        new Gives10SecondToEndsGameCommand1(
+          expirationDate,
+          findPairWherePlayerGiveAnswer.id,
+        ),
+      );
+    }
 
-    const expirationDate = new Date(
-      new Date(sendAnswer.addedAt).getTime() + 9000,
-    ).toISOString();
-
-    await this.commandBus.execute(
-      new Gives10SecondToEndsGameCommand(expirationDate),
-    );
     return sendAnswer;
   }
 }
