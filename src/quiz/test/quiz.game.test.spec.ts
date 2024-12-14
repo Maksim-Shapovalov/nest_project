@@ -7,7 +7,7 @@ import { RouterPath } from '../../TestData/RouterPath';
 import { questionTestManager } from '../../TestData/questionManager';
 import { setting } from '../../setting';
 import { questionBody } from '../type/question.type';
-import { StatusTypeEnum } from '../type/QuizGame.type';
+import { StatusTypeEnum, ViewModelPairToOutput } from '../type/QuizGame.type';
 
 describe(' tests for QuizGame', () => {
   jest.setTimeout(100000);
@@ -22,18 +22,7 @@ describe(' tests for QuizGame', () => {
     await app.init();
 
     await request(app.getHttpServer()).delete(RouterPath.dataClear);
-  });
-  afterAll(async () => {
-    await app.close();
-  });
-  let createResponseFirstUser;
-  let createResponseSecondUser;
-  let questions: questionBody[];
-  const login = setting.Username;
-  const password = setting.Password;
-  let filterQuestionsByPublish;
-  let firstGameHave1playerAnd2Player;
-  it('--POST create user1,user2 and login All user', async () => {
+
     const firstUserBody = {
       login: 'hleb121',
       password: 'string',
@@ -48,7 +37,6 @@ describe(' tests for QuizGame', () => {
       usersTestManager(app).createUserAndLogin(firstUserBody),
       usersTestManager(app).createUserAndLogin(secondUserBody),
     ]);
-    console.log(createResponseFirstUser.body, createResponseSecondUser.body);
 
     expect(createResponseFirstUser.body).toEqual(
       expect.objectContaining({ accessToken: expect.any(String) }),
@@ -57,6 +45,40 @@ describe(' tests for QuizGame', () => {
       expect.objectContaining({ accessToken: expect.any(String) }),
     );
   });
+  afterAll(async () => {
+    await app.close();
+  });
+  let createResponseFirstUser;
+  let createResponseSecondUser;
+  let questions: questionBody[];
+  const login = setting.Username;
+  const password = setting.Password;
+  let filterQuestionsByPublish;
+  let firstGameHave1playerAnd2Player;
+  // it('--POST create user1,user2 and login All user', async () => {
+  //   const firstUserBody = {
+  //     login: 'hleb121',
+  //     password: 'string',
+  //     email: 'hleb.lukahonak@gmail.com',
+  //   };
+  //   const secondUserBody = {
+  //     login: 'hleb12',
+  //     password: 'string',
+  //     email: 'hleb.lukahonak@gmail.com',
+  //   };
+  //   [createResponseFirstUser, createResponseSecondUser] = await Promise.all([
+  //     usersTestManager(app).createUserAndLogin(firstUserBody),
+  //     usersTestManager(app).createUserAndLogin(secondUserBody),
+  //   ]);
+  //   console.log(createResponseFirstUser.body, createResponseSecondUser.body);
+  //
+  //   expect(createResponseFirstUser.body).toEqual(
+  //     expect.objectContaining({ accessToken: expect.any(String) }),
+  //   );
+  //   expect(createResponseSecondUser.body).toEqual(
+  //     expect.objectContaining({ accessToken: expect.any(String) }),
+  //   );
+  // });
   it('--POST create questions ', async () => {
     for (let i = 0; i <= 10; i++) {
       const bodyToCreateQuestion = {
@@ -179,7 +201,6 @@ describe(' tests for QuizGame', () => {
     };
     const createUser3 =
       await usersTestManager(app).createUserAndLogin(user3Body);
-
     const getPairById = await request(app.getHttpServer())
       .get(`${RouterPath.quizGame}/${firstGameHave1playerAnd2Player.id}`)
       .set('Authorization', `Bearer ${createUser3.body.accessToken}`)
@@ -226,10 +247,9 @@ describe(' tests for QuizGame', () => {
         },
       }),
     );
-    const myCurrent2 = await questionTestManager(app).requestForMyCurrentGame(
+    await questionTestManager(app).requestForMyCurrentGame(
       createResponseFirstUser.body.accessToken,
     );
-    console.log(myCurrent2.body, 'myCurrent2---------------------------');
     await Promise.all([
       questionTestManager(app).addAnswer(
         bodyIncorrect,
@@ -240,10 +260,9 @@ describe(' tests for QuizGame', () => {
         createResponseFirstUser.body.accessToken,
       ),
     ]);
-    const myCurrent3 = await questionTestManager(app).requestForMyCurrentGame(
+    await questionTestManager(app).requestForMyCurrentGame(
       createResponseFirstUser.body.accessToken,
     );
-    console.log(myCurrent3.body, 'myCurrent3---------------------------');
     await Promise.all([
       questionTestManager(app).addAnswer(
         bodyCorrect,
@@ -254,10 +273,9 @@ describe(' tests for QuizGame', () => {
         createResponseFirstUser.body.accessToken,
       ),
     ]);
-    const myCurrent4 = await questionTestManager(app).requestForMyCurrentGame(
+    await questionTestManager(app).requestForMyCurrentGame(
       createResponseFirstUser.body.accessToken,
     );
-    console.log(myCurrent4.body, 'myCurrent4---------------------------');
     await Promise.all([
       questionTestManager(app).addAnswer(
         bodyIncorrect,
@@ -268,10 +286,9 @@ describe(' tests for QuizGame', () => {
         createResponseFirstUser.body.accessToken,
       ),
     ]);
-    const myCurrent1 = await questionTestManager(app).requestForMyCurrentGame(
+    await questionTestManager(app).requestForMyCurrentGame(
       createResponseFirstUser.body.accessToken,
     );
-    console.log(myCurrent1.body, 'myCurrent1.body');
     await Promise.all([
       questionTestManager(app).addAnswer(
         bodyIncorrect,
@@ -321,7 +338,93 @@ describe(' tests for QuizGame', () => {
         `Bearer ${createResponseFirstUser.body.accessToken}`,
       )
       .expect(HTTP_STATUS.OK_200);
-    console.log(getPairByMy.body.items[0].firstPlayerProgress.answers);
-    console.log(getPairByMy.body.items[0].secondPlayerProgress.answers);
+    const pair = await questionTestManager(app).getRequestForQuizGameForId(
+      findPairById.body.id,
+      createResponseFirstUser.body.accessToken,
+    );
+    expect(getPairByMy.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: expect.arrayContaining([
+        expect.objectContaining({
+          id: findPairById.body.id,
+          firstPlayerProgress: pair.body.firstPlayerProgress,
+          secondPlayerProgress: pair.body.secondPlayerProgress,
+        }),
+      ]),
+    });
+  });
+  it(`--POST create pair, connect two player, 1 player add 5 answers, await 10sec and 2 player should automatically add 5 incorrect answer`, async () => {
+    const bodyCorrect = {
+      answer: 'correct answer',
+    };
+    await request(app.getHttpServer())
+      .post(`${RouterPath.quizGame}/connection`)
+      .set(
+        'Authorization',
+        `Bearer ${createResponseFirstUser.body.accessToken}`,
+      );
+    const connectionSecondPlayer = await request(app.getHttpServer())
+      .post(`${RouterPath.quizGame}/connection`)
+      .set(
+        'Authorization',
+        `Bearer ${createResponseSecondUser.body.accessToken}`,
+      );
+    for (let i = 0; i < 5; i++) {
+      await questionTestManager(app).addAnswer(
+        bodyCorrect,
+        createResponseFirstUser.body.accessToken,
+      );
+    }
+    const findPairWhereFirstPlayerGame = await questionTestManager(
+      app,
+    ).getRequestForQuizGameForId(
+      connectionSecondPlayer.body.id,
+      createResponseFirstUser.body.accessToken,
+    );
+    const answers =
+      findPairWhereFirstPlayerGame.body.firstPlayerProgress.answers;
+    const lastAnswerFirstPlayerDate =
+      new Date(answers[answers.length - 1].addedAt).getTime() + 10000;
+    const now1 = new Date();
+    console.log(now1, 'now1');
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+    const now = new Date();
+    console.log(now, 'now');
+    const getPairByMy = await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/my`)
+      .set(
+        'Authorization',
+        `Bearer ${createResponseFirstUser.body.accessToken}`,
+      )
+      .expect(HTTP_STATUS.OK_200);
+    const firstAnswerSecondPlayer =
+      getPairByMy.body.items[0].secondPlayerProgress.answers[0];
+    console.log(firstAnswerSecondPlayer, 'firstAnswerSecondPlayer');
+    console.log(new Date(lastAnswerFirstPlayerDate), 'firstAnswerSecondPlayer');
+    const addedAtSecondPlayerDate = new Date(
+      firstAnswerSecondPlayer.addedAt,
+    ).getTime();
+
+    console.log(
+      addedAtSecondPlayerDate,
+      lastAnswerFirstPlayerDate,
+      'findPairWhereSecondPlayerGame',
+    );
+    console.log(
+      new Date(addedAtSecondPlayerDate),
+      new Date(lastAnswerFirstPlayerDate),
+      'new Date',
+    );
+    console.log(
+      new Date(addedAtSecondPlayerDate) > new Date(lastAnswerFirstPlayerDate),
+      'lastAnswerFirstPlayer',
+    );
+    expect(addedAtSecondPlayerDate).toBeGreaterThanOrEqual(
+      lastAnswerFirstPlayerDate,
+    );
+    console.log(addedAtSecondPlayerDate);
   });
 });

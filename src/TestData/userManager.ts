@@ -9,12 +9,11 @@ export const usersTestManager = (app: INestApplication) => ({
   async createUser(body: UserBasicRequestBody) {
     const login = setting.Username;
     const password = setting.Password;
-    const response = await request(app.getHttpServer())
+    return request(app.getHttpServer())
       .post(RouterPath.users)
       .auth(login, password)
       .send(body)
       .expect(HTTP_STATUS.CREATED_201);
-    return response;
   },
   async loginUser(body: BodyUserToLogin) {
     return request(app.getHttpServer())
@@ -39,4 +38,13 @@ export const usersTestManager = (app: INestApplication) => ({
       .send(bodyToLogin)
       .expect(HTTP_STATUS.OK_200);
   },
+  // async findPlayerById(body: UserBasicRequestBody) {
+  //   const login = setting.Username;
+  //   const password = setting.Password;
+  //   return request(app.getHttpServer())
+  //     .post(RouterPath.users)
+  //     .auth(login, password)
+  //     .send(body)
+  //     .expect(HTTP_STATUS.CREATED_201);
+  // },
 });

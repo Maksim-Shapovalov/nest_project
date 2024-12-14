@@ -162,12 +162,24 @@ export class QuizGameTypeOrmRepo {
           status: StatusTypeEnum.Active,
         },
       ],
-      relations: ['question'],
+      relations: ['question', 'secondPlayer', 'firstPlayer'],
     });
     if (!findPair) return false;
-    const findPlayer = await this.findPlayer(id, findPair.id);
-    if (findPlayer.answers.length === 5) return false;
-    const num = findPair.question.slice(findPlayer.answers.length)[0];
+    const anyPlayer =
+      findPair.secondPlayer.userId === id
+        ? findPair.secondPlayer.userId
+        : findPair.firstPlayer.userId;
+    const [findFirstPlayer, findSecondPlayer] = await Promise.all([
+      this.findPlayer(id, findPair.id),
+      this.findPlayer(anyPlayer, findPair.id),
+    ]);
+    if (findFirstPlayer.answers.length === 5) return false;
+    if (
+      findFirstPlayer.answers.length === 5 &&
+      findSecondPlayer.answers.length === 5
+    )
+      return false;
+    const num = findPair.question.slice(findFirstPlayer.answers.length)[0];
     if (!num) return false;
     const findQuestion = await this.questionsEntity.findOne({
       where: { id: num.id },
@@ -176,11 +188,17 @@ export class QuizGameTypeOrmRepo {
       await this.answersEntity.find({
         where: {
           questionId: findQuestion.id,
-          playerId: findPlayer.id,
+          playerId: findFirstPlayer.id,
           player: { game: { id: findPair.id } },
         },
       });
     if (findAllAnswersWherePlayerAlreadyAnswered.length > 0) return false;
+    if (findFirstPlayer.answers.length >= 5) {
+      return false;
+    }
+    if (findSecondPlayer.answers && findSecondPlayer.answers.length >= 5) {
+      return false;
+    }
     const scoreChange = findQuestion.correctAnswers.includes(answer) ? 1 : 0;
     const addAnswer = await this.answersEntity.create({
       questionId: num.id,
@@ -190,10 +208,14 @@ export class QuizGameTypeOrmRepo {
         scoreChange === 1
           ? StatusTypeEnumByAnswersToEndpoint.correct
           : StatusTypeEnumByAnswersToEndpoint.incorrect,
-      playerId: findPlayer.id,
+      playerId: findFirstPlayer.id,
     });
     const savedAnswer = await this.answersEntity.save(addAnswer);
-    await this.changeScoreToPlayer(scoreChange, findPlayer.id, savedAnswer);
+    await this.changeScoreToPlayer(
+      scoreChange,
+      findFirstPlayer.id,
+      savedAnswer,
+    );
     const pair = await this.getGameById(findPair.id);
     if (!pair) return false;
     if (
@@ -257,13 +279,11 @@ export class QuizGameTypeOrmRepo {
       relations: { answers: true },
     });
   }
-  async findPlayerByUserId(id: string): Promise<PlayersEntity> {
-    const user = await this.playersEntity.findOne({
+  async findPlayerByUserId(id: string): Promise<PlayersEntity | false> {
+    return this.playersEntity.findOne({
       where: { userId: id, game: { status: StatusTypeEnum.Active } },
       relations: { answers: true },
     });
-    console.log(user, 'user');
-    return user;
   }
 
   async findPendingStatusPair(

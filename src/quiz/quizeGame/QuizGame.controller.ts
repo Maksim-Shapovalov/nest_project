@@ -123,7 +123,6 @@ export class QuizGameController {
     const sendAnswer: AnswerType | false = await this.commandBus.execute(
       new SendAnswerCommand(answer.answer, userModel),
     );
-    console.log(1);
     if (!sendAnswer) throw new ForbiddenException();
     const findPairWherePlayerGiveAnswer: ViewModelPairToOutput | false =
       await this.commandBus.execute(
