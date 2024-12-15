@@ -37,14 +37,7 @@ import { NoMoreFiveAnswersGuard } from '../middleware/NoMoreFiveAnswersGuard';
 import {
   Gives10SecondToEndsGameCase,
   Gives10SecondToEndsGameCommand,
-  Gives10SecondToEndsGameCommand1,
 } from './useCase/CronGive10SecondToEndsGame';
-import {
-  Cron,
-  CronExpression,
-  Interval,
-  SchedulerRegistry,
-} from '@nestjs/schedule';
 
 @Controller('pair-game-quiz')
 export class QuizGameController {
@@ -133,12 +126,14 @@ export class QuizGameController {
       (findPairWherePlayerGiveAnswer.firstPlayerProgress.answers.length === 5 ||
         findPairWherePlayerGiveAnswer.secondPlayerProgress.answers.length === 5)
     ) {
-      const expirationDate = new Date(
-        new Date(sendAnswer.addedAt).getTime() + 8000,
+      console.log(1);
+      const executionTime = new Date(
+        new Date(sendAnswer.addedAt).getTime() + 10000,
       ).toISOString();
+      console.log(executionTime, ' executionTime');
       await this.commandBus.execute(
-        new Gives10SecondToEndsGameCommand1(
-          expirationDate,
+        new Gives10SecondToEndsGameCommand(
+          executionTime,
           findPairWherePlayerGiveAnswer.id,
         ),
       );

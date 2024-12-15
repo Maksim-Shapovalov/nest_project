@@ -147,73 +147,89 @@ export class QuizGameTypeOrmRepo {
     return findPairWherePlayerAddAnswerTo5Questions;
   }
   async updateAnswerToPlayerIdInGame(
-    id: string,
+    answeringUserId: string,
     answer: string,
   ): Promise<updateTypeOfQuestion1 | false> {
     const now = new Date().toISOString();
     const findPair = await this.quizGameEntityNotPlayerInfo.findOne({
       where: [
         {
-          firstPlayer: { userId: id },
+          firstPlayer: { userId: answeringUserId },
           status: StatusTypeEnum.Active,
         },
         {
-          secondPlayer: { userId: id },
+          secondPlayer: { userId: answeringUserId },
           status: StatusTypeEnum.Active,
         },
       ],
       relations: ['question', 'secondPlayer', 'firstPlayer'],
     });
     if (!findPair) return false;
-    const anyPlayer =
-      findPair.secondPlayer.userId === id
+    const anotherPlayerId =
+      findPair.secondPlayer.userId !== answeringUserId
         ? findPair.secondPlayer.userId
         : findPair.firstPlayer.userId;
-    const [findFirstPlayer, findSecondPlayer] = await Promise.all([
-      this.findPlayer(id, findPair.id),
-      this.findPlayer(anyPlayer, findPair.id),
+
+    const [answeringPlayer, anotherPlayer] = await Promise.all([
+      this.findPlayer(answeringUserId, findPair.id),
+      this.findPlayer(anotherPlayerId, findPair.id),
     ]);
-    if (findFirstPlayer.answers.length === 5) return false;
     if (
-      findFirstPlayer.answers.length === 5 &&
-      findSecondPlayer.answers.length === 5
-    )
+      answeringPlayer.answers.length === 5 ||
+      (answeringPlayer.answers.length === 5 &&
+        anotherPlayer.answers.length === 5)
+    ) {
+      console.log('PPPPPPPPPPPPPPPPPPPP');
       return false;
-    const num = findPair.question.slice(findFirstPlayer.answers.length)[0];
+    }
+
+    const num = findPair.question.slice(answeringPlayer.answers.length)[0];
     if (!num) return false;
+
     const findQuestion = await this.questionsEntity.findOne({
       where: { id: num.id },
     });
+
     const findAllAnswersWherePlayerAlreadyAnswered =
       await this.answersEntity.find({
         where: {
           questionId: findQuestion.id,
-          playerId: findFirstPlayer.id,
+          playerId: answeringPlayer.id,
           player: { game: { id: findPair.id } },
         },
       });
-    if (findAllAnswersWherePlayerAlreadyAnswered.length > 0) return false;
-    if (findFirstPlayer.answers.length >= 5) {
+
+    if (findAllAnswersWherePlayerAlreadyAnswered.length > 0) {
+      console.log('player already answered this question');
       return false;
     }
-    if (findSecondPlayer.answers && findSecondPlayer.answers.length >= 5) {
+
+    if (answeringPlayer.answers.length >= 5) {
+      console.log('player already answered all questions');
+
       return false;
     }
+    // if (anotherPlayer.answers && anotherPlayer.answers.length >= 5) {
+    //   console.log('another player already answered all answers');
+    //   return false;
+    // }
+
     const scoreChange = findQuestion.correctAnswers.includes(answer) ? 1 : 0;
     const addAnswer = await this.answersEntity.create({
       questionId: num.id,
       answer: answer,
       addedAt: now,
+      player: answeringPlayer,
       answerStatus:
         scoreChange === 1
           ? StatusTypeEnumByAnswersToEndpoint.correct
           : StatusTypeEnumByAnswersToEndpoint.incorrect,
-      playerId: findFirstPlayer.id,
+      playerId: answeringUserId,
     });
     const savedAnswer = await this.answersEntity.save(addAnswer);
     await this.changeScoreToPlayer(
       scoreChange,
-      findFirstPlayer.id,
+      answeringPlayer.id,
       savedAnswer,
     );
     const pair = await this.getGameById(findPair.id);
@@ -228,25 +244,6 @@ export class QuizGameTypeOrmRepo {
       const savePair = await this.quizGameEntityNotPlayerInfo.save(pair);
       await this.addBonusPoint(savePair);
     }
-    // else if (
-    //   pair &&
-    //   (pair.firstPlayer.answers.length === 6 ||
-    //     pair.secondPlayer.answers.length === 6)
-    // ) {
-    //   const incorrectQuantityAnswers =
-    //     pair.firstPlayer.answers.length > 5
-    //       ? pair.firstPlayer.answers
-    //       : pair.secondPlayer.answers;
-    //   const questionIds = new Set();
-    //   const duplicateAnswers = incorrectQuantityAnswers.filter((answer) => {
-    //     if (questionIds.has(answer.questionId)) return true;
-    //     questionIds.add(answer.questionId);
-    //     return false;
-    //   });
-    //   for (let i = 0; i < duplicateAnswers.length; i++) {
-    //     await this.answersEntity.delete(duplicateAnswers[i]);
-    //   }
-    // }
     const returnAnswer = await this.answersEntity.findOne({
       where: { id: savedAnswer.id },
     });
@@ -282,7 +279,7 @@ export class QuizGameTypeOrmRepo {
   async findPlayerByUserId(id: string): Promise<PlayersEntity | false> {
     return this.playersEntity.findOne({
       where: { userId: id, game: { status: StatusTypeEnum.Active } },
-      relations: { answers: true },
+      relations: { answers: true, game: true },
     });
   }
 
@@ -446,7 +443,7 @@ export class QuizGameTypeOrmRepo {
       relations: ['answers'],
     });
     player.score = player.score + point;
-    player.answers.push(addAnswer);
+    // player.answers.push(addAnswer);
     await this.playersEntity.save(player);
     return true;
   }

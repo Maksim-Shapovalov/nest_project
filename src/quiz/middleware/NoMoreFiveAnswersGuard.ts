@@ -5,6 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { QuizGameTypeOrmRepo } from '../quizeGame/QuizGame.TypeOrmRepo';
+import { StatusTypeEnum } from '../type/QuizGame.type';
 
 @Injectable()
 export class NoMoreFiveAnswersGuard implements CanActivate {
@@ -16,6 +17,14 @@ export class NoMoreFiveAnswersGuard implements CanActivate {
     const playerWithUserId =
       await this.quizGameRepo.findPlayerByUserId(userModel);
     if (!playerWithUserId) throw new ForbiddenException();
+    const findPairWherePlayerGame = await this.quizGameRepo.getGameById(
+      playerWithUserId.game.id,
+    );
+    if (
+      findPairWherePlayerGame &&
+      findPairWherePlayerGame.status === StatusTypeEnum.PendingSecondPlayer
+    )
+      throw new ForbiddenException();
     if (playerWithUserId.answers.length === 5) {
       throw new ForbiddenException();
     }

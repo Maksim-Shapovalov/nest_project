@@ -76,13 +76,7 @@ export class QuizGameControllerSuperAdmin {
     @Body() body: PublishType,
     @Param('id') id: string,
   ) {
-    console.log(id, 'id');
-    console.log(typeof id, 'typeof id');
     if (!id || typeof id !== 'string') throw new NotFoundException();
-    // if (typeof body.published === 'string') {
-    //   throw new BadRequestException();
-    // }
-    console.log(1);
     const findQuest =
       await this.quizGameSuperAdminService.updateQuestionPublished(
         body.published,

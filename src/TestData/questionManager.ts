@@ -37,10 +37,10 @@ export const questionTestManager = (app: INestApplication) => ({
       .set('Authorization', `Bearer ${user}`)
       .expect(HTTP_STATUS.OK_200);
   },
-  async getRequestForQuizGameForId(pairId: string, playerId: string) {
+  async getRequestForQuizGameForId(pairId: string, accessToken: string) {
     return request(app.getHttpServer())
       .get(`${RouterPath.quizGame}/${pairId}`)
-      .set('Authorization', `Bearer ${playerId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(HTTP_STATUS.OK_200);
   },
 });
