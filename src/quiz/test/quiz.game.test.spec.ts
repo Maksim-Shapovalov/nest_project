@@ -470,5 +470,6 @@ describe(' tests for QuizGame', () => {
     expect(addedAtSecondPlayerDate).toBeGreaterThanOrEqual(
       lastAnswerFirstPlayerDate,
     );
+    expect(finishedGame.body.status).toBe('Finished');
   });
 });
