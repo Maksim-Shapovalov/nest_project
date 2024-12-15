@@ -128,7 +128,7 @@ export class QuizGameController {
     ) {
       console.log(1);
       const executionTime = new Date(
-        new Date(sendAnswer.addedAt).getTime() + 7000,
+        new Date(sendAnswer.addedAt).getTime() + 5000,
       ).toISOString();
       console.log(executionTime, ' executionTime');
       await this.commandBus.execute(
