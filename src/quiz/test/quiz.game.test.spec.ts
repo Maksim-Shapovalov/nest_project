@@ -433,20 +433,6 @@ describe(' tests for QuizGame', () => {
       .expect(HTTP_STATUS.OK_200);
     const firstAnswerSecondPlayer =
       getPairByMy.body.items[0].secondPlayerProgress.answers[0];
-    console.log(
-      getPairByMy.body.items[0].secondPlayerProgress.answers,
-      'getPairByMy.body.items[0].secondPlayerProgress.answers',
-    );
-    console.log(
-      getPairByMy.body.items[0].firstPlayerProgress.answers,
-      'getPairByMy.body.items[0].firstPlayerProgress.answers',
-    );
-
-    console.log(
-      firstAnswerSecondPlayer,
-      'firstAnswerSecondPlayer.addedAt------------------------',
-    );
-    console.log(getPairByMy.body.items[0].secondPlayerProgress.answers);
     const addedAtSecondPlayerDate = new Date(
       firstAnswerSecondPlayer.addedAt,
     ).getTime();
