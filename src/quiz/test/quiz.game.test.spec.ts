@@ -418,7 +418,7 @@ describe(' tests for QuizGame', () => {
     const answers =
       findPairWhereFirstPlayerGame.body.firstPlayerProgress.answers;
     const lastAnswerFirstPlayerDate =
-      new Date(answers[answers.length - 1].addedAt).getTime() + 10000;
+      new Date(answers[answers.length - 1].addedAt).getTime() + 8000;
     const now1 = new Date();
     console.log(now1, 'now1');
     await new Promise((resolve) => setTimeout(resolve, 12000));

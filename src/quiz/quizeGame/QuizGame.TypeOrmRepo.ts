@@ -165,6 +165,7 @@ export class QuizGameTypeOrmRepo {
       relations: ['question', 'secondPlayer', 'firstPlayer'],
     });
     if (!findPair) return false;
+    console.log(2.2);
     const anotherPlayerId =
       findPair.secondPlayer.userId !== answeringUserId
         ? findPair.secondPlayer.userId

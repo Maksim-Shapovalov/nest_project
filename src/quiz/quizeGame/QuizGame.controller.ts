@@ -113,10 +113,12 @@ export class QuizGameController {
     @Body() answer: AnswerInput,
     @User() userModel: NewestPostLike,
   ) {
+    console.log(2);
     const sendAnswer: AnswerType | false = await this.commandBus.execute(
       new SendAnswerCommand(answer.answer, userModel),
     );
     if (!sendAnswer) throw new ForbiddenException();
+    console.log(3);
     const findPairWherePlayerGiveAnswer: ViewModelPairToOutput | false =
       await this.commandBus.execute(
         new GetUnfinishedCurrentGameCommand(userModel),

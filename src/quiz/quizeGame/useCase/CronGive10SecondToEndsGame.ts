@@ -61,37 +61,27 @@ export class Gives10SecondToEndsGameCase
     executionTime: Date,
     player: PlayersEntity,
   ) {
-    const now = new Date();
-    if (executionTime > now) {
-      console.log('Command execution time has not arrived yet');
-      return null;
-    } else {
-      const foundGame = await this.quizGameRepo.getGameById(
-        AllPairWhere1PlayerGiveAllAnswers.id,
-      );
-      if (!foundGame) return null;
-      console.log(
-        foundGame,
-        ' -------------------------------------------------------',
-      );
-      const playerToFillId = player.id;
-      const playerToFill =
-        (foundGame as BaseTypeQuizGame).firstPlayer.id === playerToFillId
-          ? foundGame.firstPlayer
-          : foundGame.secondPlayer;
-      const notAnsweredCount = 5 - playerToFill.answers.length;
-      console.log(notAnsweredCount);
-      for (let answer = 0; answer < notAnsweredCount; answer++) {
-        const updateStatusGameAndAnswers =
-          await this.quizGameRepo.updateAnswerToPlayerIdInGame(
-            player.userId,
-            'incorrect',
-          );
-        if (!updateStatusGameAndAnswers) console.log('Not Found Pair');
-      }
-
-      return true;
+    const foundGame = await this.quizGameRepo.getGameById(
+      AllPairWhere1PlayerGiveAllAnswers.id,
+    );
+    if (!foundGame) return null;
+    const playerToFillId = player.id;
+    const playerToFill =
+      (foundGame as BaseTypeQuizGame).firstPlayer.id === playerToFillId
+        ? foundGame.firstPlayer
+        : foundGame.secondPlayer;
+    if (playerToFill.answers.length === 5) return false;
+    const notAnsweredCount = 5 - playerToFill.answers.length;
+    console.log(notAnsweredCount);
+    for (let answer = 0; answer < notAnsweredCount; answer++) {
+      const updateStatusGameAndAnswers =
+        await this.quizGameRepo.updateAnswerToPlayerIdInGame(
+          player.userId,
+          'incorrect',
+        );
+      if (!updateStatusGameAndAnswers) console.log('Not Found Pair');
     }
+    return true;
   }
 
   scheduleCommand1(
@@ -112,7 +102,6 @@ export class Gives10SecondToEndsGameCase
   @Cron('* * * * * *')
   async handleCron() {
     const now = new Date();
-    console.log(now);
     if (this.scheduledCommands1.length > 0) {
       for (
         let scheduled = 0;
@@ -120,15 +109,12 @@ export class Gives10SecondToEndsGameCase
         scheduled++
       ) {
         if (this.scheduledCommands1[scheduled].executionTime <= now) {
-          console.log(523);
-          const resultToAddIncorrectAnswers = await this.AddNewIncorrectAnswer1(
+          await this.AddNewIncorrectAnswer1(
             this.scheduledCommands1[scheduled].pair,
             this.scheduledCommands1[scheduled].executionTime,
             this.scheduledCommands1[scheduled].player,
           );
-          if (resultToAddIncorrectAnswers) {
-            await this.clearDataScheduleCommand(scheduled);
-          }
+          await this.clearDataScheduleCommand(scheduled);
         }
       }
     }
