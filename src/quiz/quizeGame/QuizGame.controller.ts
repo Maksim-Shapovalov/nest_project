@@ -127,7 +127,7 @@ export class QuizGameController {
         findPairWherePlayerGiveAnswer.secondPlayerProgress.answers.length === 5)
     ) {
       const executionTime = new Date(
-        new Date(sendAnswer.addedAt).getTime() + 8000,
+        new Date(sendAnswer.addedAt).getTime() + 7000,
       ).toISOString();
       await this.commandBus.execute(
         new Gives10SecondToEndsGameCommand(
