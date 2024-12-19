@@ -72,7 +72,6 @@ export class Gives10SecondToEndsGameCase
         : foundGame.secondPlayer;
     if (playerToFill.answers.length === 5) return false;
     const notAnsweredCount = 5 - playerToFill.answers.length;
-    console.log(notAnsweredCount);
     for (let answer = 0; answer < notAnsweredCount; answer++) {
       const updateStatusGameAndAnswers =
         await this.quizGameRepo.addIncorrectAnswersAfter10sec(

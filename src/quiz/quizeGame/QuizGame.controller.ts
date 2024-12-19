@@ -113,12 +113,10 @@ export class QuizGameController {
     @Body() answer: AnswerInput,
     @User() userModel: NewestPostLike,
   ) {
-    console.log(2);
     const sendAnswer: AnswerType | false = await this.commandBus.execute(
       new SendAnswerCommand(answer.answer, userModel),
     );
     if (!sendAnswer) throw new ForbiddenException();
-    console.log(3);
     const findPairWherePlayerGiveAnswer: ViewModelPairToOutput | false =
       await this.commandBus.execute(
         new GetUnfinishedCurrentGameCommand(userModel),
@@ -128,11 +126,9 @@ export class QuizGameController {
       (findPairWherePlayerGiveAnswer.firstPlayerProgress.answers.length === 5 ||
         findPairWherePlayerGiveAnswer.secondPlayerProgress.answers.length === 5)
     ) {
-      console.log(1);
       const executionTime = new Date(
         new Date(sendAnswer.addedAt).getTime() + 8000,
       ).toISOString();
-      console.log(executionTime, ' executionTime');
       await this.commandBus.execute(
         new Gives10SecondToEndsGameCommand(
           executionTime,

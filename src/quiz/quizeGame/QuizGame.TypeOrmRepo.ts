@@ -164,12 +164,10 @@ export class QuizGameTypeOrmRepo {
       relations: ['question', 'secondPlayer', 'firstPlayer'],
     });
     if (!findPair) return false;
-    console.log(2.2);
     const anotherPlayerId =
       findPair.secondPlayer.userId !== answeringUserId
         ? findPair.secondPlayer.userId
         : findPair.firstPlayer.userId;
-
     const [answeringPlayer, anotherPlayer] = await Promise.all([
       this.findPlayer(answeringUserId, findPair.id),
       this.findPlayer(anotherPlayerId, findPair.id),
@@ -184,7 +182,10 @@ export class QuizGameTypeOrmRepo {
     }
 
     const num = findPair.question.slice(answeringPlayer.answers.length)[0];
-    if (!num) return false;
+    if (!num) {
+      console.error('no 5 questions');
+      return false;
+    }
 
     const findQuestion = await this.questionsEntity.findOne({
       where: { id: num.id },
@@ -254,7 +255,13 @@ export class QuizGameTypeOrmRepo {
     player: PlayersEntity,
   ) {
     const now = new Date().toISOString();
-    const lengthPlayerAnswers = player.answers.length;
+    const findPlayerInGame = await this.playersEntity.findOne({
+      where: { id: player.id },
+      relations: {
+        answers: true,
+      },
+    });
+    const lengthPlayerAnswers = findPlayerInGame.answers.length;
     const currentQuestions = game.question.slice(lengthPlayerAnswers)[0];
     const addIncorrectAnswerToPlayer = await this.answersEntity.create({
       questionId: currentQuestions.id,

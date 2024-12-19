@@ -16,10 +16,10 @@ export const questionTestManager = (app: INestApplication) => ({
       .send(body)
       .expect(HTTP_STATUS.CREATED_201);
   },
-  async addAnswer(body: AnswerInput, user: string) {
+  async addAnswer(body: AnswerInput, accessToken: string) {
     const createAnswer = await request(app.getHttpServer())
       .post(`${RouterPath.quizGame}/my-current/answers`)
-      .set('Authorization', `Bearer ${user}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send(body)
       .expect(HTTP_STATUS.OK_200);
     expect(createAnswer.body).toEqual(

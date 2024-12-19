@@ -393,7 +393,7 @@ describe(' tests for QuizGame', () => {
       password: 'string',
       email: 'hleb.lukahonak@gmail.com',
     };
-    [createResponseFirstUser, createResponseSecondUser] = await Promise.all([
+    await Promise.all([
       usersTestManager(app).createUserAndLogin(thirdUserBody),
       usersTestManager(app).createUserAndLogin(fourthUserBody),
     ]);
@@ -411,6 +411,7 @@ describe(' tests for QuizGame', () => {
       );
     console.log(connectionSecondPlayer.body, 'connectionSecondPlayer');
     const arrowAnswers = [];
+    console.log(createResponseFirstUser.body);
     for (let i = 0; i < 5; i++) {
       const answer = await questionTestManager(app).addAnswer(
         bodyCorrect,
@@ -467,6 +468,157 @@ describe(' tests for QuizGame', () => {
       finishedGame.body.secondPlayerProgress.answers,
       'finishedGame.body secondPlayerProgress answers',
     );
+    expect(addedAtSecondPlayerDate).toBeGreaterThanOrEqual(
+      lastAnswerFirstPlayerDate,
+    );
+    expect(finishedGame.body.status).toBe('Finished');
+  });
+  it(`--POST create 10 questions, published 5 questions. create pair, connect two player, 1 player add 5 answers, await 10sec and 2 player should automatically add 5 incorrect answer`, async () => {
+    //создание 10 вопросов
+    for (let i = 0; i <= 10; i++) {
+      const bodyToCreateQuestion = {
+        body: 'question' + i,
+        correctAnswers: ['correct answer'],
+      };
+      await questionTestManager(app).createQuestions(bodyToCreateQuestion);
+    }
+    const findQuestion = await request(app.getHttpServer())
+      .get(RouterPath.question)
+      .auth(login, password)
+      .expect(HTTP_STATUS.OK_200);
+    expect(findQuestion.body.items[0]).toEqual(
+      expect.objectContaining({
+        id: expect.any(String),
+        body: expect.any(String),
+        correctAnswers: ['correct answer'],
+        published: false,
+        createdAt: expect.any(String),
+        updatedAt: null,
+      }),
+    );
+    questions = findQuestion.body.items;
+    expect(findQuestion.body.items).toHaveLength(10);
+    //публикация 5 вопросов
+    const fiveQuestions = questions.slice(0, 5);
+    for (let i = 0; i < fiveQuestions.length; i++) {
+      const updatedQuestion = await request(app.getHttpServer())
+        .put(`${RouterPath.question}/${fiveQuestions[i].id}/publish`)
+        .auth(login, password)
+        .send({ published: true });
+      expect(updatedQuestion.status).toBe(204);
+    }
+    const findQuestions = await request(app.getHttpServer())
+      .get(`${RouterPath.question}`)
+      .auth(login, password);
+    filterQuestionsByPublish = findQuestions.body.items.filter(
+      (questions) => questions.published === true,
+    );
+    expect(fiveQuestions.length).toBe(5);
+    expect(filterQuestionsByPublish.length).toBeGreaterThan(0);
+    const allPublished = filterQuestionsByPublish.every(
+      (question) =>
+        question.published === true && typeof question.updatedAt === 'string',
+    );
+    expect(allPublished).toBe(true);
+    //тело правильного ответа
+    const bodyCorrect = {
+      answer: 'correct answer',
+    };
+    // 3-й пользователь
+    const thirdUserBody = {
+      login: 'hleb',
+      password: 'string',
+      email: 'hleb.lukahonak@gmail.com',
+    };
+    //4-й пользователь
+    const fourthUserBody = {
+      login: 'hleb4',
+      password: 'string',
+      email: 'hleb.lukahonak@gmail.com',
+    };
+    await Promise.all([
+      usersTestManager(app).createUserAndLogin(thirdUserBody),
+      usersTestManager(app).createUserAndLogin(fourthUserBody),
+    ]);
+    // подключение 1 и 2 пользователя
+    await request(app.getHttpServer())
+      .post(`${RouterPath.quizGame}/connection`)
+      .set(
+        'Authorization',
+        `Bearer ${createResponseFirstUser.body.accessToken}`,
+      );
+    const connectionSecondPlayer = await request(app.getHttpServer())
+      .post(`${RouterPath.quizGame}/connection`)
+      .set(
+        'Authorization',
+        `Bearer ${createResponseSecondUser.body.accessToken}`,
+      );
+    console.log(connectionSecondPlayer.body, 'connectionSecondPlayer');
+    const arrayAnswers = [];
+    // 1 игрок дает 5 правильных ответов
+    for (let i = 0; i < 5; i++) {
+      const answer = await questionTestManager(app).addAnswer(
+        bodyCorrect,
+        createResponseFirstUser.body.accessToken,
+      );
+      arrayAnswers.push(answer);
+    }
+    console.log(arrayAnswers);
+    //получение игры по id
+    const findPairWhereFirstPlayerGame = await questionTestManager(
+      app,
+    ).getRequestForQuizGameForId(
+      connectionSecondPlayer.body.id,
+      createResponseFirstUser.body.accessToken,
+    );
+    console.log(
+      findPairWhereFirstPlayerGame.body,
+      'findPairWhereFirstPlayerGame',
+    );
+    //ответы 1 пользователя
+    const answers =
+      findPairWhereFirstPlayerGame.body.firstPlayerProgress.answers;
+    //установка времени окончания игры
+    const lastAnswerFirstPlayerDate =
+      new Date(answers[answers.length - 1].addedAt).getTime() + 8000;
+    const now1 = new Date();
+    console.log(now1, 'now1');
+    //ожидание 12 сек
+    await new Promise((resolve) => setTimeout(resolve, 12000));
+    const now = new Date();
+    console.log(now, 'now');
+    const getPairByMy = await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/my`)
+      .set(
+        'Authorization',
+        `Bearer ${createResponseFirstUser.body.accessToken}`,
+      )
+      .expect(HTTP_STATUS.OK_200);
+    // время первого ответа 2-го пользователя
+    const firstAnswerSecondPlayer =
+      getPairByMy.body.items[0].secondPlayerProgress.answers[0];
+    const addedAtSecondPlayerDate = new Date(
+      firstAnswerSecondPlayer.addedAt,
+    ).getTime();
+    //конечный вид игры
+    const finishedGame = await questionTestManager(
+      app,
+    ).getRequestForQuizGameForId(
+      connectionSecondPlayer.body.id,
+      createResponseFirstUser.body.accessToken,
+    );
+    expect(finishedGame.body.firstPlayerProgress.answers.length).toBe(5);
+    expect(finishedGame.body.secondPlayerProgress.answers.length).toBe(5);
+    console.error(finishedGame.body, 'finishedGame.body');
+    console.error(
+      finishedGame.body.firstPlayerProgress.answers,
+      'finishedGame.body firstPlayerProgress answers',
+    );
+    console.error(
+      finishedGame.body.secondPlayerProgress.answers,
+      'finishedGame.body secondPlayerProgress answers',
+    );
+    // время первого добавленного ответа 2-го пользователя больше или установленному времени концу игры
     expect(addedAtSecondPlayerDate).toBeGreaterThanOrEqual(
       lastAnswerFirstPlayerDate,
     );
