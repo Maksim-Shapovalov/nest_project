@@ -383,6 +383,20 @@ describe(' tests for QuizGame', () => {
     const bodyCorrect = {
       answer: 'correct answer',
     };
+    const thirdUserBody = {
+      login: 'hleb',
+      password: 'string',
+      email: 'hleb.lukahonak@gmail.com',
+    };
+    const fourthUserBody = {
+      login: 'hleb4',
+      password: 'string',
+      email: 'hleb.lukahonak@gmail.com',
+    };
+    [createResponseFirstUser, createResponseSecondUser] = await Promise.all([
+      usersTestManager(app).createUserAndLogin(thirdUserBody),
+      usersTestManager(app).createUserAndLogin(fourthUserBody),
+    ]);
     await request(app.getHttpServer())
       .post(`${RouterPath.quizGame}/connection`)
       .set(

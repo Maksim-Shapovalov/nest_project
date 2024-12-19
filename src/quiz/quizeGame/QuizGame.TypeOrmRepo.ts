@@ -17,7 +17,6 @@ import {
   StatusTypeEnumByAnswersToEndpoint,
 } from '../entity/QuizGame.entity';
 import { PaginationQueryType } from '../../qurey-repo/query-filter';
-import { not } from 'rxjs/internal/util/not';
 
 @Injectable()
 export class QuizGameTypeOrmRepo {
@@ -228,11 +227,7 @@ export class QuizGameTypeOrmRepo {
       playerId: answeringUserId,
     });
     const savedAnswer = await this.answersEntity.save(addAnswer);
-    await this.changeScoreToPlayer(
-      scoreChange,
-      answeringPlayer.id,
-      savedAnswer,
-    );
+    await this.changeScoreToPlayer(scoreChange, answeringPlayer.id);
     const pair = await this.getGameById(findPair.id);
     if (!pair) return false;
     if (
@@ -253,6 +248,45 @@ export class QuizGameTypeOrmRepo {
       ...returnAnswer,
       questionId: returnAnswer.questionId.toString(),
     };
+  }
+  async addIncorrectAnswersAfter10sec(
+    game: BaseTypeQuizGame,
+    player: PlayersEntity,
+  ) {
+    const now = new Date().toISOString();
+    const lengthPlayerAnswers = player.answers.length;
+    const currentQuestions = game.question.slice(lengthPlayerAnswers)[0];
+    const addIncorrectAnswerToPlayer = await this.answersEntity.create({
+      questionId: currentQuestions.id,
+      answer: 'incorrect',
+      addedAt: now,
+      player: player,
+      answerStatus: StatusTypeEnumByAnswersToEndpoint.incorrect,
+      playerId: player.id,
+    });
+    const savedAnswer = await this.answersEntity.save(
+      addIncorrectAnswerToPlayer,
+    );
+    const gameInWhichAddIncorrectAnswers =
+      await this.quizGameEntityNotPlayerInfo.findOne({
+        where: { id: game.id },
+        relations: {
+          firstPlayer: { answers: true },
+          secondPlayer: { answers: true },
+        },
+      });
+    if (
+      gameInWhichAddIncorrectAnswers.firstPlayer.answers.length === 5 &&
+      gameInWhichAddIncorrectAnswers.secondPlayer.answers.length === 5
+    ) {
+      gameInWhichAddIncorrectAnswers.finishGameDate = now;
+      gameInWhichAddIncorrectAnswers.status = StatusTypeEnum.Finished;
+      await this.quizGameEntityNotPlayerInfo.save(
+        gameInWhichAddIncorrectAnswers,
+      );
+      await this.addBonusPoint(gameInWhichAddIncorrectAnswers);
+    }
+    return savedAnswer;
   }
 
   async getGameById(id: string): Promise<BaseTypeQuizGame | false> {
@@ -434,17 +468,12 @@ export class QuizGameTypeOrmRepo {
     }
     return true;
   }
-  private async changeScoreToPlayer(
-    point: number,
-    idPlayer: string,
-    addAnswer: AnswersEntity,
-  ) {
+  private async changeScoreToPlayer(point: number, idPlayer: string) {
     const player = await this.playersEntity.findOne({
       where: { id: idPlayer },
       relations: ['answers'],
     });
     player.score = player.score + point;
-    // player.answers.push(addAnswer);
     await this.playersEntity.save(player);
     return true;
   }

@@ -75,9 +75,9 @@ export class Gives10SecondToEndsGameCase
     console.log(notAnsweredCount);
     for (let answer = 0; answer < notAnsweredCount; answer++) {
       const updateStatusGameAndAnswers =
-        await this.quizGameRepo.updateAnswerToPlayerIdInGame(
-          player.userId,
-          'incorrect',
+        await this.quizGameRepo.addIncorrectAnswersAfter10sec(
+          foundGame,
+          player,
         );
       if (!updateStatusGameAndAnswers) console.log('Not Found Pair');
     }
