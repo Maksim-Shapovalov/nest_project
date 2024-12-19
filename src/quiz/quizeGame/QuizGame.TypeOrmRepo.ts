@@ -291,6 +291,49 @@ export class QuizGameTypeOrmRepo {
     console.log(savedAnswer, 'savedAnswer-----------');
     return savedAnswer;
   }
+  async addIncorrectAnswersAfter10sec_2(
+    game: BaseTypeQuizGame,
+    player: PlayersEntity,
+  ) {
+    const now = new Date().toISOString();
+    const quantityAnswers = player.answers.length; //0
+    if (quantityAnswers >= 5) return false;
+    for (let i = quantityAnswers; i < game.question.length; i++) {
+      const findPlayerInGame = await this.findPlayer(player.userId, game.id);
+      const quantityAnswers_ = findPlayerInGame.answers.length;
+      if (quantityAnswers_ >= 5) return false;
+      const currentQuestion = game.question[quantityAnswers_];
+      const addIncorrectAnswerToPlayer = await this.answersEntity.create({
+        questionId: currentQuestion.id,
+        answer: 'incorrect',
+        addedAt: now,
+        player: player,
+        answerStatus: StatusTypeEnumByAnswersToEndpoint.incorrect,
+        playerId: player.id,
+      });
+      await this.answersEntity.save(addIncorrectAnswerToPlayer);
+    }
+    const gameInWhichAddIncorrectAnswers =
+      await this.quizGameEntityNotPlayerInfo.findOne({
+        where: { id: game.id },
+        relations: {
+          firstPlayer: { answers: true },
+          secondPlayer: { answers: true },
+        },
+      });
+    if (
+      gameInWhichAddIncorrectAnswers.firstPlayer.answers.length === 5 &&
+      gameInWhichAddIncorrectAnswers.secondPlayer.answers.length === 5
+    ) {
+      gameInWhichAddIncorrectAnswers.finishGameDate = now;
+      gameInWhichAddIncorrectAnswers.status = StatusTypeEnum.Finished;
+      await this.quizGameEntityNotPlayerInfo.save(
+        gameInWhichAddIncorrectAnswers,
+      );
+      await this.addBonusPoint(gameInWhichAddIncorrectAnswers);
+    }
+    return gameInWhichAddIncorrectAnswers;
+  }
 
   async getGameById(id: string): Promise<BaseTypeQuizGame | false> {
     const findPair = await this.quizGameEntityNotPlayerInfo.findOne({

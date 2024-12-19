@@ -71,20 +71,17 @@ export class Gives10SecondToEndsGameCase
         ? foundGame.firstPlayer
         : foundGame.secondPlayer;
     if (playerToFill.answers.length === 5) return false;
-    const notAnsweredCount = 5 - playerToFill.answers.length;
-    for (let answer = 0; answer < notAnsweredCount; answer++) {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      const updateStatusGameAndAnswers =
-        await this.quizGameRepo.addIncorrectAnswersAfter10sec(
-          foundGame,
-          player,
-        );
-      // await this.quizGameRepo.addIncorrectAnswersAfter10sec(
-      //     foundGame,
-      //     player,
-      //   );
-      if (!updateStatusGameAndAnswers) console.log('Not Found Pair');
-    }
+    // const notAnsweredCount = 5 - playerToFill.answers.length;
+    // for (let answer = 0; answer < notAnsweredCount; answer++) {
+    //   await new Promise((resolve) => setTimeout(resolve, 800));
+    //   const updateStatusGameAndAnswers =
+    //     await this.quizGameRepo.addIncorrectAnswersAfter10sec_2(
+    //       foundGame,
+    //       player,
+    //     );
+    //   if (!updateStatusGameAndAnswers) console.log('Not Found Pair');
+    // }
+    await this.quizGameRepo.addIncorrectAnswersAfter10sec_2(foundGame, player);
     return true;
   }
 
@@ -100,7 +97,7 @@ export class Gives10SecondToEndsGameCase
     });
   }
 
-  private clearDataScheduleCommand(index: number) {
+  private async clearDataScheduleCommand(index: number) {
     this.scheduledCommands1.splice(index, 1);
   }
   @Cron('* * * * * *')
@@ -112,13 +109,22 @@ export class Gives10SecondToEndsGameCase
         scheduled < this.scheduledCommands1.length;
         scheduled++
       ) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         if (this.scheduledCommands1[scheduled].executionTime <= now) {
-          await this.AddNewIncorrectAnswer1(
-            this.scheduledCommands1[scheduled].pair,
-            this.scheduledCommands1[scheduled].executionTime,
-            this.scheduledCommands1[scheduled].player,
-          );
-          this.clearDataScheduleCommand(scheduled);
+          await Promise.all([
+            this.AddNewIncorrectAnswer1(
+              this.scheduledCommands1[scheduled].pair,
+              this.scheduledCommands1[scheduled].executionTime,
+              this.scheduledCommands1[scheduled].player,
+            ),
+            this.clearDataScheduleCommand(scheduled),
+          ]);
+          // await this.AddNewIncorrectAnswer1(
+          //   this.scheduledCommands1[scheduled].pair,
+          //   this.scheduledCommands1[scheduled].executionTime,
+          //   this.scheduledCommands1[scheduled].player,
+          // );
+          // this.clearDataScheduleCommand(scheduled);
         }
       }
     }
