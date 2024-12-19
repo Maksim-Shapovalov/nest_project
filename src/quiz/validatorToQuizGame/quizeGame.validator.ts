@@ -24,7 +24,6 @@ export class GameUserGuard implements CanActivate {
       throw new BadRequestException();
 
     const isUserInGame = await this.quizGameRepo.getGameById(gameId);
-    console.log(isUserInGame);
     if (!isUserInGame) {
       throw new NotFoundException();
     } else if (

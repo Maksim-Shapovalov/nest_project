@@ -288,7 +288,6 @@ export class QuizGameTypeOrmRepo {
       );
       await this.addBonusPoint(gameInWhichAddIncorrectAnswers);
     }
-    console.log(savedAnswer, 'savedAnswer-----------');
     return savedAnswer;
   }
   async addIncorrectAnswersAfter10sec_2(
@@ -296,7 +295,14 @@ export class QuizGameTypeOrmRepo {
     player: PlayersEntity,
   ) {
     const now = new Date().toISOString();
-    const quantityAnswers = player.answers.length; //0
+    // const quantityAnswers = player.answers.length;
+    const findPlayer = await this.playersEntity.findOne({
+      where: { id: player.id },
+      relations: {
+        answers: true,
+      },
+    });
+    const quantityAnswers = findPlayer.answers.length;
     if (quantityAnswers >= 5) return false;
     for (let i = quantityAnswers; i < game.question.length; i++) {
       const findPlayerInGame = await this.findPlayer(player.userId, game.id);

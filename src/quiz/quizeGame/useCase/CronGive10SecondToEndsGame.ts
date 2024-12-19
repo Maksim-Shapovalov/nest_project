@@ -90,6 +90,7 @@ export class Gives10SecondToEndsGameCase
     executionTime: Date,
     player: PlayersEntity,
   ) {
+    // const checkForAvailability =  this.scheduledCommands1.
     this.scheduledCommands1.push({
       pair: needingPair,
       executionTime: executionTime,
@@ -100,6 +101,12 @@ export class Gives10SecondToEndsGameCase
   private async clearDataScheduleCommand(index: number) {
     this.scheduledCommands1.splice(index, 1);
   }
+  private async clearDataScheduleCommand_1(gameId: string) {
+    const indexClearItem = this.scheduledCommands1.findIndex((game) => {
+      return game.pair.id === gameId;
+    });
+    this.scheduledCommands1.splice(indexClearItem, 1);
+  }
   @Cron('* * * * * *')
   async handleCron() {
     const now = new Date();
@@ -109,22 +116,34 @@ export class Gives10SecondToEndsGameCase
         scheduled < this.scheduledCommands1.length;
         scheduled++
       ) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 800));
         if (this.scheduledCommands1[scheduled].executionTime <= now) {
+          // await Promise.all([
+          //   this.AddNewIncorrectAnswer1(
+          //     this.scheduledCommands1[scheduled].pair,
+          //     this.scheduledCommands1[scheduled].executionTime,
+          //     this.scheduledCommands1[scheduled].player,
+          //   ),
+          //   this.clearDataScheduleCommand(scheduled),
+          // ]);
           await Promise.all([
             this.AddNewIncorrectAnswer1(
               this.scheduledCommands1[scheduled].pair,
               this.scheduledCommands1[scheduled].executionTime,
               this.scheduledCommands1[scheduled].player,
             ),
-            this.clearDataScheduleCommand(scheduled),
+            this.clearDataScheduleCommand_1(
+              this.scheduledCommands1[scheduled].pair.id,
+            ),
           ]);
           // await this.AddNewIncorrectAnswer1(
           //   this.scheduledCommands1[scheduled].pair,
           //   this.scheduledCommands1[scheduled].executionTime,
           //   this.scheduledCommands1[scheduled].player,
           // );
-          // this.clearDataScheduleCommand(scheduled);
+          // await this.clearDataScheduleCommand_1(
+          //   this.scheduledCommands1[scheduled].pair.id,
+          // );
         }
       }
     }
