@@ -73,11 +73,16 @@ export class Gives10SecondToEndsGameCase
     if (playerToFill.answers.length === 5) return false;
     const notAnsweredCount = 5 - playerToFill.answers.length;
     for (let answer = 0; answer < notAnsweredCount; answer++) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const updateStatusGameAndAnswers =
         await this.quizGameRepo.addIncorrectAnswersAfter10sec(
           foundGame,
           player,
         );
+      // await this.quizGameRepo.addIncorrectAnswersAfter10sec(
+      //     foundGame,
+      //     player,
+      //   );
       if (!updateStatusGameAndAnswers) console.log('Not Found Pair');
     }
     return true;
@@ -95,7 +100,7 @@ export class Gives10SecondToEndsGameCase
     });
   }
 
-  private async clearDataScheduleCommand(index: number) {
+  private clearDataScheduleCommand(index: number) {
     this.scheduledCommands1.splice(index, 1);
   }
   @Cron('* * * * * *')
@@ -113,7 +118,7 @@ export class Gives10SecondToEndsGameCase
             this.scheduledCommands1[scheduled].executionTime,
             this.scheduledCommands1[scheduled].player,
           );
-          await this.clearDataScheduleCommand(scheduled);
+          this.clearDataScheduleCommand(scheduled);
         }
       }
     }

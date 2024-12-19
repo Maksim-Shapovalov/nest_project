@@ -181,7 +181,8 @@ export class QuizGameTypeOrmRepo {
       return false;
     }
 
-    const num = findPair.question.slice(answeringPlayer.answers.length)[0];
+    const num = findPair.question[answeringPlayer.answers.length];
+    // const num = findPair.question.slice(answeringPlayer.answers.length)[0];
     if (!num) {
       console.error('no 5 questions');
       return false;
@@ -255,16 +256,10 @@ export class QuizGameTypeOrmRepo {
     player: PlayersEntity,
   ) {
     const now = new Date().toISOString();
-    const findPlayerInGame = await this.playersEntity.findOne({
-      where: { id: player.id },
-      relations: {
-        answers: true,
-      },
-    });
-    const lengthPlayerAnswers = findPlayerInGame.answers.length;
-    const currentQuestions = game.question.slice(lengthPlayerAnswers)[0];
+    const findPlayerInGame = await this.findPlayer(player.userId, game.id);
+    const currentQuestion = game.question[findPlayerInGame.answers.length];
     const addIncorrectAnswerToPlayer = await this.answersEntity.create({
-      questionId: currentQuestions.id,
+      questionId: currentQuestion.id,
       answer: 'incorrect',
       addedAt: now,
       player: player,
@@ -293,6 +288,7 @@ export class QuizGameTypeOrmRepo {
       );
       await this.addBonusPoint(gameInWhichAddIncorrectAnswers);
     }
+    console.log(savedAnswer, 'savedAnswer-----------');
     return savedAnswer;
   }
 
