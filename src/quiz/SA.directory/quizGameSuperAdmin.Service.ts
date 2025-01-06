@@ -16,6 +16,8 @@ export class QuizGameSuperAdminService {
   }
   async createQuestion(question: requestBodyQuestionToCreate) {
     const now = new Date();
+    console.log('this is');
+    console.log('this is');
     const createNewQuestion = new QuestionType(
       question.body,
       question.correctAnswers,
@@ -23,7 +25,6 @@ export class QuizGameSuperAdminService {
       now.toISOString(),
       null,
     );
-
     const takeAllQuestions =
       await this.quizGameSuperAdminRepository.createQuestion(createNewQuestion);
     return takeAllQuestions;

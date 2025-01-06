@@ -10,6 +10,7 @@ import {
   requestBodyQuestionToCreate,
 } from '../type/question.type';
 import { QuestionsEntity } from '../entity/Questions.Entity';
+import { log } from 'console';
 
 @Injectable()
 export class QuizGameSuperAdminRepositoryTypeORM {
@@ -31,6 +32,7 @@ export class QuizGameSuperAdminRepositoryTypeORM {
       skip: pageBlog,
     });
     const items = await Promise.all(result.map((p) => this.questGetMapper(p)));
+    console.log('write text');
     return {
       pagesCount: pageCountBlogs,
       page: filter.pageNumber,
@@ -84,6 +86,7 @@ export class QuizGameSuperAdminRepositoryTypeORM {
       published: published,
       updatedAt: now,
     });
+    console.log('write text');
     return true;
   }
 
