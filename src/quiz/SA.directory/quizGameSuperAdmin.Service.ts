@@ -18,6 +18,7 @@ export class QuizGameSuperAdminService {
     const now = new Date();
     console.log('this is');
     console.log('this is');
+    console.log('this is');
     const createNewQuestion = new QuestionType(
       question.body,
       question.correctAnswers,
