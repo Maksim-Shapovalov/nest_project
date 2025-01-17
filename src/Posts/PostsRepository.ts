@@ -1,7 +1,6 @@
 import { PostClass } from './Type/Posts.type';
 import { ObjectId } from 'mongodb';
 import { PaginationQueryType } from '../qurey-repo/query-filter';
-import { BlogsRepository } from '../Blogs/Blogs.repository';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,12 +15,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { UserRepository } from '../Users/User.repository';
 import { AvailableStatusEnum } from '../Comment/Type/Comment.type';
-import { InjectRepository } from '@nestjs/typeorm';
+import { BlogsSQLTypeOrmRepository } from '../Blogs/TypeOrm/Blogs.repo.TypeOrm';
 
 @Injectable()
 export class PostsRepository {
   constructor(
-    protected blogsRepository: BlogsRepository,
+    protected blogsSQLRepository: BlogsSQLTypeOrmRepository,
     @InjectModel(Post.name) protected postModel: Model<PostsDocument>,
     @InjectModel(PostLike.name)
     protected postLikeModel: Model<PostLikeDocument>,
@@ -65,7 +64,7 @@ export class PostsRepository {
     filter: PaginationQueryType,
     userId: string | null,
   ) {
-    const findBlog = await this.blogsRepository.getBlogsById(blogId);
+    const findBlog = await this.blogsSQLRepository.getBlogsById(blogId);
     if (!findBlog) {
       return null;
     }

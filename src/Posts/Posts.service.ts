@@ -17,11 +17,11 @@ export class PostsService {
 
   async createNewPosts(
     bodyPost: BodyPostToRequest1,
-    userId: string | null,
-    blogId?: string,
+    userId: string,
+    // blogId: string,
   ) {
     const findBlogName = await this.blogsSQLRepository.getBlogsById(
-      blogId ?? bodyPost.blogId,
+      bodyPost.blogId,
     );
     if (!findBlogName) {
       return null;
@@ -58,6 +58,15 @@ export class PostsService {
 
   async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {
     return await this.postsSQLRepository.updatePostsById(postBody);
+  }
+  async updatePostsByIdInBlog(
+    postBody: BodyUpdatingPost,
+    blogId: string,
+  ): Promise<boolean> {
+    return await this.postsSQLRepository.updatePostsByIdInBlog(
+      postBody,
+      blogId,
+    );
   }
 
   async deletePostsById(id: string): Promise<boolean> {

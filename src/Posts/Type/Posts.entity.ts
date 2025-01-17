@@ -13,8 +13,10 @@ export class PostsEntity {
   shortDescription: string;
   @Column()
   content: string;
-  @ManyToOne(() => BlogsEntity)
+  @ManyToOne(() => BlogsEntity, { onDelete: 'CASCADE' })
   @JoinColumn()
+  blog: BlogsEntity;
+  @Column()
   blogId: string;
   @Column()
   blogName: string;

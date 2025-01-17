@@ -1,5 +1,5 @@
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { PaginationQueryType } from '../../qurey-repo/query-filter';
 import {
   BodyUpdatingPost,
@@ -7,10 +7,8 @@ import {
   PostsOutputSQLType,
 } from '../Type/Posts.type';
 import { AvailableStatusEnum } from '../../Comment/Type/Comment.type';
-import { UserSQLRepository } from '../../Users/postgres/User.SqlRepositories';
 import { Injectable } from '@nestjs/common';
 import { NewestPostLike } from '../../Users/Type/User.type';
-import { UserSQLTypeOrmRepository } from '../../Users/TypeORM/User.repo.TypeORm';
 import { PostsEntity, PostsLikeEntity } from '../Type/Posts.entity';
 import { UserEntity } from '../../Users/Type/User.entity';
 import { UserRepository } from '../../Users/User.repository';
@@ -62,12 +60,12 @@ export class PostsPostgresTypeOrmRepository {
   async getPostInBlogs(
     blogId: string,
     filter: PaginationQueryType,
-    userId: NewestPostLike | null,
+    userId?: NewestPostLike | null,
   ) {
     const totalCountPosts = await this.postsEntityRepo.findAndCount({
       where: { blogId: blogId },
     });
-
+    if (!totalCountPosts) return false;
     const pageSizeInQuery: number = filter.pageSize;
     const totalCount = parseInt(totalCountPosts[1].toString());
 
@@ -151,6 +149,24 @@ export class PostsPostgresTypeOrmRepository {
     const savePosts = await this.postsEntityRepo.save(result);
     return this.postsLikeMapper(savePosts, userId);
   }
+  async updatePostsByIdInBlog(
+    postBody: BodyUpdatingPost,
+    blogId: string,
+  ): Promise<boolean> {
+    const findPostQuery = await this.postsEntityRepo.find({
+      where: { id: postBody.postId, blogId: blogId },
+    });
+    if (findPostQuery.length === 0) {
+      return null;
+    }
+    await this.postsEntityRepo.update(postBody.postId, {
+      title: postBody.title,
+      shortDescription: postBody.shortDescription,
+      content: postBody.content,
+      // blogId: postBody.blogId,
+    });
+    return true;
+  }
 
   async updatePostsById(postBody: BodyUpdatingPost): Promise<boolean> {
     const findPostQuery = await this.postsEntityRepo.find({
@@ -191,10 +207,10 @@ export class PostsPostgresTypeOrmRepository {
       //"userId" = ${userId ? userId : null}
       dislikesCount = await this.postsLikeEntityRepository
         .createQueryBuilder('dislike')
-        .where('like.likesStatus = :status', {
+        .where('dislike.likesStatus = :status', {
           status: AvailableStatusEnum.dislike,
         })
-        .andWhere('like.postId = :postId', { postId: post.id })
+        .andWhere('dislike.postId = :postId', { postId: post.id })
         .getCount();
 
       myStatus = await this.postsLikeEntityRepository

@@ -6,7 +6,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as process from 'process';
 
 import { BlogsController } from './Blogs/Blogs.controller';
-import { BlogsRepository } from './Blogs/Blogs.repository';
 import { BlogsService } from './Blogs/Blogs.service';
 import { CommentsController } from './Comment/Comment.controller';
 import { CommentsService } from './Comment/Comments.service';
@@ -45,7 +44,7 @@ import { CustomBlogIdValidation } from './Posts/validation/BlogExists.decorator'
 import { ThrottlerModule } from '@nestjs/throttler';
 import { UserSQLRepository } from './Users/postgres/User.SqlRepositories';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BlogsSQLController } from './Blogs/postgres/Blogs.postgress.controller';
+import { BlogsSQLController } from './Blogs/postgres/Blogs.SA.postgress.controller';
 import { PostsPostgresRepository } from './Posts/postgres/Posts.postgres.repository';
 import { CommentSqlRepository } from './Comment/postgress/Comments.postgress.repository';
 import { UserEntity } from './Users/Type/User.entity';
@@ -82,6 +81,7 @@ import { SendAnswerUseCase } from './quiz/quizeGame/useCase/SendAnswerUseCase';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ScheduleModule } from '@nestjs/schedule';
 import { Gives10SecondToEndsGameCase } from './quiz/quizeGame/useCase/CronGive10SecondToEndsGame';
+import { BloggersController } from './Blogs/Blogers/BloggersController';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -97,7 +97,6 @@ const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
 const repository = [
   CommentSqlTypeOrmRepository,
   CommentSqlRepository,
-  BlogsRepository,
   PostsRepository,
   AllDataClearRepo,
   RefreshTokenRepo,
@@ -183,6 +182,7 @@ const service = [
     ]),
   ],
   controllers: [
+    BloggersController,
     PostsController,
     AppController,
     UserController,

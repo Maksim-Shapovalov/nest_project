@@ -7,26 +7,46 @@ export class BlogClass {
     public name: string,
     public description: string,
     public websiteUrl: string,
+    public userId: string,
     public createdAt: string,
     public isMembership: boolean,
   ) {}
 }
 
-export type BlogsOutputModel = {
+// export type BlogsOutputModel = {
+//   id: string;
+//   name: string;
+//   description: string;
+//   websiteUrl: string;
+//   createdAt: string;
+//   isMembership: boolean;
+// };
+export abstract class BlogsOutputModel {
   id: string;
   name: string;
   description: string;
   websiteUrl: string;
   createdAt: string;
   isMembership: boolean;
-};
+}
+export class BlogsOutputClassWithSA extends BlogsOutputModel {
+  blogOwnerInfo: {
+    userId: string;
+    userLogin: string;
+  };
+}
 export type bodyForUpdateBlogs = {
   id: string;
   name: string;
   description: string;
   websiteUrl: string;
 };
-
+export type blogBodyToCreate = {
+  name: string;
+  description: string;
+  websiteUrl: string;
+  userId: string;
+};
 export class BlogRequest {
   @Length(1, 15)
   @Trim()

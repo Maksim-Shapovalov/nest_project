@@ -1,21 +1,26 @@
 import {
+  blogBodyToCreate,
   BlogClass,
-  BlogRequest,
   BlogsOutputModel,
   bodyForUpdateBlogs,
 } from './Type/Blogs.type';
 
 import { Injectable } from '@nestjs/common';
 import { BlogsSQLTypeOrmRepository } from './TypeOrm/Blogs.repo.TypeOrm';
+import { UserSQLTypeOrmRepository } from '../Users/TypeORM/User.repo.TypeORm';
 
 @Injectable()
 export class BlogsService {
-  constructor(protected blogsSQLRepository: BlogsSQLTypeOrmRepository) {}
-  async createNewBlogs(blog: BlogRequest): Promise<BlogsOutputModel> {
+  constructor(
+    protected blogsSQLRepository: BlogsSQLTypeOrmRepository,
+    protected userRepo: UserSQLTypeOrmRepository,
+  ) {}
+  async createNewBlogs(blog: blogBodyToCreate): Promise<BlogsOutputModel> {
     const newBlogs = new BlogClass(
       blog.name,
       blog.description,
       blog.websiteUrl,
+      blog.userId,
       new Date().toISOString(),
       false,
     );

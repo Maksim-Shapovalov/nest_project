@@ -14,55 +14,59 @@ import {
 } from '@nestjs/common';
 import { PostsService } from '../../Posts/Posts.service';
 import { BlogsService } from '../Blogs.service';
-import { BlogsRepository } from '../Blogs.repository';
+import { BlogsSQLTypeOrmRepository } from '../TypeOrm/Blogs.repo.TypeOrm';
+import { PostsPostgresTypeOrmRepository } from '../../Posts/TypeOrm/Posts.repo.TypeOrm';
 import { QueryType } from '../../Other/Query.Type';
+import { BearerGuard, User } from '../../auth/guard/authGuard';
+import { NewestPostLike } from '../../Users/Type/User.type';
 import { queryFilter, searchNameInBlog } from '../../qurey-repo/query-filter';
-import { BasicAuthGuard } from '../../auth/guard/basic-authGuard';
 import { BodyPostToRequest } from '../../Posts/Type/Posts.type';
 import { BlogRequest } from '../Type/Blogs.type';
-import { PostsPostgresRepository } from '../../Posts/postgres/Posts.postgres.repository';
-import { BlogsSQLTypeOrmRepository } from '../TypeOrm/Blogs.repo.TypeOrm';
-
-@UseGuards(BasicAuthGuard)
-@Controller('sa/blogs')
-export class BlogsSQLController {
+@UseGuards(BearerGuard)
+@Controller('blogger/blogs')
+export class BloggersController {
   constructor(
     protected postsService: PostsService,
     protected blogsService: BlogsService,
-    protected blogsRepository: BlogsRepository,
     protected blogsSQLRepository: BlogsSQLTypeOrmRepository,
-    protected postsSQLRepository: PostsPostgresRepository,
+    protected postsSQLRepository: PostsPostgresTypeOrmRepository,
   ) {}
-  @Get()
-  async getAllBlogs(@Query() query: QueryType) {
-    const filter = searchNameInBlog(query);
-    return this.blogsRepository.getAllBlogs(filter);
-  }
-  @Get(':id')
-  async getBlogById(@Param('id') id: string) {
-    const blog = await this.blogsSQLRepository.getBlogsById(id);
-    if (blog) {
-      return blog;
-    } else {
-      throw new NotFoundException();
-    }
-  }
-  //
-  // @UseGuards(SoftAuthGuard)
-  @Get(':id/posts')
-  async getPostsByBlogId(@Param('id') id: number, @Query() query: QueryType) {
+
+  @Get(':blogsId/posts')
+  async getPostsByBlogId(
+    @Param('blogsId') id: string,
+    @Query() query: QueryType,
+    @User() userModel: NewestPostLike,
+  ) {
     const filter = queryFilter(query);
     const result = await this.postsSQLRepository.getPostInBlogs(
       id,
       filter,
-      null,
+      userModel,
     );
     if (!result) {
       throw new NotFoundException();
     }
     return result;
   }
-  @UseGuards(BasicAuthGuard)
+  @Get()
+  async getAllBlogs(@Query() query: QueryType) {
+    const filter = searchNameInBlog(query);
+    return this.blogsSQLRepository.getAllBlogs(filter);
+  }
+  @Post()
+  async createNewBlog(
+    @Body() blogInputModel: BlogRequest,
+    @User() userModel: NewestPostLike,
+  ) {
+    const blog = {
+      name: blogInputModel.name,
+      description: blogInputModel.description,
+      websiteUrl: blogInputModel.websiteUrl,
+      userId: userModel.userId,
+    };
+    return this.blogsService.createNewBlogs(blog);
+  }
   @Post(':id/posts')
   @HttpCode(201)
   async createPostInBlogByBlogId(
@@ -72,6 +76,7 @@ export class BlogsSQLController {
   ) {
     const user = request.user;
     const findBlog = await this.blogsSQLRepository.getBlogsById(id);
+    console.log(findBlog, 'findBlog');
     if (!findBlog) throw new NotFoundException();
     const postBody = {
       title: blogsInputModel.title,
@@ -79,25 +84,15 @@ export class BlogsSQLController {
       content: blogsInputModel.content,
       blogId: id,
     };
+    console.log(postBody, 'postBody');
     const newPost = await this.postsService.createNewPosts(
       postBody,
-      id,
-      user ? user.userId : null,
+      user.userId,
     );
     if (!newPost) {
       throw new NotFoundException();
     }
     return newPost;
-  }
-  @UseGuards(BasicAuthGuard)
-  @Post()
-  async createNewBlog(@Body() blogInputModel: BlogRequest) {
-    const blog = {
-      name: blogInputModel.name,
-      description: blogInputModel.description,
-      websiteUrl: blogInputModel.websiteUrl,
-    };
-    return this.blogsService.createNewBlogs(blog);
   }
   @Put(':id')
   @HttpCode(204)
@@ -119,6 +114,7 @@ export class BlogsSQLController {
       return HttpCode(204);
     }
   }
+  // TODO: updatePostByPostIdInBlogByBlogId изменить под пост
   @Put(':blogId/posts/:postId')
   @HttpCode(204)
   async updatePostInBlogByBlogIdAndPostId(
@@ -135,7 +131,7 @@ export class BlogsSQLController {
       shortDescription: postUpdateModel.shortDescription,
       content: postUpdateModel.content,
     };
-    const result = await this.postsService.updatePostsById(post);
+    const result = await this.postsService.updatePostsByIdInBlog(post, blogId);
     if (!result) {
       throw new NotFoundException();
     } else {
@@ -152,6 +148,7 @@ export class BlogsSQLController {
     }
     return HttpCode(204);
   }
+  // TODO: deletePostByPostIdInBlogById изменить под пост
   @Delete(':blogId/posts/:postId')
   @HttpCode(204)
   async deletePostInBlogById(
@@ -163,6 +160,7 @@ export class BlogsSQLController {
       blogId,
       postId,
     );
+    console.log(deleted, 'deleted');
 
     if (!deleted) {
       throw new NotFoundException();

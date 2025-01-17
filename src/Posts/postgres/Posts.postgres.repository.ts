@@ -56,7 +56,7 @@ export class PostsPostgresRepository {
   }
 
   async getPostInBlogs(
-    blogId: number,
+    blogId: string,
     filter: PaginationQueryType,
     userId: NewestPostLike | null,
   ) {
