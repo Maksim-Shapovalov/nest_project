@@ -18,7 +18,7 @@ export class BloggerAffiliationMiddleware implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const userModel = request.user.userId;
-    const blogId = request.params.id;
+    const blogId = request.params.blogId;
     if (!blogId || !this.customUUIDValidation.validate(blogId))
       throw new BadRequestException();
 

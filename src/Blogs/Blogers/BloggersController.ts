@@ -34,13 +34,13 @@ export class BloggersController {
   ) {}
   @Get(':blogsId/posts')
   async getPostsByBlogId(
-    @Param('blogsId') id: string,
+    @Param('blogsId') blogId: string,
     @Query() query: QueryType,
     @User() userModel: NewestPostLike,
   ) {
     const filter = queryFilter(query);
     const result = await this.postsSQLRepository.getPostInBlogs(
-      id,
+      blogId,
       filter,
       userModel,
     );
@@ -67,21 +67,21 @@ export class BloggersController {
     };
     return this.blogsService.createNewBlogs(blog);
   }
-  @Post(':id/posts')
+  @Post(':blogId/posts')
   @HttpCode(201)
   async createPostInBlogByBlogId(
-    @Param('id') id: string,
+    @Param('blogId') blogId: string,
     @Body() blogsInputModel: BodyPostToRequest,
     @Req() request,
   ) {
     const user = request.user;
-    const findBlog = await this.blogsSQLRepository.getBlogsById(id);
+    const findBlog = await this.blogsSQLRepository.getBlogsById(blogId);
     if (!findBlog) throw new NotFoundException();
     const postBody = {
       title: blogsInputModel.title,
       shortDescription: blogsInputModel.shortDescription,
       content: blogsInputModel.content,
-      blogId: id,
+      blogId: blogId,
     };
     const newPost = await this.postsService.createNewPosts(
       postBody,
@@ -93,15 +93,15 @@ export class BloggersController {
     return newPost;
   }
   @UseGuards(BloggerAffiliationMiddleware)
-  @Put(':id')
+  @Put(':blogId')
   @HttpCode(204)
   async updateBlogByBlogId(
-    @Param('id') idBlogs: string,
+    @Param('blogId') blogId: string,
     @Body()
     blogUpdateModel: BlogRequest,
   ) {
     const blogs = {
-      id: idBlogs,
+      id: blogId,
       name: blogUpdateModel.name,
       description: blogUpdateModel.description,
       websiteUrl: blogUpdateModel.websiteUrl,
@@ -113,6 +113,7 @@ export class BloggersController {
       return HttpCode(204);
     }
   }
+  @UseGuards(BloggerAffiliationMiddleware)
   @Put(':blogId/posts/:postId')
   @HttpCode(204)
   async updatePostInBlogByBlogIdAndPostId(
@@ -136,6 +137,7 @@ export class BloggersController {
       return HttpCode(204);
     }
   }
+  @UseGuards(BloggerAffiliationMiddleware)
   @Delete(':id')
   @HttpCode(204)
   async deleteBlogById(@Param('id') id: string) {
