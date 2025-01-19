@@ -22,6 +22,7 @@ import { NewestPostLike } from '../../Users/Type/User.type';
 import { queryFilter, searchNameInBlog } from '../../qurey-repo/query-filter';
 import { BodyPostToRequest } from '../../Posts/Type/Posts.type';
 import { BlogRequest } from '../Type/Blogs.type';
+import { BloggerAffiliationMiddleware } from '../Middleware/BloggerAffiliation.Middleware';
 @UseGuards(BearerGuard)
 @Controller('blogger/blogs')
 export class BloggersController {
@@ -31,7 +32,6 @@ export class BloggersController {
     protected blogsSQLRepository: BlogsSQLTypeOrmRepository,
     protected postsSQLRepository: PostsPostgresTypeOrmRepository,
   ) {}
-
   @Get(':blogsId/posts')
   async getPostsByBlogId(
     @Param('blogsId') id: string,
@@ -76,7 +76,6 @@ export class BloggersController {
   ) {
     const user = request.user;
     const findBlog = await this.blogsSQLRepository.getBlogsById(id);
-    console.log(findBlog, 'findBlog');
     if (!findBlog) throw new NotFoundException();
     const postBody = {
       title: blogsInputModel.title,
@@ -84,7 +83,6 @@ export class BloggersController {
       content: blogsInputModel.content,
       blogId: id,
     };
-    console.log(postBody, 'postBody');
     const newPost = await this.postsService.createNewPosts(
       postBody,
       user.userId,
@@ -94,6 +92,7 @@ export class BloggersController {
     }
     return newPost;
   }
+  @UseGuards(BloggerAffiliationMiddleware)
   @Put(':id')
   @HttpCode(204)
   async updateBlogByBlogId(
@@ -114,7 +113,6 @@ export class BloggersController {
       return HttpCode(204);
     }
   }
-  // TODO: updatePostByPostIdInBlogByBlogId изменить под пост
   @Put(':blogId/posts/:postId')
   @HttpCode(204)
   async updatePostInBlogByBlogIdAndPostId(

@@ -20,7 +20,7 @@ export class BlogsEntity {
   @ManyToOne(() => UserEntity)
   @JoinColumn()
   user: UserEntity;
-  @Column({ default: null })
+  @Column()
   userId: string;
 
   static ViewModelBlogs(blog: BlogsEntity): BlogsOutputModel {

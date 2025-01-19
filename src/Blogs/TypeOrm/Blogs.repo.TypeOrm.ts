@@ -86,6 +86,13 @@ export class BlogsSQLTypeOrmRepository {
     if (!findCursor) return null;
     return BlogsEntity.ViewModelBlogs(findCursor);
   }
+  async getBlogForMiddleware(id: string): Promise<BlogsEntity | null> {
+    const findCursor = await this.blogsRepository.findOne({
+      where: { id: id },
+    });
+    if (!findCursor) return null;
+    return findCursor;
+  }
   async saveBlog(blog: BlogClass): Promise<BlogsOutputModel> {
     const ownerBlog = await this.userRepository.findOne({
       where: { id: blog.userId },
@@ -102,6 +109,7 @@ export class BlogsSQLTypeOrmRepository {
     const result = await this.blogsRepository.save(newBlogs);
     return BlogsEntity.ViewModelBlogs(result);
   }
+
   async updateBlogById(blogs: bodyForUpdateBlogs): Promise<boolean> {
     const findBlogQuery = await this.blogsRepository.find({
       where: { id: blogs.id },
