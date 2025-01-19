@@ -138,10 +138,10 @@ export class BloggersController {
     }
   }
   @UseGuards(BloggerAffiliationMiddleware)
-  @Delete(':id')
+  @Delete(':blogId')
   @HttpCode(204)
-  async deleteBlogById(@Param('id') id: string) {
-    const deleted = await this.blogsService.deleteBlogsById(id);
+  async deleteBlogById(@Param('blogId') blogId: string) {
+    const deleted = await this.blogsService.deleteBlogsById(blogId);
 
     if (!deleted) {
       throw new NotFoundException();
@@ -160,7 +160,6 @@ export class BloggersController {
       blogId,
       postId,
     );
-    console.log(deleted, 'deleted');
 
     if (!deleted) {
       throw new NotFoundException();
