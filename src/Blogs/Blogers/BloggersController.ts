@@ -149,6 +149,7 @@ export class BloggersController {
     return HttpCode(204);
   }
   // TODO: deletePostByPostIdInBlogById изменить под пост
+  @UseGuards(BloggerAffiliationMiddleware)
   @Delete(':blogId/posts/:postId')
   @HttpCode(204)
   async deletePostInBlogById(
