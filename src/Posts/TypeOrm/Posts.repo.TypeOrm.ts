@@ -153,10 +153,10 @@ export class PostsPostgresTypeOrmRepository {
     postBody: BodyUpdatingPost,
     blogId: string,
   ): Promise<boolean> {
-    const findPostQuery = await this.postsEntityRepo.find({
+    const findPostQuery = await this.postsEntityRepo.findOne({
       where: { id: postBody.postId, blogId: blogId },
     });
-    if (findPostQuery.length === 0) {
+    if (!findPostQuery) {
       return null;
     }
     await this.postsEntityRepo.update(postBody.postId, {

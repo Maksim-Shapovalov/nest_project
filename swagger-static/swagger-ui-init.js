@@ -119,6 +119,24 @@ window.onload = function() {
               "description": ""
             }
           }
+        },
+        "delete": {
+          "operationId": "BloggersController_deleteBlogById",
+          "parameters": [
+            {
+              "name": "blogId",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": ""
+            }
+          }
         }
       },
       "/blogger/blogs/{blogId}/posts/{postId}": {
@@ -171,26 +189,6 @@ window.onload = function() {
             },
             {
               "name": "postId",
-              "required": true,
-              "in": "path",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": ""
-            }
-          }
-        }
-      },
-      "/blogger/blogs/{id}": {
-        "delete": {
-          "operationId": "BloggersController_deleteBlogById",
-          "parameters": [
-            {
-              "name": "id",
               "required": true,
               "in": "path",
               "schema": {
