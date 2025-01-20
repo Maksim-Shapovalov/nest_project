@@ -67,6 +67,7 @@ export class BloggersController {
     };
     return this.blogsService.createNewBlogs(blog);
   }
+  @UseGuards(BloggerAffiliationMiddleware)
   @Post(':blogId/posts')
   @HttpCode(201)
   async createPostInBlogByBlogId(
