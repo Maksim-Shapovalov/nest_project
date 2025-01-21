@@ -81,6 +81,8 @@ export class BlogsSQLTypeOrmRepository {
         items: items,
       };
     } else {
+      const totalCount = parseInt(res.length.toString());
+      const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
       const items = res.map((b) => BlogsEntity.ViewModelBlogs(b));
       return {
         pagesCount: pageCountBlogs,
