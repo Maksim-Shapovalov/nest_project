@@ -50,9 +50,12 @@ export class BloggersController {
     return result;
   }
   @Get()
-  async getAllBlogs(@Query() query: QueryType) {
+  async getAllBlogs(
+    @Query() query: QueryType,
+    @User() userModel: NewestPostLike,
+  ) {
     const filter = searchNameInBlog(query);
-    return this.blogsSQLRepository.getAllBlogs(filter);
+    return this.blogsSQLRepository.getAllBlogs(filter, userModel);
   }
   @Post()
   async createNewBlog(

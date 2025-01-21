@@ -14,6 +14,7 @@ import { Injectable } from '@nestjs/common';
 import { BlogsEntity } from '../Type/Blogs.entity';
 import { PostsEntity } from '../../Posts/Type/Posts.entity';
 import { UserEntity } from '../../Users/Type/User.entity';
+import { NewestPostLike } from '../../Users/Type/User.type';
 
 @Injectable()
 export class BlogsSQLTypeOrmRepository {
@@ -27,6 +28,7 @@ export class BlogsSQLTypeOrmRepository {
   ) {}
   async getAllBlogs(
     filter: BlogsPaginationQueryType,
+    userModel?: NewestPostLike,
     path?: string,
   ): Promise<PaginationType<BlogsOutputModel | BlogsOutputClassWithSA>> {
     const filterQuery = filter.searchNameTerm;
@@ -48,6 +50,9 @@ export class BlogsSQLTypeOrmRepository {
       .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
         filterQuery: `%${filterQuery}%`,
       })
+      .andWhere('blog.userId LIKE :userModel.userId', {
+        userId: userModel ? userModel.userId : null,
+      })
       .orderBy(
         `blog.${filter.sortBy}`,
         filter.sortDirection.toUpperCase() as 'ASC' | 'DESC',
@@ -56,7 +61,6 @@ export class BlogsSQLTypeOrmRepository {
       .skip(pageBlog)
       .getMany();
     if (path) {
-      console.log(res, 'res');
       const items = res.map((b) => {
         return BlogsEntity.ViewModelBlogsBySuperAdmin(b);
       });
