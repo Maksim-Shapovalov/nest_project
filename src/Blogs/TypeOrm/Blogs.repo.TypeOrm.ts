@@ -34,14 +34,12 @@ export class BlogsSQLTypeOrmRepository {
     const filterQuery = filter.searchNameTerm;
 
     const pageSizeInQuery: number = filter.pageSize;
-    const totalCountBlogs = await this.blogsRepository
-      .createQueryBuilder('blog')
-      .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
-        filterQuery: `%${filterQuery}%`,
-      })
-      .getCount();
-    const totalCount = parseInt(totalCountBlogs.toString());
-    const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
+    // const totalCountBlogs = await this.blogsRepository
+    //   .createQueryBuilder('blog')
+    //   .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
+    //     filterQuery: `%${filterQuery}%`,
+    //   })
+    //   .getCount();
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
 
     const res = await this.blogsRepository
@@ -60,6 +58,8 @@ export class BlogsSQLTypeOrmRepository {
       .take(pageSizeInQuery)
       .skip(pageBlog)
       .getMany();
+    const totalCount = parseInt(res.toString());
+    const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
     if (path) {
       const items = res.map((b) => {
         return BlogsEntity.ViewModelBlogsBySuperAdmin(b);
