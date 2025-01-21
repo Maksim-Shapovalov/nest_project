@@ -34,23 +34,21 @@ export class BlogsSQLTypeOrmRepository {
     const filterQuery = filter.searchNameTerm;
 
     const pageSizeInQuery: number = filter.pageSize;
-    // const totalCountBlogs = await this.blogsRepository
-    //   .createQueryBuilder('blog')
-    //   .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
-    //     filterQuery: `%${filterQuery}%`,
-    //   })
-    //   .getCount();
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
-
-    const res = await this.blogsRepository
+    const queryBuilder = this.blogsRepository
       .createQueryBuilder('blog')
       .leftJoinAndSelect('blog.user', 'user')
       .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
         filterQuery: `%${filterQuery}%`,
-      })
-      .andWhere('blog.userId = :userId', {
-        userId: userModel ? userModel.userId : null,
-      })
+      });
+
+    if (userModel && userModel.userId) {
+      queryBuilder.andWhere('blog.userId = :userId', {
+        userId: userModel.userId,
+      });
+    }
+
+    const res = await queryBuilder
       .orderBy(
         `blog.${filter.sortBy}`,
         filter.sortDirection.toUpperCase() as 'ASC' | 'DESC',
@@ -58,7 +56,24 @@ export class BlogsSQLTypeOrmRepository {
       .take(pageSizeInQuery)
       .skip(pageBlog)
       .getMany();
-    const totalCount = parseInt(res.toString());
+    // const res = await this.blogsRepository
+    //   .createQueryBuilder('blog')
+    //   .leftJoinAndSelect('blog.user', 'user')
+    //   .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
+    //     filterQuery: `%${filterQuery}%`,
+    //   })
+    //   .andWhere('blog.userId = :userId', {
+    //     userId: userModel ? userModel.userId : null,
+    //   })
+    //   .orderBy(
+    //     `blog.${filter.sortBy}`,
+    //     filter.sortDirection.toUpperCase() as 'ASC' | 'DESC',
+    //   )
+    //   .take(pageSizeInQuery)
+    //   .skip(pageBlog)
+    //   .getMany();
+    const totalCount = parseInt(res.length.toString());
+    console.log(res, 'res');
     const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
     if (path) {
       const items = res.map((b) => {
