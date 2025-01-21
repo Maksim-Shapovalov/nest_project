@@ -50,7 +50,7 @@ export class BlogsSQLTypeOrmRepository {
       .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
         filterQuery: `%${filterQuery}%`,
       })
-      .andWhere('blog.userId LIKE :userModel.userId', {
+      .andWhere('blog.userId = :userId', {
         userId: userModel ? userModel.userId : null,
       })
       .orderBy(
