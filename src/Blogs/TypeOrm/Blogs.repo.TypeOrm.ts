@@ -81,7 +81,16 @@ export class BlogsSQLTypeOrmRepository {
         items: items,
       };
     } else {
-      const totalCount = parseInt(res.length.toString());
+      const totalBlogs = await this.blogsRepository
+        .createQueryBuilder('blog')
+        .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
+          filterQuery: `%${filterQuery}%`,
+        })
+        .andWhere('blog.userId = :userId', {
+          userId: userModel.userId,
+        })
+        .getMany();
+      const totalCount = parseInt(totalBlogs.length.toString());
       const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
       const items = res.map((b) => BlogsEntity.ViewModelBlogs(b));
       return {
