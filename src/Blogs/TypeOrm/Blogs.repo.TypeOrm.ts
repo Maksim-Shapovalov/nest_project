@@ -35,7 +35,12 @@ export class BlogsSQLTypeOrmRepository {
 
     const pageSizeInQuery: number = filter.pageSize;
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
-    const totalBlogs = await this.blogsRepository.find();
+    const totalBlogs = await this.blogsRepository
+      .createQueryBuilder('blog')
+      .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
+        filterQuery: `%${filterQuery}%`,
+      })
+      .getMany();
 
     const queryBuilder123 = this.blogsRepository
       .createQueryBuilder('blog')
@@ -43,7 +48,6 @@ export class BlogsSQLTypeOrmRepository {
       .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
         filterQuery: `%${filterQuery}%`,
       });
-    console.log(userModel, 'userModel');
 
     if (userModel && userModel.userId) {
       queryBuilder123.andWhere('blog.userId = :userId', {
