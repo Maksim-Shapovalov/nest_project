@@ -28,27 +28,32 @@ export class BlogsSQLTypeOrmRepository {
   ) {}
   async getAllBlogs(
     filter: BlogsPaginationQueryType,
-    userModel?: NewestPostLike,
+    userModel?: NewestPostLike | null,
     path?: string,
   ): Promise<PaginationType<BlogsOutputModel | BlogsOutputClassWithSA>> {
     const filterQuery = filter.searchNameTerm;
 
     const pageSizeInQuery: number = filter.pageSize;
     const pageBlog: number = (filter.pageNumber - 1) * pageSizeInQuery;
-    const queryBuilder = this.blogsRepository
+    const totalBlogs = await this.blogsRepository.find();
+
+    const queryBuilder123 = this.blogsRepository
       .createQueryBuilder('blog')
       .leftJoinAndSelect('blog.user', 'user')
       .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
         filterQuery: `%${filterQuery}%`,
       });
+    console.log(userModel, 'userModel');
 
     if (userModel && userModel.userId) {
-      queryBuilder.andWhere('blog.userId = :userId', {
+      queryBuilder123.andWhere('blog.userId = :userId', {
         userId: userModel.userId,
       });
+    } else {
+      queryBuilder123.andWhere('1=1');
     }
 
-    const res = await queryBuilder
+    const res = await queryBuilder123
       .orderBy(
         `blog.${filter.sortBy}`,
         filter.sortDirection.toUpperCase() as 'ASC' | 'DESC',
@@ -56,25 +61,10 @@ export class BlogsSQLTypeOrmRepository {
       .take(pageSizeInQuery)
       .skip(pageBlog)
       .getMany();
-    // const res = await this.blogsRepository
-    //   .createQueryBuilder('blog')
-    //   .leftJoinAndSelect('blog.user', 'user')
-    //   .where('LOWER(blog.name) LIKE LOWER(:filterQuery)', {
-    //     filterQuery: `%${filterQuery}%`,
-    //   })
-    //   .andWhere('blog.userId = :userId', {
-    //     userId: userModel ? userModel.userId : null,
-    //   })
-    //   .orderBy(
-    //     `blog.${filter.sortBy}`,
-    //     filter.sortDirection.toUpperCase() as 'ASC' | 'DESC',
-    //   )
-    //   .take(pageSizeInQuery)
-    //   .skip(pageBlog)
-    //   .getMany();
-    const totalCount = parseInt(res.length.toString());
-    console.log(res, 'res');
+
+    const totalCount = parseInt(totalBlogs.length.toString());
     const pageCountBlogs: number = Math.ceil(totalCount / pageSizeInQuery);
+
     if (path) {
       const items = res.map((b) => {
         return BlogsEntity.ViewModelBlogsBySuperAdmin(b);

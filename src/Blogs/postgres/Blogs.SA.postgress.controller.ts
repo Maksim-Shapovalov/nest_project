@@ -31,6 +31,7 @@ export class BlogsSQLController {
     const filter = searchNameInBlog(query);
     const takeBlogs = await this.blogsSQLRepository.getAllBlogs(
       filter,
+      null,
       req.path,
     );
     return takeBlogs;
