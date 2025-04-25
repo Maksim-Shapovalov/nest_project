@@ -13,7 +13,9 @@ export class EmailConfirmationEntity {
   id: string;
   @Column()
   userId: string;
-  @OneToOne(() => UserEntity, (user) => user.emailConfirmation)
+  @OneToOne(() => UserEntity, (user) => user.emailConfirmation, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
   @Column()
