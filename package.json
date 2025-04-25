@@ -62,7 +62,8 @@
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "typeorm": "^0.3.20",
-    "uuidv4": "^6.2.13"
+    "uuidv4": "^6.2.13",
+    "vercel": "^41.6.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

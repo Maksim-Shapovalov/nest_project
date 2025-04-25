@@ -3,14 +3,7 @@
   "builds": [
     {
       "src": "src/main.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "dist/**/*.js",
-          "src/**/*.ts",
-          "src/swagger-static/**/*"
-        ]
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
