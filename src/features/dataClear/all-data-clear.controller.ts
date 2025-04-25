@@ -2,14 +2,14 @@ import { Controller, Delete, HttpCode } from '@nestjs/common';
 
 import { AllDataClearRepo } from './AllDataClearRepo';
 
-@Controller('testing/all-data')
+@Controller('testing')
 export class AllDataClearController {
   constructor(protected allDataClearRepo: AllDataClearRepo) {}
-  @Delete()
+  @Delete('all-data')
   @HttpCode(204)
   async allDataClear() {
+    console.log('Clearing data...');
     await this.allDataClearRepo.dataClear();
-    return HttpCode(204);
   }
 }
 
