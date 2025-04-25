@@ -4,7 +4,7 @@ import { AppModule, HTTP_STATUS } from '../src/app.module';
 import { appSettings } from '../src/app.settings';
 import request from 'supertest';
 import mongoose from 'mongoose';
-import { BlogsOutputModel } from '../src/Blogs/Type/Blogs.type';
+import { BlogsOutputModel } from '../src/features/blogs/domain/Blogs.type';
 let blogInDb: BlogsOutputModel;
 describe('Blogs e2e', () => {
   let app: INestApplication;

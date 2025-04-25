@@ -1,87 +1,78 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UserController } from './Users/User.controller';
-import { MongooseModule } from '@nestjs/mongoose';
+import { UserController } from './features/users/api/User.controller';
+
 import * as process from 'process';
 
-import { BlogsController } from './Blogs/Blogs.controller';
-import { BlogsService } from './Blogs/Blogs.service';
-import { CommentsController } from './Comment/Comment.controller';
-import { CommentsService } from './Comment/Comments.service';
-
-import { User, UserSchema } from './Users/Type/User.schemas';
-import { PostsController } from './Posts/Posts.controller';
-import { PostsRepository } from './Posts/PostsRepository';
-import { PostsService } from './Posts/Posts.service';
-import { Blog, BlogSchema } from './Blogs/Type/Blogs.schemas';
-import {
-  Comment,
-  CommentsLike,
-  CommentsLikeSchema,
-  CommentsSchema,
-} from './Comment/Type/Comments.schemas';
-import {
-  Post,
-  PostLike,
-  PostLikeSchema,
-  PostsSchema,
-} from './Posts/Type/Posts.schemas';
-
-import { AllDataClearController } from './DataClear/all-data-clear.controller';
-import { AllDataClearRepo } from './DataClear/AllDataClearRepo';
-import { ConfigModule } from '@nestjs/config';
+import { BlogsController } from './features/blogs/api/Blogs.controller';
+import { BlogsService } from './features/blogs/aplication/Blogs.service';
+import { CommentsController } from './features/comment/api/Comment.controller';
+import { CommentsService } from './features/comment/aplication/Comments.service';
+import { PostsController } from './features/post/api/Posts.controller';
+import { PostsService } from './features/post/aplication/Posts.service';
+import { AllDataClearController } from './features/dataClear/all-data-clear.controller';
+import { AllDataClearRepo } from './features/dataClear/AllDataClearRepo';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { DeviceController } from './Device/SecurityDevice.controller';
-import { Device, DeviceSchema } from './Device/Type/DataId.schemas';
-import { AuthModule } from './auth/auth.module';
-import { RefreshToken, TokenRefreshSchema } from './Token/Token.schema';
-import { RefreshTokenRepo } from './Token/refreshToken-repo';
-import { EmailManager } from './Email/email-manager';
-import { EmailAdapter } from './Email/email-adapter';
-import { CustomBlogIdValidation } from './Posts/validation/BlogExists.decorator';
+import { DeviceController } from './features/device/api/SecurityDevice.controller';
+import { AuthModule } from './features/auth/auth.module';
+import { EmailManager } from './features/email/email-manager';
+import { EmailAdapter } from './features/email/email-adapter';
+import { CustomBlogIdValidation } from './core/decorators/BlogExists.decorator';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { UserSQLRepository } from './Users/postgres/User.SqlRepositories';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BlogsSQLController } from './Blogs/postgres/Blogs.SA.postgress.controller';
-import { PostsPostgresRepository } from './Posts/postgres/Posts.postgres.repository';
-import { CommentSqlRepository } from './Comment/postgress/Comments.postgress.repository';
-import { UserEntity } from './Users/Type/User.entity';
-import { PostsEntity, PostsLikeEntity } from './Posts/Type/Posts.entity';
-import { BlogsEntity } from './Blogs/Type/Blogs.entity';
+import { BlogsSQLController } from './features/blogs/api/Blogs.SA.postgress.controller';
+import { UserEntity } from './features/users/domain/User.entity';
+import {
+  PostsEntity,
+  PostsLikeEntity,
+} from './features/post/domain/Posts.entity';
+import { BlogsEntity } from './features/blogs/domain/Blogs.entity';
 import {
   CommentEntity,
   CommentLikeEntity,
-} from './Comment/Type/Comment.entity';
-import { DeviceEntity } from './Device/Type/Device.entity';
-import { UserSQLTypeOrmRepository } from './Users/TypeORM/User.repo.TypeORm';
-import { BlogsSQLTypeOrmRepository } from './Blogs/TypeOrm/Blogs.repo.TypeOrm';
-import { PostsPostgresTypeOrmRepository } from './Posts/TypeOrm/Posts.repo.TypeOrm';
-import { CommentSqlTypeOrmRepository } from './Comment/TypeOrm/Comments.repo.TypeOrm';
-import { SecurityDevicesSQLTypeOrmRepository } from './Device/TypeOrm/Device.repo.TypeOrm';
+} from './features/comment/domain/Comment.entity';
+import { DeviceEntity } from './features/device/domain/Device.entity';
+import { UserSQLTypeOrmRepository } from './features/users/infrastrucrue/User.repo.TypeORm';
+import { BlogsSQLTypeOrmRepository } from './features/blogs/infrastructure/Blogs.repo.TypeOrm';
+import { PostsPostgresTypeOrmRepository } from './features/post/infrastrucrue/Posts.repo.TypeOrm';
+import { CommentSqlTypeOrmRepository } from './features/comment/infrastructure/Comments.repo.TypeOrm';
+import { SecurityDevicesSQLTypeOrmRepository } from './features/device/infrastructure/Device.repo.TypeOrm';
+
+import { QuizGameTypeOrmRepo } from './features/quizGame/infrastrucrue/QuizGame.TypeOrmRepo';
+import { QuizGameService } from './features/quizGame/aplication/QuizGame.service';
+import { QuizGameController } from './features/quizGame/api/QuizGame.controller';
+import { QuizGameControllerSuperAdmin } from './features/quizGame/api/quizGameSuperAdmin.Controller';
+import { QuizGameSuperAdminService } from './features/quizGame/aplication/quizGameSuperAdmin.Service';
+
+import { QuizGameSuperAdminRepositoryTypeORM } from './features/quizGame/infrastrucrue/quizGameSuperAdmin.Repository.TypeORM';
+import { CustomUUIDValidation } from './core/decorators/validator.validateUUID';
+import { GetTopPlayersUseCase } from './features/quizGame/aplication/useCase/quizGame/GetTopPlayersUseCase';
+import { GetHistoryGameByPlayerUseCase } from './features/quizGame/aplication/useCase/quizGame/GetHistoryGameByPlayerUseCase';
+import { GetUnfinishedCurrentGameUseCase } from './features/quizGame/aplication/useCase/quizGame/GetUnfinishedCurrentGameUseCase';
+import { FindActivePairUseCase } from './features/quizGame/aplication/useCase/quizGame/FindActivePairUseCase';
+import { SendAnswerUseCase } from './features/quizGame/aplication/useCase/quizGame/SendAnswerUseCase';
+import { CqrsModule } from '@nestjs/cqrs';
+import { ScheduleModule } from '@nestjs/schedule';
+import { Gives10SecondToEndsGameCase } from './features/quizGame/aplication/useCase/quizGame/CronGive10SecondToEndsGame';
+import { BloggersController } from './features/blogs/api/BloggersController';
+import { UpdatePostsByIdInBlogCase } from './features/blogs/api/useCaseByBlogger/UpdateBlogById';
+import { DeleteBlogByIdCase } from './features/blogs/api/useCaseByBlogger/DeleteBlogsById';
+import { DeletePostInBlogByIdCase } from './features/blogs/api/useCaseByBlogger/DeletePostInBlogById';
+import { CreateNewBlogsCase } from './features/blogs/api/useCaseByBlogger/СreateNewBlogs';
 import {
   AnswersEntity,
   QuizGameEntityNotPlayerInfo,
-} from './quiz/entity/QuizGame.entity';
-import { QuizGameTypeOrmRepo } from './quiz/quizeGame/QuizGame.TypeOrmRepo';
-import { QuizGameService } from './quiz/quizeGame/QuizGame.service';
-import { QuizGameController } from './quiz/quizeGame/QuizGame.controller';
-import { QuizGameControllerSuperAdmin } from './quiz/SA.directory/quizGameSuperAdmin.Controller';
-import { QuizGameSuperAdminService } from './quiz/SA.directory/quizGameSuperAdmin.Service';
-import { QuestionsEntity } from './quiz/entity/Questions.Entity';
-import { PlayersEntity } from './quiz/entity/Players.Entity';
-import { QuizGameSuperAdminRepositoryTypeORM } from './quiz/SA.directory/quizGameSuperAdmin.Repository.TypeORM';
-import { CustomUUIDValidation } from './Other/validator.validateUUID';
-import { GetTopPlayersUseCase } from './quiz/quizeGame/useCase/GetTopPlayersUseCase';
-import { GetHistoryGameByPlayerUseCase } from './quiz/quizeGame/useCase/GetHistoryGameByPlayerUseCase';
-import { GetUnfinishedCurrentGameUseCase } from './quiz/quizeGame/useCase/GetUnfinishedCurrentGameUseCase';
-import { FindActivePairUseCase } from './quiz/quizeGame/useCase/FindActivePairUseCase';
-import { SendAnswerUseCase } from './quiz/quizeGame/useCase/SendAnswerUseCase';
-import { CqrsModule } from '@nestjs/cqrs';
-import { ScheduleModule } from '@nestjs/schedule';
-import { Gives10SecondToEndsGameCase } from './quiz/quizeGame/useCase/CronGive10SecondToEndsGame';
-import { BloggersController } from './Blogs/Blogers/BloggersController';
+} from './features/quizGame/domain/QuizGame.entity';
+import { QuestionsEntity } from './features/quizGame/domain/Questions.Entity';
+import { PlayersEntity } from './features/quizGame/domain/Players.Entity';
+import { EmailConfirmationEntity } from './features/users/domain/Email.confirmation.entity';
+import { UserService } from './features/users/aplication/User.service';
+import { CryptoService } from './core/service/crypto/crypro.service';
+import { BanUserAndDeleteDeviceCase } from './features/users/aplication/UseCase/BanOrUnbanUserAndDeleteDevices';
+import { CreateUserCase } from './features/users/aplication/UseCase/CreateUser.use-case';
+import { DeleteUserCase } from './features/users/aplication/UseCase/DeleteUser.use-case';
+import { GetUserByIdCase } from './features/users/aplication/UseCase/GetUserById.use-case';
+import { ConfigModule } from './core/config/config.module';
 
 export const HTTP_STATUS = {
   OK_200: 200,
@@ -93,34 +84,64 @@ export const HTTP_STATUS = {
   NOT_FOUND_404: 404,
   TOO_MANY_REQUESTS_429: 429,
 };
-const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE2 } = process.env;
+const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE_LIVE_CODING } = process.env;
 const repository = [
   CommentSqlTypeOrmRepository,
-  CommentSqlRepository,
-  PostsRepository,
   AllDataClearRepo,
-  RefreshTokenRepo,
-  UserSQLRepository,
   SecurityDevicesSQLTypeOrmRepository,
   QuizGameSuperAdminRepositoryTypeORM,
   QuizGameTypeOrmRepo,
   UserSQLTypeOrmRepository,
   PostsPostgresTypeOrmRepository,
-  PostsPostgresRepository,
   BlogsSQLTypeOrmRepository,
 ];
+const entity = [
+  EmailConfirmationEntity,
+  UserEntity,
+  PostsEntity,
+  BlogsEntity,
+  CommentEntity,
+  DeviceEntity,
+  PostsLikeEntity,
+  CommentLikeEntity,
+  QuizGameEntityNotPlayerInfo,
+  AnswersEntity,
+  QuestionsEntity,
+  PlayersEntity,
+];
+const controllers = [
+  BloggersController,
+  PostsController,
+  UserController,
+  BlogsController,
+  CommentsController,
+  AllDataClearController,
+  DeviceController,
+  BlogsSQLController,
+  QuizGameController,
+  QuizGameControllerSuperAdmin,
+];
 const useCases = [
+  DeleteUserCase,
+  GetUserByIdCase,
+  BanUserAndDeleteDeviceCase,
+  CreateUserCase,
   GetTopPlayersUseCase,
   GetHistoryGameByPlayerUseCase,
   GetUnfinishedCurrentGameUseCase,
   FindActivePairUseCase,
   SendAnswerUseCase,
   Gives10SecondToEndsGameCase,
+  UpdatePostsByIdInBlogCase,
+  DeletePostInBlogByIdCase,
+  CreateNewBlogsCase,
+  DeleteBlogByIdCase,
 ];
 const service = [
+  CryptoService,
+  UserService,
   BlogsService,
   PostsService,
-  AppService,
   QuizGameService,
   QuizGameSuperAdminService,
   CommentsService,
@@ -128,32 +149,21 @@ const service = [
 
 @Module({
   imports: [
+    // ConfigModule.forRoot(),
+    ConfigModule,
     AuthModule,
-    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: PGHOST,
       port: 5432,
       username: PGUSER,
       password: PGPASSWORD,
-      database: PGDATABASE2,
+      database: PGDATABASE_LIVE_CODING,
       autoLoadEntities: true,
       synchronize: true,
       ssl: true,
     }),
-    TypeOrmModule.forFeature([
-      UserEntity,
-      PostsEntity,
-      BlogsEntity,
-      CommentEntity,
-      DeviceEntity,
-      PostsLikeEntity,
-      CommentLikeEntity,
-      QuizGameEntityNotPlayerInfo,
-      AnswersEntity,
-      QuestionsEntity,
-      PlayersEntity,
-    ]),
+    TypeOrmModule.forFeature([...entity]),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
@@ -162,38 +172,12 @@ const service = [
       },
     ]),
     CqrsModule,
-    MongooseModule.forRoot(
-      process.env.MONGO_URL || 'mongodb://localhost:27017',
-    ),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'swagger-static'),
       serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/swagger',
     }),
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-      { name: Blog.name, schema: BlogSchema },
-      { name: Comment.name, schema: CommentsSchema },
-      { name: Post.name, schema: PostsSchema },
-      { name: PostLike.name, schema: PostLikeSchema },
-      { name: CommentsLike.name, schema: CommentsLikeSchema },
-      { name: Device.name, schema: DeviceSchema },
-      // { name: Token.name, schema: TokenSchema },
-      { name: RefreshToken.name, schema: TokenRefreshSchema },
-    ]),
   ],
-  controllers: [
-    BloggersController,
-    PostsController,
-    AppController,
-    UserController,
-    BlogsController,
-    CommentsController,
-    AllDataClearController,
-    DeviceController,
-    BlogsSQLController,
-    QuizGameController,
-    QuizGameControllerSuperAdmin,
-  ],
+  controllers: [...controllers],
   providers: [
     EmailManager,
     EmailAdapter,

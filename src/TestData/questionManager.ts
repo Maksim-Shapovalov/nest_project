@@ -3,8 +3,8 @@ import { setting } from '../setting';
 import request from 'supertest';
 import { RouterPath } from './RouterPath';
 import { HTTP_STATUS } from '../app.module';
-import { requestBodyQuestionToCreate } from '../quiz/type/question.type';
-import { AnswerInput } from '../quiz/type/QuizGame.type';
+import { requestBodyQuestionToCreate } from '../features/quizGame/domain/type/question.type';
+import { AnswerInput } from '../features/quizGame/domain/type/QuizGame.type';
 
 export const questionTestManager = (app: INestApplication) => ({
   async createQuestions(body: requestBodyQuestionToCreate) {

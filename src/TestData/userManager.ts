@@ -2,11 +2,13 @@ import request from 'supertest';
 import { RouterPath } from './RouterPath';
 import { INestApplication } from '@nestjs/common';
 import { setting } from '../setting';
-import { BodyUserToLogin, UserBasicRequestBody } from '../Users/Type/User.type';
+import { BodyUserToLogin } from '../features/users/domain/User.type';
 import { HTTP_STATUS } from '../app.module';
+import { BanUserDto } from '../features/users/api/dto/update-ban.user.dto';
+import { CreateUserDto } from '../features/users/api/dto/create.user.dto';
 
 export const usersTestManager = (app: INestApplication) => ({
-  async createUser(body: UserBasicRequestBody) {
+  async createUser(body: BanUserDto) {
     const login = setting.Username;
     const password = setting.Password;
     return request(app.getHttpServer())
@@ -21,7 +23,7 @@ export const usersTestManager = (app: INestApplication) => ({
       .send(body)
       .expect(HTTP_STATUS.OK_200);
   },
-  async createUserAndLogin(bodyToCreate: UserBasicRequestBody) {
+  async createUserAndLogin(bodyToCreate: CreateUserDto) {
     const login = setting.Username;
     const password = setting.Password;
     const responseToCreate = await request(app.getHttpServer())

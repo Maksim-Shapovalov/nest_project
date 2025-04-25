@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { appSettings } from '../src/app.settings';
 import request from 'supertest';
 import mongoose from 'mongoose';
-import { UserOutputModel } from '../src/Users/Type/User.type';
+import { UserOutputModel } from '../src/features/users/domain/User.type';
 let userInDB: UserOutputModel;
 describe('Users e2e', () => {
   let app: INestApplication;
