@@ -201,10 +201,10 @@ export class UserSQLTypeOrmRepository {
     newUser.email = user.getEmail();
     newUser.createdAt = user.getCreatedAt();
     newUser.recoveryCode = user.getRecoveryCode();
+    newUser.emailConfirmation = new EmailConfirmationEntity();
     newUser.emailConfirmation.confirmationCode = user.getConfirmationCode();
     newUser.emailConfirmation.expirationDate = user.getExpirationDate();
     newUser.emailConfirmation.isConfirmed = user.getIsConfirmed();
-    console.log(newUser, '---------newUser');
     const saveUser = await this.userEntityRepo.save(newUser);
     // const emailConfirmation = new EmailConfirmationEntity();
     // emailConfirmation.confirmationCode = user.getConfirmationCode();
@@ -212,7 +212,6 @@ export class UserSQLTypeOrmRepository {
     // emailConfirmation.isConfirmed = user.getIsConfirmed();
     // emailConfirmation.userId = saveUser.id;
     // await this.userEntityRepo.manager.save(emailConfirmation);
-    console.log(saveUser, '-----------saveUser');
     return saveUser;
   }
 
